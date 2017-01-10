@@ -2,7 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.ui;
 
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
-import ru.mydesignstudio.protege.plugin.search.ui.component.SearchParamsViewComponent;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.SearchParamsViewComponent;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 import java.awt.BorderLayout;

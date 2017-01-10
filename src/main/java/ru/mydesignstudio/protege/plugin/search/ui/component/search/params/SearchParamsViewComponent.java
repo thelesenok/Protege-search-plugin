@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.ui.component;
+package ru.mydesignstudio.protege.plugin.search.ui.component.search.params;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;

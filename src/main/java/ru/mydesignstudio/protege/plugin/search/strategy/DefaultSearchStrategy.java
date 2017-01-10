@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy;
 
 import ru.mydesignstudio.protege.plugin.search.api.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.ui.component.DefaultSearchStrategyParamsComponent;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.DefaultSearchStrategyParamsComponent;
 
 import javax.inject.Inject;
 import java.awt.Component;

@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.ui.model.table;
+package ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.model;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;

@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.ui.component;
+package ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDatatype;
@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by abarmin on 05.01.17.
  */
 public class LogicalOperationHelper {
-    public Collection<LogicalOperation> getAvailableOperations(Collection<OWLPropertyRange> propertyRanges) {
+    public static final Collection<LogicalOperation> getAvailableOperations(Collection<OWLPropertyRange> propertyRanges) {
         final Collection<LogicalOperation> operations = new ArrayList<>();
         for (OWLPropertyRange propertyRange : propertyRanges) {
             if (propertyRange instanceof OWLClassExpression) {
@@ -32,7 +32,7 @@ public class LogicalOperationHelper {
         return operations;
     }
 
-    public boolean hasClassExpression(Collection<OWLPropertyRange> propertyRanges) {
+    public static final boolean hasClassExpression(Collection<OWLPropertyRange> propertyRanges) {
         return CollectionUtils.every(propertyRanges, new Specification<OWLPropertyRange>() {
             @Override
             public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {

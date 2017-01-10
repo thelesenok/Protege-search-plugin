@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.ui.component;
+package ru.mydesignstudio.protege.plugin.search.ui.component.search.results;
 
 import com.google.common.eventbus.Subscribe;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
