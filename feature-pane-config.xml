@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <VSNode splits="1.0">
+        <HSNode splits="0.5">
+            <VSNode splits="0.25 0.25">
+                <CNode>
+                    <Component label="Search params">
+                        <Property id="pluginId" value="search-plugin.SearchParamsView"/>
+                    </Component>
+                </CNode>
+                <CNode>
+                    <Component label="Search results">
+                        <Property id="pluginId" value="search-plugin.SearchResultsView"/>
+                    </Component>
+                </CNode>
+            </VSNode>
+        </HSNode>
+    </VSNode>
+</layout>

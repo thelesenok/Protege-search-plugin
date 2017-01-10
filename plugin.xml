@@ -2,22 +2,28 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-      <!-- Change me!  Remove this and the corresponding java class when you start adding real plugin content of your own. -->
-       <extension id="example.menu"
-               point="org.protege.editor.core.application.EditorKitMenuAction">
-        <name value="Example..."/>
-        <class value="template.TemplateMenu"/>
-        <toolTip value="A menu plugin to bootstrap the new plugin process"/>
-        <path value="org.protege.editor.owl.menu.tools/SlotZ-Z"/>
+    <extension id="WorkspaceTab"
+               point="org.protege.editor.core.application.WorkspaceTab">
+        <label value="Search tab"/>
+        <class value="ru.mydesignstudio.protege.plugin.search.ui.SearchFeaturePane"/>
+        <index value="X"/>
         <editorKitId value="OWLEditorKit"/>
+        <defaultViewConfigFileName value="feature-pane-config.xml"/>
     </extension>
 
-      <!-- Change me!  Remove this and the corresponding java class when you start adding real plugin content of your own. -->
-    <extension id="example.view"
+    <extension id="SearchParamsView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Example"/>
-        <class value="template.TemplateView"/>
+        <label value="Search params"/>
+        <class value="ru.mydesignstudio.protege.plugin.search.ui.SearchParamsView"/>
        	<headerColor value="@org.protege.ontologycolor"/>
+        <category value="@org.protege.ontologycategory"/>
+    </extension>
+
+    <extension id="SearchResultsView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Search results"/>
+        <class value="ru.mydesignstudio.protege.plugin.search.ui.SearchResultsView"/>
+        <headerColor value="@org.protege.ontologycolor"/>
         <category value="@org.protege.ontologycategory"/>
     </extension>
 </plugin>
