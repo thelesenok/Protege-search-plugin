@@ -2,6 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.service;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
@@ -12,8 +13,8 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.query.SparqlQueryConverter;
@@ -22,7 +23,9 @@ import ru.mydesignstudio.protege.plugin.search.service.sparql.reasoner.SparqlInf
 import ru.mydesignstudio.protege.plugin.search.service.sparql.reasoner.SparqlReasoner;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.reasoner.SparqlReasonerException;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.reasoner.SparqlResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,9 +88,18 @@ public class OWLServiceImpl implements OWLService {
 
     @Override
     public Collection<OWLNamedIndividual> getIndividuals(OWLClass owlClass) {
-        // TODO: 05.01.17 что-то тут не так
-        final OWLReasoner reasoner = OntologyConfig.getModelManager().getReasoner();
-        return reasoner.getInstances(owlClass, false).getFlattened();
+        final Set<OWLClassAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.CLASS_ASSERTION);
+        return CollectionUtils.map(CollectionUtils.filter(axioms, new Specification<OWLClassAssertionAxiom>() {
+            @Override
+            public boolean isSatisfied(OWLClassAssertionAxiom axiom) {
+                return axiom.getClassesInSignature().contains(owlClass);
+            }
+        }), new Transformer<OWLClassAssertionAxiom, OWLNamedIndividual>() {
+            @Override
+            public OWLNamedIndividual transform(OWLClassAssertionAxiom item) {
+                return (OWLNamedIndividual) item.getIndividual();
+            }
+        });
     }
 
     @Override

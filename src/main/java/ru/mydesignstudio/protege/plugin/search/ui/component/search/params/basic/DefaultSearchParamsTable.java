@@ -122,7 +122,9 @@ public class DefaultSearchParamsTable extends JTable {
 
     @Subscribe
     public void changeClassEventListener(ChangeClassEvent event) {
-        final JComboBox<OWLUIProperty> propertyEditor = (JComboBox<OWLUIProperty>) propertyEditors.get(event.getEditingRow()).getComponent();
+        final int editingRow = event.getEditingRow();
+        final DefaultCellEditor cellEditor = (DefaultCellEditor) getCellEditor(editingRow, 1);
+        final JComboBox<OWLUIProperty> propertyEditor = (JComboBox<OWLUIProperty>) cellEditor.getComponent();
         final OWLClass owlClass = event.getOwlClass();
         final Collection<OWLObjectProperty> objectProperties = owlService.getObjectProperties(owlClass);
         propertyEditor.removeAllItems();
@@ -139,7 +141,8 @@ public class DefaultSearchParamsTable extends JTable {
     @Subscribe
     public void changePropertyEventListener(ChangePropertyEvent event) {
         final int editingRow = event.getEditingRow();
-        final JComboBox<LogicalOperation> operationEditor = (JComboBox<LogicalOperation>) operationEditors.get(editingRow).getComponent();
+        final DefaultCellEditor cellEditor = (DefaultCellEditor) getCellEditor(editingRow, 2);
+        final JComboBox<LogicalOperation> operationEditor = (JComboBox<LogicalOperation>) cellEditor.getComponent();
         operationEditor.removeAllItems();
         operationEditor.setSelectedItem(null);
         //
@@ -152,9 +155,13 @@ public class DefaultSearchParamsTable extends JTable {
         if (LogicalOperationHelper.hasClassExpression(ranges)) {
             final JComboBox<OWLUIIndividual> individualSelector = new JComboBox<>();
             valueEditors.put(editingRow, new DefaultCellEditor(individualSelector));
-            final Collection<OWLNamedIndividual> individuals = owlService.getIndividuals(event.getOwlClass());
-            for (OWLNamedIndividual individual : individuals) {
-                individualSelector.addItem(new OWLUIIndividual(individual));
+            for (OWLPropertyRange range : ranges) {
+                for (OWLClass owlClass : range.getClassesInSignature()) {
+                    final Collection<OWLNamedIndividual> individuals = owlService.getIndividuals(owlClass);
+                    for (OWLNamedIndividual individual : individuals) {
+                        individualSelector.addItem(new OWLUIIndividual(individual));
+                    }
+                }
             }
         } else {
             final JTextField textEditor = new JTextField();

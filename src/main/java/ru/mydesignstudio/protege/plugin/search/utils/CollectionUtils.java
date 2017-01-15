@@ -52,4 +52,14 @@ public class CollectionUtils {
         }
         return result;
     }
+
+    public static final <ITEM> Collection<ITEM> filter(Collection<ITEM> source, Specification<ITEM> specification) {
+        final Collection<ITEM> target = new ArrayList<>();
+        for (ITEM item : source) {
+            if (specification.isSatisfied(item)) {
+                target.add(item);
+            }
+        }
+        return target;
+    }
 }
