@@ -39,6 +39,9 @@ public class CriteriaTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        if (!selectQuery.hasWherePart(rowIndex)) {
+            return null;
+        }
         final WherePart wherePart = selectQuery.getWhereParts().get(rowIndex);
         if (columnIndex == 0) {
             final OWLClass owlClass = wherePart.getOwlClass();
@@ -58,7 +61,7 @@ public class CriteriaTableModel extends AbstractTableModel {
         } else if (columnIndex == 3) {
             return wherePart.getValue();
         } else if (columnIndex == 4) {
-            return "-";
+            return rowIndex > 0 ? "Remove criteria" : "";
         }
         return null;
     }
@@ -75,6 +78,9 @@ public class CriteriaTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (!selectQuery.hasWherePart(rowIndex)) {
+            return;
+        }
         final WherePart wherePart = selectQuery.getWhereParts().get(rowIndex);
         if (columnIndex == 0) {
             if (aValue == null) {
@@ -95,6 +101,8 @@ public class CriteriaTableModel extends AbstractTableModel {
             wherePart.setLogicalOperation(logicalOperation);
         } else if (columnIndex == 3) {
             wherePart.setValue(aValue);
+        } else if (columnIndex == 4) {
+            // это колонка с кнопками, для нее ничего не делаем
         } else {
             throw new RuntimeException(String.format(
                     "Setting value to column %s is not implemented",

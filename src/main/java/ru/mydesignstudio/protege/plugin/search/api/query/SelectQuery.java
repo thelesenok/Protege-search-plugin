@@ -26,4 +26,14 @@ public class SelectQuery implements QueryObject {
     public void addWherePart(WherePart wherePart) {
         whereParts.add(wherePart);
     }
+
+    public boolean hasWherePart(int index) {
+        return (index >= 0) && (whereParts.size() > index);
+    }
+
+    public void removeWherePart(int index) {
+        if (hasWherePart(index)) {
+            whereParts.remove(index);
+        }
+    }
 }

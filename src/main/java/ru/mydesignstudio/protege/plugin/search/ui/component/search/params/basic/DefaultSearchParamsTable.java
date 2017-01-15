@@ -10,8 +10,11 @@ import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.editor.ButtonCellEditor;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.editor.ButtonCellRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.event.ChangeClassEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.event.ChangePropertyEvent;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.event.RemoveRowEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
@@ -48,6 +51,8 @@ public class DefaultSearchParamsTable extends JTable {
         this.owlService = owlService;
         //
         getColumnModel().getColumn(0).setCellEditor(createEditorForClassColumn());
+        getColumnModel().getColumn(4).setCellEditor(new ButtonCellEditor());
+        getColumnModel().getColumn(4).setCellRenderer(new ButtonCellRenderer());
         //
         eventBus.register(this);
     }
@@ -167,5 +172,10 @@ public class DefaultSearchParamsTable extends JTable {
             final JTextField textEditor = new JTextField();
             valueEditors.put(editingRow, new DefaultCellEditor(textEditor));
         }
+    }
+
+    @Subscribe
+    public void removeRowEvent(RemoveRowEvent event) {
+        selectQuery.removeWherePart(event.getCurrentRow());
     }
 }
