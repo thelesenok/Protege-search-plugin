@@ -10,7 +10,7 @@
 
 	<groupId>ru.mydesignstudio.protege</groupId>
 	<artifactId>search-plugin</artifactId>
-	<version>0.2-beta-1</version>
+	<version>0.2</version>
 	<name>Protege Search Plugin</name>
 	<description>Search plugin for protege 5.x</description>
 
