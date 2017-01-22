@@ -1,14 +1,18 @@
 package ru.mydesignstudio.protege.plugin.search.service.sparql.query;
 
+import org.semanticweb.owlapi.model.IRI;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIObject;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,6 +28,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
     private static final String OBJECT = "object";
     private static final AtomicInteger variableIndex = new AtomicInteger(0);
     private static final String NEW_LINE = "\n";
+    private final Map<String, String> prefixes = new HashMap<String, String>();
 
     private String getVariableName() {
         return "?variable" + variableIndex.incrementAndGet();
@@ -36,7 +41,8 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
                 .append(OBJECT)
                 .append(" a ")
                 .append(fromType.getOwlClass().getIRI().toQuotedString())
-                .append(". ");
+                .append(". ")
+                .append(NEW_LINE);
         return builder.toString();
     }
 
@@ -47,18 +53,24 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         final String variableName = getVariableName();
         // делаем выбор указанного критерия
         builder.append("?").append(OBJECT).append(" ");
-        builder.append(PREFIX).append(":").append(propertyName).append(" ");
-        builder.append(variableName).append(". ");
+        builder.append(getIRIPrefix(wherePart.getProperty().getIRI()))
+                .append(":")
+                .append(propertyName)
+                .append(" ")
+                .append(variableName)
+                .append(". ")
+                .append(NEW_LINE);
         // добавляем фильтр на указанный критерий
         final Object value = wherePart.getValue();
         final LogicalOperation operation = wherePart.getLogicalOperation();
         if (LogicalOperation.EQUALS.equals(operation)) {
-            if (value instanceof OWLUIObject) {
+            if ((value instanceof OWLUIObject) &&
+                    !(value instanceof OWLUILiteral)) {
                 final OWLUIObject owluiObject = (OWLUIObject) value;
                 builder.append("?")
                         .append(OBJECT)
                         .append(" ")
-                        .append(PREFIX)
+                        .append(getIRIPrefix(wherePart.getProperty().getIRI()))
                         .append(":")
                         .append(wherePart.getProperty().getIRI().getFragment())
                         .append(" ")
@@ -76,22 +88,45 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         return builder.toString();
     }
 
+    private void generatePrefixes(SelectQuery selectQuery) {
+        int prefixIndex = 0;
+        final IRI fromIRI = selectQuery.getFrom().getOwlClass().getIRI();
+        prefixes.put(getIRINamespace(fromIRI), PREFIX + prefixIndex++);
+        for (WherePart wherePart : selectQuery.getWhereParts()) {
+            final IRI propertyIRI = wherePart.getProperty().getIRI();
+            prefixes.put(getIRINamespace(propertyIRI), PREFIX + prefixIndex++);
+        }
+    }
+
+    private String getIRINamespace(IRI iri) {
+        final URI uri = iri.toURI();
+        return uri.getScheme() + ":" + uri.getSchemeSpecificPart();
+    }
+
+    private String getIRIPrefix(IRI iri) {
+        final String namespace = getIRINamespace(iri);
+        return prefixes.get(namespace);
+    }
+
     @Override
     public String visit(SelectQuery selectQuery) {
+        generatePrefixes(selectQuery);
+        //
         final StringBuilder builder = new StringBuilder();
         builder.append(DEFAULTS);
-        builder.append("PREFIX ")
-                .append(PREFIX)
-                .append(": ")
-                .append("<")
-                .append(StringUtils.substringBefore(selectQuery.getFrom().getOwlClass().getIRI().toString(), "#"))
-                .append("#")
-                .append(">")
-                .append(NEW_LINE);
+        for (Map.Entry<String, String> prefix : prefixes.entrySet()) {
+            builder.append("PREFIX ")
+                    .append(prefix.getValue())
+                    .append(": ")
+                    .append("<")
+                    .append(prefix.getKey())
+                    .append("#>")
+                    .append(NEW_LINE);
+        }
         builder.append("SELECT * ");
         final List<WherePart> whereParts = selectQuery.getWhereParts();
-        builder.append(" WHERE ");
-        builder.append(" {");
+        builder.append(" WHERE ").append(NEW_LINE);
+        builder.append(" {").append(NEW_LINE);
         builder.append(visit(selectQuery.getFrom()));
         if (CollectionUtils.isNotEmpty(whereParts)) {
             for (WherePart wherePart : whereParts) {

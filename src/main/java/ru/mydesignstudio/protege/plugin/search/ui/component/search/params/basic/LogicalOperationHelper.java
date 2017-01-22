@@ -1,6 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
@@ -27,6 +28,8 @@ public class LogicalOperationHelper {
                 } else {
                     throw new RuntimeException("Unsupported datatype");
                 }
+            } else if (propertyRange instanceof OWLDataOneOf) {
+                operations.add(LogicalOperation.EQUALS);
             }
         }
         return operations;
@@ -37,6 +40,15 @@ public class LogicalOperationHelper {
             @Override
             public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
                 return (owlPropertyRange instanceof OWLClassExpression);
+            }
+        });
+    }
+
+    public static final boolean hasEnumerationExpression(Collection<OWLPropertyRange> propertyRanges) {
+        return CollectionUtils.every(propertyRanges, new Specification<OWLPropertyRange>() {
+            @Override
+            public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
+                return (owlPropertyRange instanceof OWLDataOneOf);
             }
         });
     }

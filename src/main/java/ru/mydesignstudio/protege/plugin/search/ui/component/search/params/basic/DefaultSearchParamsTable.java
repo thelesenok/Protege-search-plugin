@@ -2,7 +2,9 @@ package ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic
 
 import com.google.common.eventbus.Subscribe;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
@@ -18,6 +20,7 @@ import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
+import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIProperty;
 
 import javax.swing.DefaultCellEditor;
@@ -166,6 +169,15 @@ public class DefaultSearchParamsTable extends JTable {
                     for (OWLNamedIndividual individual : individuals) {
                         individualSelector.addItem(new OWLUIIndividual(individual));
                     }
+                }
+            }
+        } else if (LogicalOperationHelper.hasEnumerationExpression(ranges)) {
+            final JComboBox<OWLUILiteral> literalSelector = new JComboBox<>();
+            valueEditors.put(editingRow, new DefaultCellEditor(literalSelector));
+            for (OWLPropertyRange range : ranges) {
+                final OWLDataOneOf enumerationRange = (OWLDataOneOf) range;
+                for (OWLLiteral owlLiteral : enumerationRange.getValues()) {
+                    literalSelector.addItem(new OWLUILiteral(owlLiteral));
                 }
             }
         } else {
