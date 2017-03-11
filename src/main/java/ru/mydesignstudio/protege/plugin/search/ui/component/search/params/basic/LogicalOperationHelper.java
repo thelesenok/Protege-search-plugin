@@ -38,6 +38,12 @@ public class LogicalOperationHelper {
                     operations.add(LogicalOperation.LESS_THAN);
                     operations.add(LogicalOperation.MORE_OR_EQUALS);
                     operations.add(LogicalOperation.LESS_OR_EQUALS);
+                } else if (datatype.isDatatype()) {
+                    operations.add(LogicalOperation.EQUALS);
+                    operations.add(LogicalOperation.MORE_THAN);
+                    operations.add(LogicalOperation.MORE_OR_EQUALS);
+                    operations.add(LogicalOperation.LESS_THAN);
+                    operations.add(LogicalOperation.LESS_OR_EQUALS);
                 } else {
                     LOGGER.error("Unsupported datatype {}", datatype);
                     throw new RuntimeException("Unsupported datatype");
@@ -54,6 +60,19 @@ public class LogicalOperationHelper {
             @Override
             public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
                 return (owlPropertyRange instanceof OWLClassExpression);
+            }
+        });
+    }
+
+    public static final boolean hasDateExpression(Collection<OWLPropertyRange> propertyRanges) {
+        return CollectionUtils.every(propertyRanges, new Specification<OWLPropertyRange>() {
+            @Override
+            public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
+                if (owlPropertyRange instanceof OWLDatatype) {
+                    final OWLDatatype datatype = (OWLDatatype) owlPropertyRange;
+                    return datatype.isDatatype();
+                }
+                return false;
             }
         });
     }

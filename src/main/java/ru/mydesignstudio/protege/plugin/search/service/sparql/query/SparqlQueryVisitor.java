@@ -8,6 +8,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.DateWherePartConverter;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.IndividualWherePartConverter;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.IntegerWherePartConverter;
 import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.StringWherePartConverter;
@@ -19,6 +20,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         conditionConverters.put(OWLUIIndividual.class, new IndividualWherePartConverter());
         conditionConverters.put(String.class, new StringWherePartConverter());
         conditionConverters.put(Integer.class, new IntegerWherePartConverter());
+        conditionConverters.put(Date.class, new DateWherePartConverter());
     }
 
     private String getVariableName() {
@@ -91,6 +94,8 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
             conditionConverter = conditionConverters.get(Integer.class);
         } else if (LogicalOperationHelper.hasStringExpression(ranges)) {
             conditionConverter = conditionConverters.get(String.class);
+        } else if (LogicalOperationHelper.hasDateExpression(ranges)) {
+            conditionConverter = conditionConverters.get(Date.class);
         } else {
             LOGGER.error("Can't get value converter");
             throw new RuntimeException("Can't get value converter");
