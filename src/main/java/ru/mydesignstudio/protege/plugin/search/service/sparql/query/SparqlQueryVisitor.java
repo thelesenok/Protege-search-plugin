@@ -1,15 +1,24 @@
 package ru.mydesignstudio.protege.plugin.search.service.sparql.query;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLPropertyRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
-import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIObject;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.IndividualWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.IntegerWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.StringWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.service.sparql.query.converter.WherePartConditionConverter;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.LogicalOperationHelper;
+import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 
+import javax.inject.Inject;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by abarmin on 07.01.17.
  */
 public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, WherePartVisitor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlQueryVisitor.class);
     private static final String DEFAULTS =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
@@ -29,6 +39,16 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
     private static final AtomicInteger variableIndex = new AtomicInteger(0);
     private static final String NEW_LINE = "\n";
     private final Map<String, String> prefixes = new HashMap<String, String>();
+    private final Map<Class, WherePartConditionConverter> conditionConverters = new HashMap<>();
+
+    @Inject
+    private OWLService owlService;
+
+    public SparqlQueryVisitor() {
+        conditionConverters.put(OWLUIIndividual.class, new IndividualWherePartConverter());
+        conditionConverters.put(String.class, new StringWherePartConverter());
+        conditionConverters.put(Integer.class, new IntegerWherePartConverter());
+    }
 
     private String getVariableName() {
         return "?variable" + variableIndex.incrementAndGet();
@@ -62,29 +82,22 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
                 .append(NEW_LINE);
         // добавляем фильтр на указанный критерий
         final Object value = wherePart.getValue();
-        final LogicalOperation operation = wherePart.getLogicalOperation();
-        if (LogicalOperation.EQUALS.equals(operation)) {
-            if ((value instanceof OWLUIObject) &&
-                    !(value instanceof OWLUILiteral)) {
-                final OWLUIObject owluiObject = (OWLUIObject) value;
-                builder.append("?")
-                        .append(OBJECT)
-                        .append(" ")
-                        .append(getIRIPrefix(wherePart.getProperty().getIRI()))
-                        .append(":")
-                        .append(wherePart.getProperty().getIRI().getFragment())
-                        .append(" ")
-                        .append(owluiObject.getQuotedString())
-                        .append(".")
-                        .append(NEW_LINE);
-            } else {
-                builder.append("FILTER(STR(" + variableName + ") = \"" + String.valueOf(value) + "\")");
-            }
-        } else if (LogicalOperation.LIKE.equals(operation)) {
-            builder.append("FILTER(REGEX(" + variableName + ", \"" + String.valueOf(value) + "\", \"i\"))");
+        //
+        final WherePartConditionConverter conditionConverter;
+        final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(wherePart.getProperty());
+        if (LogicalOperationHelper.hasClassExpression(ranges)) {
+            conditionConverter = conditionConverters.get(OWLUIIndividual.class);
+        } else if (LogicalOperationHelper.hasIntegerExpression(ranges)) {
+            conditionConverter = conditionConverters.get(Integer.class);
+        } else if (LogicalOperationHelper.hasStringExpression(ranges)) {
+            conditionConverter = conditionConverters.get(String.class);
         } else {
-            throw new RuntimeException("Not implemented yet");
+            LOGGER.error("Can't get value converter");
+            throw new RuntimeException("Can't get value converter");
         }
+        builder.append(conditionConverter.convert(wherePart, value, variableName));
+        builder.append(NEW_LINE);
+        //
         return builder.toString();
     }
 

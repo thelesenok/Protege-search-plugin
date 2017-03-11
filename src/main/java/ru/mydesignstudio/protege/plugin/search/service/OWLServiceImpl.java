@@ -27,6 +27,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -35,6 +36,9 @@ import java.util.Set;
  * Created by abarmin on 03.01.17.
  */
 public class OWLServiceImpl implements OWLService {
+    @Inject
+    private SparqlQueryConverter queryConverter;
+
     private OWLOntology getOntology() {
         return OntologyConfig.getOntology();
     }
@@ -109,7 +113,7 @@ public class OWLServiceImpl implements OWLService {
             final SparqlReasoner reasoner = factory.createReasoner(OntologyConfig.getModelManager().getOWLOntologyManager());
             reasoner.precalculate();
             //
-            final String sparqlQuery = SparqlQueryConverter.convert(selectQuery);
+            final String sparqlQuery = queryConverter.convert(selectQuery);
             final SparqlResultSet sparqlResultSet = reasoner.executeQuery(sparqlQuery);
             return sparqlResultSet;
         } catch (SparqlReasonerException e) {
