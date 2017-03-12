@@ -7,11 +7,14 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.ui.component.renderer.CellRendererWithIcon;
+import ru.mydesignstudio.protege.plugin.search.ui.component.renderer.JComboboxIconRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.editor.ButtonCellEditor;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.editor.ButtonCellRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.event.ChangeClassEvent;
@@ -19,8 +22,10 @@ import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.event.RemoveRowEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.basic.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
+import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIDataProperty;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
+import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIObjectProperty;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIProperty;
 
 import javax.swing.DefaultCellEditor;
@@ -28,6 +33,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
@@ -54,10 +60,17 @@ public class DefaultSearchParamsTable extends JTable {
         this.owlService = owlService;
         //
         getColumnModel().getColumn(0).setCellEditor(createEditorForClassColumn());
+        getColumnModel().getColumn(0).setCellRenderer(createCellRendererWithIcons());
+        getColumnModel().getColumn(1).setCellRenderer(createCellRendererWithIcons());
+        getColumnModel().getColumn(3).setCellRenderer(createCellRendererWithIcons());
         getColumnModel().getColumn(4).setCellEditor(new ButtonCellEditor());
         getColumnModel().getColumn(4).setCellRenderer(new ButtonCellRenderer());
         //
         eventBus.register(this);
+    }
+
+    private TableCellRenderer createCellRendererWithIcons() {
+        return new CellRendererWithIcon();
     }
 
     @Override
@@ -83,6 +96,7 @@ public class DefaultSearchParamsTable extends JTable {
     private TableCellEditor getEditorForPropertyColumn(int row) {
         if (!propertyEditors.containsKey(row)) {
             final JComboBox<OWLUIProperty> propertyEditor = new JComboBox<>();
+            propertyEditor.setRenderer(createComboboxRenderer());
             propertyEditor.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
@@ -107,8 +121,13 @@ public class DefaultSearchParamsTable extends JTable {
         return operationEditors.get(row);
     }
 
+    private JComboboxIconRenderer createComboboxRenderer() {
+        return new JComboboxIconRenderer();
+    }
+
     private DefaultCellEditor createEditorForClassColumn() {
         final JComboBox<OWLUIClass> classColumnSelector = new JComboBox<>();
+        classColumnSelector.setRenderer(createComboboxRenderer());
         final Collection<OWLClass> classes = owlService.getClasses();
         for (OWLClass owlClass : classes) {
             classColumnSelector.addItem(new OWLUIClass(owlClass));
@@ -138,12 +157,24 @@ public class DefaultSearchParamsTable extends JTable {
         propertyEditor.removeAllItems();
         propertyEditor.setSelectedItem(null);
         for (OWLObjectProperty property : objectProperties) {
-            propertyEditor.addItem(new OWLUIProperty(property));
+            propertyEditor.addItem(createOWLUIProperty(property));
         }
         final Collection<OWLDataProperty> dataProperties = owlService.getDataProperties(owlClass);
         for (OWLDataProperty property : dataProperties) {
-            propertyEditor.addItem(new OWLUIProperty(property));
+            propertyEditor.addItem(createOWLUIProperty(property));
         }
+    }
+
+    private OWLUIProperty createOWLUIProperty(OWLProperty property) {
+        if (property instanceof OWLObjectProperty) {
+            return new OWLUIObjectProperty(property);
+        } else if (property instanceof OWLDataProperty) {
+            return new OWLUIDataProperty(property);
+        }
+        throw new RuntimeException(String.format(
+                "Unknown property type %s",
+                property.getClass()
+        ));
     }
 
     @Subscribe
@@ -162,6 +193,7 @@ public class DefaultSearchParamsTable extends JTable {
         //
         if (LogicalOperationHelper.hasClassExpression(ranges)) {
             final JComboBox<OWLUIIndividual> individualSelector = new JComboBox<>();
+            individualSelector.setRenderer(createComboboxRenderer());
             valueEditors.put(editingRow, new DefaultCellEditor(individualSelector));
             for (OWLPropertyRange range : ranges) {
                 for (OWLClass owlClass : range.getClassesInSignature()) {
@@ -173,6 +205,7 @@ public class DefaultSearchParamsTable extends JTable {
             }
         } else if (LogicalOperationHelper.hasEnumerationExpression(ranges)) {
             final JComboBox<OWLUILiteral> literalSelector = new JComboBox<>();
+            literalSelector.setRenderer(createComboboxRenderer());
             valueEditors.put(editingRow, new DefaultCellEditor(literalSelector));
             for (OWLPropertyRange range : ranges) {
                 final OWLDataOneOf enumerationRange = (OWLDataOneOf) range;

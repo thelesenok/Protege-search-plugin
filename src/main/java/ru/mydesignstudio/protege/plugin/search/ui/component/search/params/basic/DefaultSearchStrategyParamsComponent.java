@@ -7,6 +7,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.ui.component.renderer.JComboboxIconRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
 import ru.mydesignstudio.protege.plugin.search.utils.Action;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
@@ -67,6 +68,7 @@ public class DefaultSearchStrategyParamsComponent extends JPanel implements Sear
 
     private void fillTargetTypeSelector() {
         final JComboBox<OWLUIClass> typeSelector = new JComboBox<OWLUIClass>();
+        typeSelector.setRenderer(new JComboboxIconRenderer());
         CollectionUtils.forEach(CollectionUtils.map(owlService.getClasses(), new Transformer<OWLClass, OWLUIClass>() {
                     @Override
                     public OWLUIClass transform(OWLClass item) {
