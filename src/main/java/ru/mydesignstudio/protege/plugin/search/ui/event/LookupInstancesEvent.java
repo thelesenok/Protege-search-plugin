@@ -1,19 +1,22 @@
 package ru.mydesignstudio.protege.plugin.search.ui.event;
 
 import ru.mydesignstudio.protege.plugin.search.api.Event;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
+
+import java.util.Collection;
 
 /**
  * Created by abarmin on 07.01.17.
  */
 public class LookupInstancesEvent implements Event {
-    private final SelectQuery selectQuery;
+    private final Collection<LookupParam> lookupParams;
 
-    public LookupInstancesEvent(SelectQuery selectQuery) {
-        this.selectQuery = selectQuery;
+    public LookupInstancesEvent(Collection<LookupParam> lookupParams) {
+        this.lookupParams = lookupParams;
     }
 
-    public SelectQuery getSelectQuery() {
-        return selectQuery;
+    public Collection<LookupParam> getLookupParams() {
+        return lookupParams;
     }
+
 }

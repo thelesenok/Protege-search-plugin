@@ -2,7 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.ui;
 
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
-import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.SearchParamsViewComponent;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.params.SearchParamsPane;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 import java.awt.BorderLayout;
@@ -17,7 +17,7 @@ public class SearchParamsView extends AbstractOWLViewComponent {
                 getOWLModelManager()
         );
 
-        final SearchParamsViewComponent component = InjectionUtils.getInstance(SearchParamsViewComponent.class);
+        final SearchParamsPane component = InjectionUtils.getInstance(SearchParamsPane.class);
         //
         setLayout(new BorderLayout());
         add(component, BorderLayout.CENTER);

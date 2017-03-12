@@ -1,6 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
-import ru.mydesignstudio.protege.plugin.search.api.SearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 
 import java.util.Collection;
 

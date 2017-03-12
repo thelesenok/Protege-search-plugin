@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
-import ru.mydesignstudio.protege.plugin.search.service.OWLServiceImpl;
-import ru.mydesignstudio.protege.plugin.search.service.SearchStrategyRegistry;
-import ru.mydesignstudio.protege.plugin.search.service.SearchStrategyServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistry;
+import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyServiceImpl;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;

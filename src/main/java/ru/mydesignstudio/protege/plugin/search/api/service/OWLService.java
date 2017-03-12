@@ -6,8 +6,9 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 
 import java.util.Collection;
 
@@ -20,7 +21,7 @@ public interface OWLService {
      *
      * @return
      */
-    Collection<OWLClass> getClasses();
+    Collection<OWLClass> getClasses() throws ApplicationException;
 
     /**
      * Свойства указанного класса
@@ -28,7 +29,7 @@ public interface OWLService {
      * @param owlClass
      * @return
      */
-    Collection<OWLObjectProperty> getObjectProperties(OWLClass owlClass);
+    Collection<OWLObjectProperty> getObjectProperties(OWLClass owlClass) throws ApplicationException;
 
     /**
      * Свойтсва указанного класса
@@ -36,7 +37,7 @@ public interface OWLService {
      * @param owlClass
      * @return
      */
-    Collection<OWLDataProperty> getDataProperties(OWLClass owlClass);
+    Collection<OWLDataProperty> getDataProperties(OWLClass owlClass) throws ApplicationException;
 
     /**
      * Типы, поддерживаемые указанным свойством
@@ -44,7 +45,7 @@ public interface OWLService {
      * @param owlProperty
      * @return
      */
-    Collection<OWLPropertyRange> getPropertyRanges(OWLProperty owlProperty);
+    Collection<OWLPropertyRange> getPropertyRanges(OWLProperty owlProperty) throws ApplicationException;
 
     /**
      * Экземпляры указанного класса
@@ -52,13 +53,12 @@ public interface OWLService {
      * @param owlClass
      * @return
      */
-    Collection<OWLNamedIndividual> getIndividuals(OWLClass owlClass);
+    Collection<OWLNamedIndividual> getIndividuals(OWLClass owlClass) throws ApplicationException;
 
     /**
-     * Искать экземпляры по объекту запроса
-     *
-     * @param selectQuery
+     * Искать экземпляры по набору указанных параметров
+     * @param params
      * @return
      */
-    ResultSet search(SelectQuery selectQuery);
+    ResultSet search(Collection<LookupParam> params) throws ApplicationException;
 }
