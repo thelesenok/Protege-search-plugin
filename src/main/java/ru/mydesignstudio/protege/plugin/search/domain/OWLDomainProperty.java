@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.ui.model;
+package ru.mydesignstudio.protege.plugin.search.domain;
 
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
@@ -6,10 +6,10 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 /**
  * Created by abarmin on 04.01.17.
  */
-public class OWLUIProperty implements OWLUIObject {
+public class OWLDomainProperty implements OWLDomainObject {
     private final OWLProperty owlProperty;
 
-    public OWLUIProperty(OWLProperty owlProperty) {
+    public OWLDomainProperty(OWLProperty owlProperty) {
         this.owlProperty = owlProperty;
     }
 

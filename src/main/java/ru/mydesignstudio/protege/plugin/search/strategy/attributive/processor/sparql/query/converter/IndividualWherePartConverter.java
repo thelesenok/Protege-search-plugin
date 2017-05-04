@@ -3,14 +3,14 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.s
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
 
 /**
  * Created by abarmin on 05.02.17.
  */
-public class IndividualWherePartConverter implements WherePartConditionConverter<OWLUIIndividual> {
+public class IndividualWherePartConverter implements WherePartConditionConverter<OWLDomainIndividual> {
     @Override
-    public String convert(WherePart wherePart, OWLUIIndividual value, String variableName) throws ApplicationException {
+    public String convert(WherePart wherePart, OWLDomainIndividual value, String variableName) throws ApplicationException {
         final LogicalOperation logicalOperation = wherePart.getLogicalOperation();
         if (!LogicalOperation.EQUALS.equals(logicalOperation)) {
             throw new ApplicationException("Only EQUALS operation for OWLIndividual is allowed");

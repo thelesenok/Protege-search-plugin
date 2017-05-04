@@ -12,7 +12,7 @@ import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.utils.Action;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
@@ -83,16 +83,16 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     }
 
     private void fillTargetTypeSelector() throws ApplicationException {
-        final JComboBox<OWLUIClass> typeSelector = new JComboBox<OWLUIClass>();
+        final JComboBox<OWLDomainClass> typeSelector = new JComboBox<OWLDomainClass>();
         typeSelector.setRenderer(new JComboboxIconRenderer());
-        CollectionUtils.forEach(CollectionUtils.map(owlService.getClasses(), new Transformer<OWLClass, OWLUIClass>() {
+        CollectionUtils.forEach(CollectionUtils.map(owlService.getClasses(), new Transformer<OWLClass, OWLDomainClass>() {
                     @Override
-                    public OWLUIClass transform(OWLClass item) {
-                        return new OWLUIClass(item);
+                    public OWLDomainClass transform(OWLClass item) {
+                        return new OWLDomainClass(item);
                     }
-                }), new Action<OWLUIClass>() {
+                }), new Action<OWLDomainClass>() {
                     @Override
-                    public void run(OWLUIClass uiClass) {
+                    public void run(OWLDomainClass uiClass) {
                         typeSelector.addItem(uiClass);
                     }
                 });
@@ -107,7 +107,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final OWLUIClass item = (OWLUIClass) e.getItem();
+                    final OWLDomainClass item = (OWLDomainClass) e.getItem();
                     selectQuery.setFrom(new FromType(item.getOwlClass()));
                 }
             }

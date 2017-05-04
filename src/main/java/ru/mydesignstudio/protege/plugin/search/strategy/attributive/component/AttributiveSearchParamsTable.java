@@ -29,12 +29,12 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.re
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIDataProperty;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIObjectProperty;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainDataProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainLiteral;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainObjectProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainProperty;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
@@ -125,17 +125,17 @@ public class AttributiveSearchParamsTable extends JTable {
 
     private TableCellEditor getEditorForClassColumn(int row) {
         if (!classEditors.containsKey(row)) {
-            final JComboBox<OWLUIClass> classColumnSelector = new JComboBox<>();
+            final JComboBox<OWLDomainClass> classColumnSelector = new JComboBox<>();
             classColumnSelector.setRenderer(createComboboxRenderer());
             final Collection<OWLClass> classes = getAvailableClassesForLookup();
             for (OWLClass owlClass : classes) {
-                classColumnSelector.addItem(new OWLUIClass(owlClass));
+                classColumnSelector.addItem(new OWLDomainClass(owlClass));
             }
             classColumnSelector.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
-                        final OWLUIClass owluiClass = (OWLUIClass) e.getItem();
+                        final OWLDomainClass owluiClass = (OWLDomainClass) e.getItem();
                         eventBus.publish(new ChangeClassEvent(
                                 owluiClass.getOwlClass(),
                                 getEditingRow()
@@ -159,15 +159,15 @@ public class AttributiveSearchParamsTable extends JTable {
 
     private TableCellEditor getEditorForPropertyColumn(int row) {
         if (!propertyEditors.containsKey(row)) {
-            final JComboBox<OWLUIProperty> propertyEditor = new JComboBox<>();
+            final JComboBox<OWLDomainProperty> propertyEditor = new JComboBox<>();
             propertyEditor.setRenderer(createComboboxRenderer());
             propertyEditor.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (ItemEvent.SELECTED == e.getStateChange()) {
-                        final JComboBox<OWLUIClass> classSelector = (JComboBox<OWLUIClass>) ((DefaultCellEditor) getCellEditor(row, 0)).getComponent();
-                        final OWLUIProperty uiProperty = (OWLUIProperty) e.getItem();
-                        final OWLUIClass uiClass = (OWLUIClass) classSelector.getSelectedItem();
+                        final JComboBox<OWLDomainClass> classSelector = (JComboBox<OWLDomainClass>) ((DefaultCellEditor) getCellEditor(row, 0)).getComponent();
+                        final OWLDomainProperty uiProperty = (OWLDomainProperty) e.getItem();
+                        final OWLDomainClass uiClass = (OWLDomainClass) classSelector.getSelectedItem();
                         eventBus.publish(new ChangePropertyEvent(uiClass.getOwlClass(), uiProperty.getOwlProperty(), row));
                     }
                 }
@@ -207,7 +207,7 @@ public class AttributiveSearchParamsTable extends JTable {
         try {
             final int editingRow = event.getEditingRow();
             final DefaultCellEditor cellEditor = (DefaultCellEditor) getCellEditor(editingRow, 1);
-            final JComboBox<OWLUIProperty> propertyEditor = (JComboBox<OWLUIProperty>) cellEditor.getComponent();
+            final JComboBox<OWLDomainProperty> propertyEditor = (JComboBox<OWLDomainProperty>) cellEditor.getComponent();
             final OWLClass owlClass = event.getOwlClass();
             final Collection<OWLProperty> properties = getAvailablePropertiesForLookup(owlClass);
             propertyEditor.removeAllItems();
@@ -220,11 +220,11 @@ public class AttributiveSearchParamsTable extends JTable {
         }
     }
 
-    private OWLUIProperty createOWLUIProperty(OWLProperty property) throws ApplicationException {
+    private OWLDomainProperty createOWLUIProperty(OWLProperty property) throws ApplicationException {
         if (property instanceof OWLObjectProperty) {
-            return new OWLUIObjectProperty(property);
+            return new OWLDomainObjectProperty(property);
         } else if (property instanceof OWLDataProperty) {
-            return new OWLUIDataProperty(property);
+            return new OWLDomainDataProperty(property);
         }
         throw new ApplicationException(String.format(
                 "Unknown property type %s",
@@ -250,25 +250,25 @@ public class AttributiveSearchParamsTable extends JTable {
                 }
                 //
                 if (LogicalOperationHelper.hasClassExpression(ranges)) {
-                    final JComboBox<OWLUIIndividual> individualSelector = new JComboBox<>();
+                    final JComboBox<OWLDomainIndividual> individualSelector = new JComboBox<>();
                     individualSelector.setRenderer(createComboboxRenderer());
                     valueEditors.put(editingRow, new DefaultCellEditor(individualSelector));
                     for (OWLPropertyRange range : ranges) {
                         for (OWLClass owlClass : range.getClassesInSignature()) {
                             final Collection<OWLNamedIndividual> individuals = owlService.getIndividuals(owlClass);
                             for (OWLNamedIndividual individual : individuals) {
-                                individualSelector.addItem(new OWLUIIndividual(individual));
+                                individualSelector.addItem(new OWLDomainIndividual(individual));
                             }
                         }
                     }
                 } else if (LogicalOperationHelper.hasEnumerationExpression(ranges)) {
-                    final JComboBox<OWLUILiteral> literalSelector = new JComboBox<>();
+                    final JComboBox<OWLDomainLiteral> literalSelector = new JComboBox<>();
                     literalSelector.setRenderer(createComboboxRenderer());
                     valueEditors.put(editingRow, new DefaultCellEditor(literalSelector));
                     for (OWLPropertyRange range : ranges) {
                         final OWLDataOneOf enumerationRange = (OWLDataOneOf) range;
                         for (OWLLiteral owlLiteral : enumerationRange.getValues()) {
-                            literalSelector.addItem(new OWLUILiteral(owlLiteral));
+                            literalSelector.addItem(new OWLDomainLiteral(owlLiteral));
                         }
                     }
                 } else {
@@ -300,13 +300,13 @@ public class AttributiveSearchParamsTable extends JTable {
     private void updatePropertyEditors() throws ApplicationException {
         for (Map.Entry<Integer, DefaultCellEditor> entry : propertyEditors.entrySet()) {
             final TableCellEditor classEditor = getCellEditor(entry.getKey(), 0);
-            final OWLUIClass uiClass = (OWLUIClass) classEditor.getCellEditorValue();
+            final OWLDomainClass uiClass = (OWLDomainClass) classEditor.getCellEditorValue();
             if (uiClass == null) {
                 continue;
             }
             final OWLClass selectedClass = uiClass.getOwlClass();
             //
-            final JComboBox<OWLUIProperty> component = (JComboBox<OWLUIProperty>) entry.getValue().getComponent();
+            final JComboBox<OWLDomainProperty> component = (JComboBox<OWLDomainProperty>) entry.getValue().getComponent();
             component.removeAllItems();
             //
             for (OWLProperty property : getAvailablePropertiesForLookup(selectedClass)) {
@@ -317,10 +317,10 @@ public class AttributiveSearchParamsTable extends JTable {
 
     private void updateClassEditors() throws ApplicationException {
         for (DefaultCellEditor editor : classEditors.values()) {
-            final JComboBox<OWLUIClass> component = (JComboBox<OWLUIClass>) editor.getComponent();
+            final JComboBox<OWLDomainClass> component = (JComboBox<OWLDomainClass>) editor.getComponent();
             component.removeAllItems();
             for (OWLClass owlClass : getAvailableClassesForLookup()) {
-                component.addItem(new OWLUIClass(owlClass));
+                component.addItem(new OWLDomainClass(owlClass));
             }
         }
     }

@@ -1,14 +1,14 @@
-package ru.mydesignstudio.protege.plugin.search.ui.model;
+package ru.mydesignstudio.protege.plugin.search.domain;
 
 import org.semanticweb.owlapi.model.OWLLiteral;
 
 /**
  * Created by abarmin on 22.01.17.
  */
-public class OWLUILiteral implements OWLUIObject {
+public class OWLDomainLiteral implements OWLDomainObject {
     private final OWLLiteral literal;
 
-    public OWLUILiteral(OWLLiteral literal) {
+    public OWLDomainLiteral(OWLLiteral literal) {
         this.literal = literal;
     }
 

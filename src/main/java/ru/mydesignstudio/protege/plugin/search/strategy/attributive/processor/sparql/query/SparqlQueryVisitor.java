@@ -17,7 +17,7 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sp
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.StringWherePartConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.WherePartConditionConverter;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 
 import javax.inject.Inject;
@@ -50,7 +50,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
     private OWLService owlService;
 
     public SparqlQueryVisitor() {
-        conditionConverters.put(OWLUIIndividual.class, new IndividualWherePartConverter());
+        conditionConverters.put(OWLDomainIndividual.class, new IndividualWherePartConverter());
         conditionConverters.put(String.class, new StringWherePartConverter());
         conditionConverters.put(Integer.class, new IntegerWherePartConverter());
         conditionConverters.put(Date.class, new DateWherePartConverter());
@@ -142,7 +142,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         final WherePartConditionConverter conditionConverter;
         final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(wherePart.getProperty());
         if (LogicalOperationHelper.hasClassExpression(ranges)) {
-            conditionConverter = conditionConverters.get(OWLUIIndividual.class);
+            conditionConverter = conditionConverters.get(OWLDomainIndividual.class);
         } else if (LogicalOperationHelper.hasIntegerExpression(ranges)) {
             conditionConverter = conditionConverters.get(Integer.class);
         } else if (LogicalOperationHelper.hasStringExpression(ranges)) {

@@ -3,8 +3,8 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.m
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
-import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainProperty;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
@@ -47,12 +47,12 @@ public class CriteriaTableModel extends AbstractTableModel {
         if (columnIndex == 0) {
             final OWLClass owlClass = wherePart.getOwlClass();
             if (owlClass != null) {
-                return new OWLUIClass(owlClass);
+                return new OWLDomainClass(owlClass);
             }
         } else if (columnIndex == 1) {
             final OWLProperty owlProperty = wherePart.getProperty();
             if (owlProperty != null) {
-                return new OWLUIProperty(owlProperty);
+                return new OWLDomainProperty(owlProperty);
             }
         } else if (columnIndex == 2) {
             final LogicalOperation logicalOperation = wherePart.getLogicalOperation();
@@ -87,14 +87,14 @@ public class CriteriaTableModel extends AbstractTableModel {
             if (aValue == null) {
                 wherePart.setOwlClass(null);
             } else {
-                final OWLUIClass owluiClass = (OWLUIClass) aValue;
+                final OWLDomainClass owluiClass = (OWLDomainClass) aValue;
                 wherePart.setOwlClass(owluiClass.getOwlClass());
             }
         } else if (columnIndex == 1) {
             if (aValue == null) {
                 wherePart.setProperty(null);
             } else {
-                final OWLUIProperty owluiProperty = (OWLUIProperty) aValue;
+                final OWLDomainProperty owluiProperty = (OWLDomainProperty) aValue;
                 wherePart.setProperty(owluiProperty.getOwlProperty());
             }
         } else if (columnIndex == 2) {
