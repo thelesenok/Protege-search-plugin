@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query;
 
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 

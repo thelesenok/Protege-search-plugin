@@ -10,7 +10,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.AttributiveCollectorParams;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
 import ru.mydesignstudio.protege.plugin.search.utils.Action;
@@ -35,7 +35,7 @@ import java.awt.event.ItemListener;
 /**
  * Created by abarmin on 03.01.17.
  */
-public class AttributiveSearchStrategyParamsComponent extends JPanel implements SearchStrategyComponent<AttributiveCollectorParams> {
+public class AttributiveSearchStrategyParamsComponent extends JPanel implements SearchStrategyComponent<AttributiveProcessorParams> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AttributiveSearchStrategyParamsComponent.class);
     @Inject
     private OWLService owlService;
@@ -122,7 +122,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     }
 
     @Override
-    public AttributiveCollectorParams getSearchParams() {
-        return new AttributiveCollectorParams(selectQuery);
+    public AttributiveProcessorParams getSearchParams() {
+        return new AttributiveProcessorParams(selectQuery);
     }
 }

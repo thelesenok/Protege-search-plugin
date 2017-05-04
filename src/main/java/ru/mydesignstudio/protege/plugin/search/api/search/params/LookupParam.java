@@ -1,16 +1,16 @@
 package ru.mydesignstudio.protege.plugin.search.api.search.params;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyParams;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 
 /**
  * Created by abarmin on 12.03.17.
  */
 public class LookupParam {
     private final SearchStrategy strategy;
-    private final SearchStrategyParams strategyParams;
+    private final SearchProcessorParams strategyParams;
 
-    public LookupParam(SearchStrategy strategy, SearchStrategyParams strategyParams) {
+    public LookupParam(SearchStrategy strategy, SearchProcessorParams strategyParams) {
         this.strategy = strategy;
         this.strategyParams = strategyParams;
     }
@@ -19,7 +19,7 @@ public class LookupParam {
         return strategy;
     }
 
-    public SearchStrategyParams getStrategyParams() {
+    public SearchProcessorParams getStrategyParams() {
         return strategyParams;
     }
 }

@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -11,11 +11,11 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter.DateWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter.IndividualWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter.IntegerWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter.StringWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter.WherePartConditionConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.DateWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.IndividualWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.IntegerWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.StringWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.WherePartConditionConverter;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;

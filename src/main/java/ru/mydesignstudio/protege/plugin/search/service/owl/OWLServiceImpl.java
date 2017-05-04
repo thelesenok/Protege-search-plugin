@@ -16,8 +16,9 @@ import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.EmptyResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchCollector;
+import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
@@ -103,14 +104,23 @@ public class OWLServiceImpl implements OWLService {
     @Override
     public ResultSet search(Collection<LookupParam> params) throws ApplicationException {
         /**
+         * Получим запрос по которому будем искать
+         */
+        SelectQuery selectQuery = null;
+        for (LookupParam param : params) {
+            final SearchStrategy strategy = param.getStrategy();
+            final SearchProcessor processor = strategy.getSearchProcessor();
+            selectQuery = processor.prepareQuery(selectQuery, param.getStrategyParams());
+        }
+        /**
          * Реализуем последовательный поиск разными стратегиями
          * на основе параметров, выбранных в компоненте
          */
         ResultSet resultSet = new EmptyResultSet();
         for (LookupParam param : params) {
             final SearchStrategy strategy = param.getStrategy();
-            final SearchCollector collector = strategy.getSearchCollector();
-            resultSet = collector.collect(resultSet, param.getStrategyParams());
+            final SearchProcessor processor = strategy.getSearchProcessor();
+            resultSet = processor.collect(resultSet, selectQuery, param.getStrategyParams());
         }
         return resultSet;
     }

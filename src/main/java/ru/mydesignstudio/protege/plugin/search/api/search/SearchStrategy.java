@@ -1,12 +1,14 @@
 package ru.mydesignstudio.protege.plugin.search.api.search;
 
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchCollector;
+import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 
 import java.awt.Component;
 
 /**
  * Created by abarmin on 03.01.17.
+ *
+ * Стратегия поиска
  */
 public interface SearchStrategy {
     /**
@@ -21,7 +23,7 @@ public interface SearchStrategy {
      *
      * @return
      */
-    <T extends Component&SearchStrategyComponent> T getSearchParamsPane();
+    <T extends Component & SearchStrategyComponent> T getSearchParamsPane();
 
     /**
      * Обязательная, не может быть выключена
@@ -43,5 +45,5 @@ public interface SearchStrategy {
      *
      * @return
      */
-    SearchCollector getSearchCollector();
+    SearchProcessor getSearchProcessor();
 }

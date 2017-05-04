@@ -5,6 +5,7 @@ import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.service.search.strategy.StrategyComparator;
 import ru.mydesignstudio.protege.plugin.search.ui.event.LookupInstancesEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 
@@ -21,9 +22,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.TreeSet;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -70,11 +72,13 @@ public class SearchParamsPane extends JPanel {
                 // надо собрать со всех активных способов поиска
                 // указанные в них параметры и передать их все
                 // в центральный метод поиска
-                final ArrayList<LookupParam> params = new ArrayList<>();
-                for (SearchStrategy enabledStrategy : enabledStrategies) {
+                final Collection<LookupParam> params = new LinkedList<LookupParam>();
+                final TreeSet<SearchStrategy> sortedStrategies = new TreeSet<>(new StrategyComparator());
+                sortedStrategies.addAll(enabledStrategies);
+                for (SearchStrategy enabledStrategy : sortedStrategies) {
                     params.add(new LookupParam(
                             enabledStrategy,
-                            enabledStrategy.getSearchParamsPane().getSearchParams()
+                            enabledStrategy.getSearchParamsPane() == null ? null : enabledStrategy.getSearchParamsPane().getSearchParams()
                     ));
                 }
                 eventBus.publish(new LookupInstancesEvent(params));
@@ -102,11 +106,18 @@ public class SearchParamsPane extends JPanel {
         if (strategyParamsPane == null) {
             return;
         }
-        // добавляем на отдельную закладку
-        this.criteriaContainer.addTab(
-                selectedStrategy.getTitle(),
-                selectedStrategy.getSearchParamsPane()
-        );
+        if (event.isSelected()) {
+            // добавляем на отдельную закладку
+            this.criteriaContainer.addTab(
+                    selectedStrategy.getTitle(),
+                    selectedStrategy.getSearchParamsPane()
+            );
+        } else {
+            // убираем закладку
+            this.criteriaContainer.remove(
+                    selectedStrategy.getSearchParamsPane()
+            );
+        }
     }
 
     /**

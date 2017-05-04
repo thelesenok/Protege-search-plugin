@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;

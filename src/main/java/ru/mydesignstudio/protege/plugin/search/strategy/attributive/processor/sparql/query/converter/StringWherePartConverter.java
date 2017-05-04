@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.attributive.collector.sparql.query.converter;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

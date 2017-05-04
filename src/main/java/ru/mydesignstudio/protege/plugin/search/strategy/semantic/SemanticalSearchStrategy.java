@@ -1,7 +1,7 @@
-package ru.mydesignstudio.protege.plugin.search.strategy;
+package ru.mydesignstudio.protege.plugin.search.strategy.semantic;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchCollector;
+import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
 
 import java.awt.Component;
 
@@ -27,11 +27,11 @@ public class SemanticalSearchStrategy implements SearchStrategy {
 
     @Override
     public int getOrder() {
-        return 2;
+        return 100;
     }
 
     @Override
-    public SearchCollector getSearchCollector() {
+    public SearchProcessor getSearchProcessor() {
         return null;
     }
 }
