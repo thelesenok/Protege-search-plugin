@@ -71,7 +71,11 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     }
 
     private void fillCriteriaTable() {
-        final AttributiveSearchParamsTable criteriaTable = new AttributiveSearchParamsTable(selectQuery, owlService, wrapperService);
+        final AttributiveSearchParamsTable criteriaTable = new AttributiveSearchParamsTable(
+                selectQuery,
+                owlService,
+                wrapperService
+        );
         final JScrollPane scrollPane = new JScrollPane(criteriaTable);
         criteriaTable.setFillsViewportHeight(true);
         //

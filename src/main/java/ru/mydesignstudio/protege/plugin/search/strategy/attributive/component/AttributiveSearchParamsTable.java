@@ -17,6 +17,8 @@ import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.editor.ButtonCellEditor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.editor.ButtonCellRenderer;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.ChangeClassEvent;
@@ -25,15 +27,17 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.ev
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.CellRendererWithIcon;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
+import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIClass;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIDataProperty;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIIndividual;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUILiteral;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIObjectProperty;
 import ru.mydesignstudio.protege.plugin.search.ui.model.OWLUIProperty;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -43,6 +47,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,11 +62,16 @@ public class AttributiveSearchParamsTable extends JTable {
     private final OWLService owlService;
     private final ExceptionWrapperService wrapperService;
 
+    private Map<Integer, DefaultCellEditor> classEditors = new HashMap<>();
     private Map<Integer, DefaultCellEditor> propertyEditors = new HashMap<>();
     private Map<Integer, DefaultCellEditor> operationEditors = new HashMap<>();
     private Map<Integer, DefaultCellEditor> valueEditors = new HashMap<>();
 
     private EventBus eventBus = EventBus.getInstance();
+    /**
+     * Признак включенности поиска по связям
+     */
+    private boolean isRelationalLookupEnabled = false;
 
     public AttributiveSearchParamsTable(SelectQuery selectQuery, OWLService owlService, ExceptionWrapperService wrapperService) {
         super(new CriteriaTableModel(selectQuery));
@@ -71,17 +81,11 @@ public class AttributiveSearchParamsTable extends JTable {
         this.owlService = owlService;
         this.wrapperService = wrapperService;
         //
-        try {
-            getColumnModel().getColumn(0).setCellEditor(createEditorForClassColumn());
-            getColumnModel().getColumn(0).setCellRenderer(createCellRendererWithIcons());
-            getColumnModel().getColumn(1).setCellRenderer(createCellRendererWithIcons());
-            getColumnModel().getColumn(3).setCellRenderer(createCellRendererWithIcons());
-            getColumnModel().getColumn(4).setCellEditor(new ButtonCellEditor());
-            getColumnModel().getColumn(4).setCellRenderer(new ButtonCellRenderer());
-        } catch (ApplicationException e) {
-            LOGGER.warn("Can't initialize attributes table {}", e);
-            throw new ApplicationRuntimeException(e);
-        }
+        getColumnModel().getColumn(0).setCellRenderer(createCellRendererWithIcons());
+        getColumnModel().getColumn(1).setCellRenderer(createCellRendererWithIcons());
+        getColumnModel().getColumn(3).setCellRenderer(createCellRendererWithIcons());
+        getColumnModel().getColumn(4).setCellEditor(new ButtonCellEditor());
+        getColumnModel().getColumn(4).setCellRenderer(new ButtonCellRenderer());
     }
 
     private TableCellRenderer createCellRendererWithIcons() {
@@ -90,7 +94,9 @@ public class AttributiveSearchParamsTable extends JTable {
 
     @Override
     public TableCellEditor getCellEditor(int row, int column) {
-        if (column == 1) {
+        if (column == 0) {
+            return getEditorForClassColumn(row);
+        } else if (column == 1) {
             return getEditorForPropertyColumn(row);
         } else if (column == 2) {
             return getEditorForOperationColumn(row);
@@ -98,6 +104,49 @@ public class AttributiveSearchParamsTable extends JTable {
             return getEditorForValueColumn(row);
         }
         return super.getCellEditor(row, column);
+    }
+
+    private Collection<OWLClass> getAvailableClassesForLookup() {
+        try {
+            final Collection<OWLClass> classes = owlService.getClasses();
+            if (isRelationalLookupEnabled) {
+                return classes;
+            }
+            return CollectionUtils.filter(classes, new Specification<OWLClass>() {
+                @Override
+                public boolean isSatisfied(OWLClass owlClass) {
+                    return owlClass == selectQuery.getFrom().getOwlClass();
+                }
+            });
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
+
+    private TableCellEditor getEditorForClassColumn(int row) {
+        if (!classEditors.containsKey(row)) {
+            final JComboBox<OWLUIClass> classColumnSelector = new JComboBox<>();
+            classColumnSelector.setRenderer(createComboboxRenderer());
+            final Collection<OWLClass> classes = getAvailableClassesForLookup();
+            for (OWLClass owlClass : classes) {
+                classColumnSelector.addItem(new OWLUIClass(owlClass));
+            }
+            classColumnSelector.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (ItemEvent.SELECTED == e.getStateChange()) {
+                        final OWLUIClass owluiClass = (OWLUIClass) e.getItem();
+                        eventBus.publish(new ChangeClassEvent(
+                                owluiClass.getOwlClass(),
+                                getEditingRow()
+                        ));
+                    }
+                }
+            });
+            final DefaultCellEditor cellEditor = new DefaultCellEditor(classColumnSelector);
+            classEditors.put(row, cellEditor);
+        }
+        return classEditors.get(row);
     }
 
     private TableCellEditor getEditorForValueColumn(int row) {
@@ -140,26 +189,17 @@ public class AttributiveSearchParamsTable extends JTable {
         return new JComboboxIconRenderer();
     }
 
-    private DefaultCellEditor createEditorForClassColumn() throws ApplicationException {
-        final JComboBox<OWLUIClass> classColumnSelector = new JComboBox<>();
-        classColumnSelector.setRenderer(createComboboxRenderer());
-        final Collection<OWLClass> classes = owlService.getClasses();
-        for (OWLClass owlClass : classes) {
-            classColumnSelector.addItem(new OWLUIClass(owlClass));
-        }
-        classColumnSelector.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (ItemEvent.SELECTED == e.getStateChange()) {
-                    final OWLUIClass owluiClass = (OWLUIClass) e.getItem();
-                    eventBus.publish(new ChangeClassEvent(
-                            owluiClass.getOwlClass(),
-                            getEditingRow()
-                    ));
-                }
+    private Collection<OWLProperty> getAvailablePropertiesForLookup(OWLClass owlClass) {
+        final Collection<OWLProperty> properties = new ArrayList<>();
+        try {
+            properties.addAll(owlService.getDataProperties(owlClass));
+            if (isRelationalLookupEnabled) {
+                properties.addAll(owlService.getObjectProperties(owlClass));
             }
-        });
-        return new DefaultCellEditor(classColumnSelector);
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+        return properties;
     }
 
     @Subscribe
@@ -169,14 +209,10 @@ public class AttributiveSearchParamsTable extends JTable {
             final DefaultCellEditor cellEditor = (DefaultCellEditor) getCellEditor(editingRow, 1);
             final JComboBox<OWLUIProperty> propertyEditor = (JComboBox<OWLUIProperty>) cellEditor.getComponent();
             final OWLClass owlClass = event.getOwlClass();
-            final Collection<OWLObjectProperty> objectProperties = owlService.getObjectProperties(owlClass);
+            final Collection<OWLProperty> properties = getAvailablePropertiesForLookup(owlClass);
             propertyEditor.removeAllItems();
             propertyEditor.setSelectedItem(null);
-            for (OWLObjectProperty property : objectProperties) {
-                propertyEditor.addItem(createOWLUIProperty(property));
-            }
-            final Collection<OWLDataProperty> dataProperties = owlService.getDataProperties(owlClass);
-            for (OWLDataProperty property : dataProperties) {
+            for (OWLProperty property : properties) {
                 propertyEditor.addItem(createOWLUIProperty(property));
             }
         } catch (ApplicationException e) {
@@ -245,7 +281,52 @@ public class AttributiveSearchParamsTable extends JTable {
     }
 
     @Subscribe
-    public void removeRowEvent(RemoveRowEvent event) {
+    public void onStrategyToggleEvent(StrategyChangeEvent event) {
+        try {
+            if (event.getStrategy().getClass() == RelationalSearchStrategy.class) {
+                isRelationalLookupEnabled = event.isSelected();
+                // надо обновить все выбиралки классов, чтобы
+                // там на выбор был только текущий класс
+                updateClassEditors();
+                // обновим выбиралки свойств - там должны остаться
+                // только data properties
+                updatePropertyEditors();
+            }
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
+
+    private void updatePropertyEditors() throws ApplicationException {
+        for (Map.Entry<Integer, DefaultCellEditor> entry : propertyEditors.entrySet()) {
+            final TableCellEditor classEditor = getCellEditor(entry.getKey(), 0);
+            final OWLUIClass uiClass = (OWLUIClass) classEditor.getCellEditorValue();
+            if (uiClass == null) {
+                continue;
+            }
+            final OWLClass selectedClass = uiClass.getOwlClass();
+            //
+            final JComboBox<OWLUIProperty> component = (JComboBox<OWLUIProperty>) entry.getValue().getComponent();
+            component.removeAllItems();
+            //
+            for (OWLProperty property : getAvailablePropertiesForLookup(selectedClass)) {
+                component.addItem(createOWLUIProperty(property));
+            }
+        }
+    }
+
+    private void updateClassEditors() throws ApplicationException {
+        for (DefaultCellEditor editor : classEditors.values()) {
+            final JComboBox<OWLUIClass> component = (JComboBox<OWLUIClass>) editor.getComponent();
+            component.removeAllItems();
+            for (OWLClass owlClass : getAvailableClassesForLookup()) {
+                component.addItem(new OWLUIClass(owlClass));
+            }
+        }
+    }
+
+    @Subscribe
+    public void onRemoveRowEvent(RemoveRowEvent event) {
         selectQuery.removeWherePart(event.getCurrentRow());
     }
 }

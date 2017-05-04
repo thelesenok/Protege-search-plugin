@@ -1,22 +1,24 @@
-package ru.mydesignstudio.protege.plugin.search.strategy;
+package ru.mydesignstudio.protege.plugin.search.strategy.relational;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchCollector;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 
 import java.awt.Component;
 
 /**
- * Created by abarmin on 03.01.17.
+ * Created by abarmin on 04.05.17.
+ *
+ * Стратегия поиска "С учетом отношений"
  */
-@Deprecated
-public class SemanticalSearchStrategy implements SearchStrategy {
+public class RelationalSearchStrategy implements SearchStrategy {
     @Override
     public String getTitle() {
-        return "Semantical search strategy";
+        return "Relational lookup";
     }
 
     @Override
-    public Component getSearchParamsPane() {
+    public <T extends Component & SearchStrategyComponent> T getSearchParamsPane() {
         return null;
     }
 
@@ -27,7 +29,7 @@ public class SemanticalSearchStrategy implements SearchStrategy {
 
     @Override
     public int getOrder() {
-        return 2;
+        return 1;
     }
 
     @Override

@@ -4,6 +4,7 @@ import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.SemanticalSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -22,11 +23,14 @@ public class SearchStrategyServiceImpl implements SearchStrategyService {
     @Inject
     private AttributiveSearchStrategy attributiveSearchStrategy;
     @Inject
+    private RelationalSearchStrategy relationalSearchStrategy;
+    @Inject
     private SemanticalSearchStrategy semanticalSearchStrategy;
 
     @PostConstruct
     public void init() {
         register(attributiveSearchStrategy);
+        register(relationalSearchStrategy);
         register(semanticalSearchStrategy);
     }
 
