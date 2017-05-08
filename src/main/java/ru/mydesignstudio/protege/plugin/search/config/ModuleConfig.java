@@ -10,9 +10,13 @@ import com.google.inject.spi.TypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategySerializationService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
-import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistry;
+import ru.mydesignstudio.protege.plugin.search.service.search.serialization.SearchStrategySerializationManager;
+import ru.mydesignstudio.protege.plugin.search.service.search.serialization.SearchStrategySerializationServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
+import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyServiceImpl;
 
 import javax.annotation.PostConstruct;
@@ -26,9 +30,11 @@ public class ModuleConfig extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(SearchStrategyService.class).to(SearchStrategyServiceImpl.class);
-        bind(SearchStrategyRegistry.class).in(Singleton.class);
+        bind(SearchStrategyService.class).to(SearchStrategyServiceImpl.class).in(Singleton.class);
+        bind(SearchStrategyRegistry.class).to(SearchStrategyRegistryImpl.class).in(Singleton.class);
         bind(OWLService.class).to(OWLServiceImpl.class);
+        bind(SearchStrategySerializationService.class).to(SearchStrategySerializationServiceImpl.class);
+        bind(SearchStrategySerializationManager.class).asEagerSingleton();
         bindListener(Matchers.any(), new TypeListener() {
             @Override
             public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {

@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 
 import java.util.Collection;
@@ -21,4 +22,13 @@ public interface SearchStrategyService {
      * @return
      */
     Collection<SearchStrategy> getStrategies();
+
+    /**
+     * Зарегистрированная стратегия по классу
+     * @param strategyClass - класс
+     * @param <T>
+     * @return
+     * @throws ApplicationException
+     */
+    <T extends SearchStrategy> T getStrategy(Class<T> strategyClass) throws ApplicationException;
 }

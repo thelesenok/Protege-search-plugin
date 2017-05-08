@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -109,6 +110,19 @@ public class OWLUtils {
         return StringUtils.equalsIgnoreCase(
                 first.toStringID(),
                 second.toStringID()
+        );
+    }
+
+    /**
+     * Являются ли два идентификатора эквивалентными
+     * @param first - этот
+     * @param second - и этот
+     * @return
+     */
+    public static boolean equals(IRI first, IRI second) {
+        return StringUtils.equalsIgnoreCase(
+                first.toQuotedString(),
+                second.toQuotedString()
         );
     }
 }

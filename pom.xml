@@ -8,6 +8,11 @@
 		<version>7</version>
 	</parent>
 
+	<properties>
+		<protege.version>4.3.0</protege.version>
+		<gson.version>2.8.0</gson.version>
+	</properties>
+
 	<groupId>ru.mydesignstudio.protege</groupId>
 	<artifactId>search-plugin</artifactId>
 	<version>0.6</version>
@@ -25,10 +30,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<properties>
-		<protege.version>4.3.0</protege.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -72,6 +73,12 @@
 			<artifactId>rdf-library</artifactId>
 			<version>2.0.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -92,18 +99,18 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-ClassPath>.</Bundle-ClassPath>
+						<Bundle-ClassPath>.,gson-${gson.version}.jar</Bundle-ClassPath>
 						<Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Vendor>The Protege Development Team</Bundle-Vendor>
 						<Import-Package>
-							org.apache.log4j.*;version="[1.2,2)", 
+							org.apache.log4j.*;version="[1.2,2)",
 							org.protege.editor.core.*;version="4.3",
 							org.protege.editor.owl.*;version="4.3",
 							*
 						</Import-Package>
 						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
 						<Private-Package>skeleton</Private-Package>
-						<Embed-Dependency></Embed-Dependency>
+						<Embed-Dependency>gson</Embed-Dependency>
 					</instructions>
 					<executions>
 						<execution>

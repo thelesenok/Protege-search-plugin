@@ -97,6 +97,22 @@ public interface OWLService {
     OWLIndividual getIndividual(IRI uri) throws ApplicationException;
 
     /**
+     * Класс по идентификатору
+     * @param iri - идентификатор объекта
+     * @return - класс
+     * @throws ApplicationException
+     */
+    OWLClass getOWLClass(IRI iri) throws ApplicationException;
+
+    /**
+     * Свойство по идентификатору
+     * @param iri - идентификатор
+     * @return - свойство
+     * @throws ApplicationException
+     */
+    OWLProperty getProperty(IRI iri) throws ApplicationException;
+
+    /**
      * Значение свойства
      * @param individual - объект, у которого пытаемся получить значение свойства
      * @param property - объект свойства

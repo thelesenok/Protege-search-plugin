@@ -7,21 +7,27 @@ import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.StrategyComparator;
 import ru.mydesignstudio.protege.plugin.search.ui.event.LookupInstancesEvent;
+import ru.mydesignstudio.protege.plugin.search.ui.event.properties.LoadSearchPropertiesEvent;
+import ru.mydesignstudio.protege.plugin.search.ui.event.properties.LoadedSearchPropertiesEvent;
+import ru.mydesignstudio.protege.plugin.search.ui.event.properties.SaveSearchPropertiesEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,6 +45,7 @@ public class SearchParamsPane extends JPanel {
 
     @Inject
     private SearchStrategyService strategyService;
+
     private final EventBus eventBus = EventBus.getInstance();
 
     public SearchParamsPane() {
@@ -69,21 +76,173 @@ public class SearchParamsPane extends JPanel {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // надо собрать со всех активных способов поиска
-                // указанные в них параметры и передать их все
-                // в центральный метод поиска
-                final Collection<LookupParam> params = new LinkedList<LookupParam>();
-                final TreeSet<SearchStrategy> sortedStrategies = new TreeSet<>(new StrategyComparator());
-                sortedStrategies.addAll(enabledStrategies);
-                for (SearchStrategy enabledStrategy : sortedStrategies) {
-                    params.add(new LookupParam(
-                            enabledStrategy,
-                            enabledStrategy.getSearchParamsPane() == null ? null : enabledStrategy.getSearchParamsPane().getSearchParams()
-                    ));
-                }
+                final Collection<LookupParam> params = getLookupParams(getEnabledStrategies());
                 eventBus.publish(new LookupInstancesEvent(params));
             }
         });
+        /**
+         * добавим также кнопки сохранения и загрузки
+         */
+        final Button saveButton = new Button("Save");
+        final Button loadButton = new Button("Load");
+        searchButtonContainer.add(saveButton);
+        searchButtonContainer.add(loadButton);
+        /**
+         * повесим на кнопки обработчики
+         */
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final File file = savePropertiesHandler();
+                if (file == null) {
+                    /**
+                     * Пользователь передумал - ничего не делаем
+                     */
+                    return;
+                }
+                final Collection<SearchStrategy> enabledStrategies = getEnabledStrategies();
+                final Collection<LookupParam> lookupParams = getLookupParams(enabledStrategies);
+                eventBus.publish(
+                        new SaveSearchPropertiesEvent(
+                                file,
+                                lookupParams
+                        )
+                );
+            }
+        });
+        loadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final File file = loadPropertiesHandler();
+                if (file == null) {
+                    /**
+                     * Пользователь передумал - ничего не делаем
+                     */
+                    return;
+                }
+                eventBus.publish(new LoadSearchPropertiesEvent(file));
+            }
+        });
+    }
+
+    /**
+     * Показать диалог сохранения файла
+     * @return - куда сохранять
+     */
+    private File savePropertiesHandler() {
+        return showFileDialog("Save properties");
+    }
+
+    /**
+     * Показать диалог работы с файлом
+     * @param dialogTitle - заголовок диалога
+     * @return
+     */
+    private File showFileDialog(String dialogTitle) {
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle(dialogTitle);
+        final int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+        return null;
+    }
+
+    /**
+     * Показать диалог загрузки файлов
+     * @return - выбранный файл
+     */
+    private File loadPropertiesHandler() {
+        return showFileDialog("Load properties");
+    }
+
+    /**
+     * Параметры поиска, доступные в указанных стратегиях
+     * @param strategies - сортированные стратегии
+     * @return
+     */
+    private Collection<LookupParam> getLookupParams(Collection<SearchStrategy> strategies) {
+        final Collection<LookupParam> params = new LinkedList<LookupParam>();
+        for (SearchStrategy enabledStrategy : strategies) {
+            params.add(new LookupParam(
+                    enabledStrategy,
+                    enabledStrategy.getSearchParamsPane() == null ? null : enabledStrategy.getSearchParamsPane().getSearchParams()
+            ));
+        }
+        return params;
+    }
+
+    /**
+     * Включенные стратегии в правильном порядке
+     * @return
+     */
+    private Collection<SearchStrategy> getEnabledStrategies() {
+        final TreeSet<SearchStrategy> sortedStrategies = new TreeSet<>(new StrategyComparator());
+        sortedStrategies.addAll(enabledStrategies);
+        return sortedStrategies;
+    }
+
+    /**
+     * Когда параметры поиска загрузили из файла
+     * @param event - событие с данными
+     */
+    @Subscribe
+    public void onSavedParamsLoadListener(LoadedSearchPropertiesEvent event) {
+        final Collection<LookupParam> params = event.getLookupParams();
+        /**
+         * выключаем все предыдущие стратегии
+         */
+        for (SearchStrategy strategy : enabledStrategies) {
+            disableStrategy(strategy);
+        }
+        /**
+         * включим стратегии, загрузим в них параметры
+         */
+        for (LookupParam lookupParam : params) {
+            enableStrategy(lookupParam.getStrategy());
+        }
+    }
+
+    /**
+     * Включить стратегию
+     * @param strategy - какую именно
+     */
+    private void enableStrategy(SearchStrategy strategy) {
+        if (enabledStrategies.contains(strategy)) {
+            return;
+        }
+        this.enabledStrategies.add(strategy);
+        final Component strategyParamsPane = strategy.getSearchParamsPane();
+        if (strategyParamsPane == null) {
+            return;
+        }
+        // добавляем на отдельную закладку
+        this.criteriaContainer.addTab(
+                strategy.getTitle(),
+                strategy.getSearchParamsPane()
+        );
+    }
+
+    /**
+     * Выключить стратегию
+     * @param strategy - какую именно
+     */
+    private void disableStrategy(SearchStrategy strategy) {
+        if (strategy.isRequired()) {
+            /**
+             * обязательные стратегии выключить нельзя
+             */
+            return;
+        }
+        this.enabledStrategies.remove(strategy);
+        final Component strategyParamsPane = strategy.getSearchParamsPane();
+        if (strategyParamsPane == null) {
+            return;
+        }
+        // добавляем на отдельную закладку
+        this.criteriaContainer.remove(
+                strategy.getSearchParamsPane()
+        );
     }
 
     /**
@@ -95,28 +254,11 @@ public class SearchParamsPane extends JPanel {
     @Subscribe
     public void onStrategyChangeEventListener(StrategyChangeEvent event) {
         final SearchStrategy selectedStrategy = event.getStrategy();
-        final Component strategyParamsPane = selectedStrategy.getSearchParamsPane();
         // если это включение стратегии, то добавляем ее в список
         if (event.isSelected()) {
-            this.enabledStrategies.add(selectedStrategy);
+            enableStrategy(selectedStrategy);
         } else {
-            this.enabledStrategies.remove(selectedStrategy);
-        }
-        //
-        if (strategyParamsPane == null) {
-            return;
-        }
-        if (event.isSelected()) {
-            // добавляем на отдельную закладку
-            this.criteriaContainer.addTab(
-                    selectedStrategy.getTitle(),
-                    selectedStrategy.getSearchParamsPane()
-            );
-        } else {
-            // убираем закладку
-            this.criteriaContainer.remove(
-                    selectedStrategy.getSearchParamsPane()
-            );
+            disableStrategy(selectedStrategy);
         }
     }
 

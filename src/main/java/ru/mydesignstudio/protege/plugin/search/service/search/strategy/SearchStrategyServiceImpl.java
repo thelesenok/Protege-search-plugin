@@ -1,6 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.search.strategy;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.semantic.SemanticalSearchStrategy;
@@ -47,5 +49,17 @@ public class SearchStrategyServiceImpl implements SearchStrategyService {
         final List<SearchStrategy> strategies = new ArrayList<>(registry.getStrategies());
         Collections.sort(strategies, new StrategyComparator());
         return strategies;
+    }
+
+    @Override
+    public <T extends SearchStrategy> T getStrategy(Class<T> strategyClass) throws ApplicationException {
+        final T strategy = registry.getStrategy(strategyClass);
+        if (strategy == null) {
+            throw new ApplicationException(String.format(
+                    "There is no registered strategy with class %s",
+                    strategyClass
+            ));
+        }
+        return strategy;
     }
 }

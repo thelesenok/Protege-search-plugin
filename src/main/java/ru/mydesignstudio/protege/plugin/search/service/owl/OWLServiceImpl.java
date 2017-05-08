@@ -159,12 +159,44 @@ public class OWLServiceImpl implements OWLService {
     }
 
     @Override
-    public OWLIndividual getIndividual(IRI uri) throws ApplicationException {
+    public OWLIndividual getIndividual(final IRI uri) throws ApplicationException {
         final Set<OWLNamedIndividual> owlNamedIndividuals = getOntology().getIndividualsInSignature();
         return CollectionUtils.findFirst(owlNamedIndividuals, new Specification<OWLNamedIndividual>() {
             @Override
             public boolean isSatisfied(OWLNamedIndividual individual) {
                 return individual.getIRI().equals(uri);
+            }
+        });
+    }
+
+    @Override
+    public OWLClass getOWLClass(final IRI iri) throws ApplicationException {
+        final Set<OWLClass> classesInSignature = getOntology().getClassesInSignature();
+        return CollectionUtils.findFirst(classesInSignature, new Specification<OWLClass>() {
+            @Override
+            public boolean isSatisfied(OWLClass owlClass) {
+                return OWLUtils.equals(owlClass.getIRI(), iri);
+            }
+        });
+    }
+
+    @Override
+    public OWLProperty getProperty(IRI iri) throws ApplicationException {
+        final Set<OWLObjectProperty> objectProperties = getOntology().getObjectPropertiesInSignature();
+        final OWLObjectProperty objectProperty = CollectionUtils.findFirst(objectProperties, new Specification<OWLObjectProperty>() {
+            @Override
+            public boolean isSatisfied(OWLObjectProperty property) {
+                return OWLUtils.equals(property.getIRI(), iri);
+            }
+        });
+        if (objectProperty != null) {
+            return objectProperty;
+        }
+        final Set<OWLDataProperty> dataProperties = getOntology().getDataPropertiesInSignature();
+        return CollectionUtils.findFirst(dataProperties, new Specification<OWLDataProperty>() {
+            @Override
+            public boolean isSatisfied(OWLDataProperty property) {
+                return OWLUtils.equals(property.getIRI(), iri);
             }
         });
     }
