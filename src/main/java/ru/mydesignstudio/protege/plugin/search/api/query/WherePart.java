@@ -5,6 +5,8 @@ import org.semanticweb.owlapi.model.OWLProperty;
 
 /**
  * Created by abarmin on 04.01.17.
+ *
+ * Ограничивающая часть запроса
  */
 public class WherePart implements QueryObject {
     private OWLClass owlClass;
@@ -42,5 +44,15 @@ public class WherePart implements QueryObject {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @Override
+    public WherePart clone() {
+        final WherePart clone = new WherePart();
+        clone.setOwlClass(getOwlClass());
+        clone.setLogicalOperation(getLogicalOperation());
+        clone.setProperty(getProperty());
+        clone.setValue(getValue());
+        return clone;
     }
 }

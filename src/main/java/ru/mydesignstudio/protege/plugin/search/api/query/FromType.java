@@ -15,4 +15,8 @@ public class FromType implements QueryObject {
     public OWLClass getOwlClass() {
         return owlClass;
     }
+
+    public FromType clone() {
+        return new FromType(getOwlClass());
+    }
 }

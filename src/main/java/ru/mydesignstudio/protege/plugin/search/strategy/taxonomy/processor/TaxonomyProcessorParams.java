@@ -7,7 +7,7 @@ import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProces
  *
  * Параметры поиска с учетом таксономической близости
  */
-public class TaxonomyCollectorParams implements SearchProcessorParams {
+public class TaxonomyProcessorParams implements SearchProcessorParams {
     private int proximity = 3;
 
     public int getProximity() {

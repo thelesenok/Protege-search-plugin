@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.component;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyCollectorParams;
+import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -13,8 +13,8 @@ import java.awt.Label;
  *
  * Настройки поиска с учетом таксономической близости
  */
-public class TaxonomySearchParamsComponent extends JPanel implements SearchStrategyComponent<TaxonomyCollectorParams> {
-    private TaxonomyCollectorParams params = new TaxonomyCollectorParams();
+public class TaxonomySearchParamsComponent extends JPanel implements SearchStrategyComponent<TaxonomyProcessorParams> {
+    private TaxonomyProcessorParams params = new TaxonomyProcessorParams();
     private JTextField proximityValueField;
 
     public TaxonomySearchParamsComponent() {
@@ -29,7 +29,7 @@ public class TaxonomySearchParamsComponent extends JPanel implements SearchStrat
     }
 
     @Override
-    public TaxonomyCollectorParams getSearchParams() {
+    public TaxonomyProcessorParams getSearchParams() {
         params.setProximity(
                 Integer.parseInt(
                         proximityValueField.getText()

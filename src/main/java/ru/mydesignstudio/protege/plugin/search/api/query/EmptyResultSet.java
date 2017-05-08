@@ -2,6 +2,8 @@ package ru.mydesignstudio.protege.plugin.search.api.query;
 
 /**
  * Created by abarmin on 12.03.17.
+ *
+ * Результаты запроса, которые ничего не содержат
  */
 public class EmptyResultSet implements ResultSet {
     @Override

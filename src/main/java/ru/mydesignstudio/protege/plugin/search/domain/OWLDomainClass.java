@@ -3,17 +3,16 @@ package ru.mydesignstudio.protege.plugin.search.domain;
 import org.semanticweb.owlapi.model.OWLClass;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
-import java.util.Collection;
-
 /**
  * Created by abarmin on 04.01.17.
  *
  * Класс предметной области из онтологии
  */
 public class OWLDomainClass implements OWLDomainObject {
+    /**
+     * Какой класс онтологии здесь обернут
+     */
     private final OWLClass owlClass;
-    private OWLDomainClass parent;
-    private Collection<OWLDomainClass> children;
 
     public OWLDomainClass(OWLClass owlClass) {
         this.owlClass = owlClass;
@@ -21,6 +20,17 @@ public class OWLDomainClass implements OWLDomainObject {
 
     public OWLClass getOwlClass() {
         return owlClass;
+    }
+
+    /**
+     * Является ли класс вершиной иерархии (Thing)
+     * @return
+     */
+    public boolean isTopLevelClass() {
+        return StringUtils.equalsIgnoreCase(
+                getOwlClass().getIRI().getFragment(),
+                "Thing"
+        );
     }
 
     @Override

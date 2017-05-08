@@ -11,19 +11,13 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.DateWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.IndividualWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.IntegerWherePartConverter;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.StringWherePartConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.WherePartConditionConverter;
-import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.WherePartConditionConverterFactory;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,21 +34,15 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
     private static final String PREFIX = "prfx";
-    private static final String OBJECT = "object";
+    public static final String OBJECT = "object";
     private static final AtomicInteger variableIndex = new AtomicInteger(0);
     private static final String NEW_LINE = "\n";
     private final Map<String, String> prefixes = new HashMap<String, String>();
-    private final Map<Class, WherePartConditionConverter> conditionConverters = new HashMap<>();
 
     @Inject
     private OWLService owlService;
-
-    public SparqlQueryVisitor() {
-        conditionConverters.put(OWLDomainIndividual.class, new IndividualWherePartConverter());
-        conditionConverters.put(String.class, new StringWherePartConverter());
-        conditionConverters.put(Integer.class, new IntegerWherePartConverter());
-        conditionConverters.put(Date.class, new DateWherePartConverter());
-    }
+    @Inject
+    private WherePartConditionConverterFactory conditionConverterFactory;
 
     private String getNextVariableName() {
         return "?variable" + variableIndex.incrementAndGet();
@@ -139,20 +127,8 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         // добавляем фильтр на указанный критерий
         final Object value = wherePart.getValue();
         //
-        final WherePartConditionConverter conditionConverter;
         final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(wherePart.getProperty());
-        if (LogicalOperationHelper.hasClassExpression(ranges)) {
-            conditionConverter = conditionConverters.get(OWLDomainIndividual.class);
-        } else if (LogicalOperationHelper.hasIntegerExpression(ranges)) {
-            conditionConverter = conditionConverters.get(Integer.class);
-        } else if (LogicalOperationHelper.hasStringExpression(ranges)) {
-            conditionConverter = conditionConverters.get(String.class);
-        } else if (LogicalOperationHelper.hasDateExpression(ranges)) {
-            conditionConverter = conditionConverters.get(Date.class);
-        } else {
-            LOGGER.error("Can't get value converter");
-            throw new ApplicationException("Can't get value converter");
-        }
+        final WherePartConditionConverter conditionConverter = conditionConverterFactory.getConverter(ranges);
         builder.append(conditionConverter.convert(wherePart, value, variableName));
         builder.append(NEW_LINE);
         //

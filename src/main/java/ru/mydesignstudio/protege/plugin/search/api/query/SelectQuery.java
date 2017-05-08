@@ -6,9 +6,17 @@ import java.util.List;
 
 /**
  * Created by abarmin on 04.01.17.
+ *
+ * Объектное представление запроса
  */
 public class SelectQuery implements QueryObject {
+    /**
+     * Какого типа результат
+     */
     private FromType from;
+    /**
+     * По каким условиям отбираем
+     */
     private final List<WherePart> whereParts = new ArrayList<>();
 
     public FromType getFrom() {
@@ -35,5 +43,17 @@ public class SelectQuery implements QueryObject {
         if (hasWherePart(index)) {
             whereParts.remove(index);
         }
+    }
+
+    @Override
+    public SelectQuery clone() {
+        final SelectQuery query = new SelectQuery();
+        final FromType from = getFrom().clone();
+        query.setFrom(from);
+        for (WherePart wherePart : getWhereParts()) {
+            final WherePart clonedWherePart = wherePart.clone();
+            query.addWherePart(clonedWherePart);
+        }
+        return query;
     }
 }

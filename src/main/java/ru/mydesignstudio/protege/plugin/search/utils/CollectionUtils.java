@@ -30,6 +30,22 @@ public class CollectionUtils {
         return destination;
     }
 
+    /**
+     * Получить первый элемент коллекции, удовлетворяющий условию
+     * @param source - коллекция
+     * @param specification - условие
+     * @param <ITEM> - элемент коллекции
+     * @return - подходящий элемент
+     */
+    public static final <ITEM> ITEM findFirst(Collection<ITEM> source, Specification<ITEM> specification) {
+        for (ITEM item : source) {
+            if (specification.isSatisfied(item)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public static final <ITEM> void forEach(Collection<ITEM> source, Action<ITEM> action) {
         for (ITEM item : source) {
             action.run(item);

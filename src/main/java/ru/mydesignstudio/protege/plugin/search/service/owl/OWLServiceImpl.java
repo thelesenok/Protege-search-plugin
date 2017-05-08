@@ -1,18 +1,23 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl;
 
 import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.EmptyResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
@@ -123,5 +128,72 @@ public class OWLServiceImpl implements OWLService {
             resultSet = processor.collect(resultSet, selectQuery, param.getStrategyParams());
         }
         return resultSet;
+    }
+
+    @Override
+    public OWLClass getParentClass(OWLClass child) throws ApplicationException {
+        final Set<OWLSubClassOfAxiom> axioms = getOntology().getAxioms(AxiomType.SUBCLASS_OF);
+        for (OWLSubClassOfAxiom axiom : axioms) {
+            for (OWLClass childClass : axiom.getSubClass().getClassesInSignature()) {
+                if (child.equals(childClass)) {
+                    final Set<OWLClass> parentClasses = axiom.getSuperClass().getClassesInSignature();
+                    return parentClasses.iterator().next();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Collection<OWLClass> getChildrenClasses(OWLClass parent) throws ApplicationException {
+        final Set<OWLSubClassOfAxiom> axioms = getOntology().getAxioms(AxiomType.SUBCLASS_OF);
+        for (OWLSubClassOfAxiom axiom : axioms) {
+            for (OWLClass owlClass : axiom.getSuperClass().getClassesInSignature()) {
+                if (parent.equals(owlClass)) {
+                    return axiom.getSubClass().getClassesInSignature();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public OWLIndividual getIndividual(IRI uri) throws ApplicationException {
+        final Set<OWLNamedIndividual> owlNamedIndividuals = getOntology().getIndividualsInSignature();
+        return CollectionUtils.findFirst(owlNamedIndividuals, new Specification<OWLNamedIndividual>() {
+            @Override
+            public boolean isSatisfied(OWLNamedIndividual individual) {
+                return individual.getIRI().equals(uri);
+            }
+        });
+    }
+
+    @Override
+    public Object getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException {
+        // @TODO поправить эту копипасту. чет у меня не получилось прикастовать ровно
+        if (property instanceof OWLObjectProperty) {
+            final Set<OWLObjectPropertyAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.OBJECT_PROPERTY_ASSERTION);
+            final Collection<OWLObjectPropertyAssertionAxiom> subjectAxioms = CollectionUtils.filter(axioms, new Specification<OWLObjectPropertyAssertionAxiom>() {
+                @Override
+                public boolean isSatisfied(OWLObjectPropertyAssertionAxiom axiom) {
+                    return axiom.getSubject().equals(individual) && axiom.getProperty().equals(property);
+                }
+            });
+            if (CollectionUtils.isNotEmpty(subjectAxioms)) {
+                return subjectAxioms.iterator().next().getObject();
+            }
+        } else if (property instanceof OWLDataProperty) {
+            final Set<OWLDataPropertyAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.DATA_PROPERTY_ASSERTION);
+            final Collection<OWLDataPropertyAssertionAxiom> subjectAxioms = CollectionUtils.filter(axioms, new Specification<OWLDataPropertyAssertionAxiom>() {
+                @Override
+                public boolean isSatisfied(OWLDataPropertyAssertionAxiom axiom) {
+                    return axiom.getSubject().equals(individual) && axiom.getProperty().equals(property);
+                }
+            });
+            if (CollectionUtils.isNotEmpty(subjectAxioms)) {
+                return subjectAxioms.iterator().next().getObject();
+            }
+        }
+        return null;
     }
 }
