@@ -1,10 +1,10 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.proximity;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity.calculator.ProximityCalculator;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity.calculator.ProximityCalculatorEquals;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.proximity.calculator.ProximityCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.proximity.calculator.ProximityCalculatorEquals;
 
 import javax.inject.Inject;
 

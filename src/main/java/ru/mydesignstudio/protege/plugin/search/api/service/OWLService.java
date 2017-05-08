@@ -81,6 +81,14 @@ public interface OWLService {
     Collection<OWLClass> getChildrenClasses(OWLClass parent) throws ApplicationException;
 
     /**
+     * Класс экземпляра
+     * @param individual - экземпляр
+     * @return - его класс
+     * @throws ApplicationException
+     */
+    OWLClass getIndividualClass(OWLIndividual individual) throws ApplicationException;
+
+    /**
      * Элемент по идентификатору
      * @param uri - длинный идентификатор объекта
      * @return

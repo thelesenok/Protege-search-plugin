@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity.calculator;
+package ru.mydesignstudio.protege.plugin.search.strategy.attributive.proximity.calculator;
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;

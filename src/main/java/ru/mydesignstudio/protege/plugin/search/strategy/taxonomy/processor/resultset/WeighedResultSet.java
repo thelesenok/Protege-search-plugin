@@ -1,20 +1,21 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.resultset;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity.ProximityCalculatorFactory;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.proximity.calculator.ProximityCalculator;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,8 +31,6 @@ import java.util.Set;
 public class WeighedResultSet implements ResultSet {
     private static final Logger LOGGER = LoggerFactory.getLogger(WeighedResultSet.class);
 
-    @Inject
-    private ProximityCalculatorFactory calculatorFactory;
     @Inject
     private OWLService owlService;
 
@@ -65,7 +64,10 @@ public class WeighedResultSet implements ResultSet {
                 row.addCell(columnName, result);
             }
             try {
-                row.addCell(WEIGHT_COLUMN, String.valueOf(getRowWeight(row)));
+                row.addCell(WEIGHT_COLUMN, String.format(
+                        "%.2f",
+                        getRowWeight(row)
+                ));
             } catch (ApplicationException e) {
                 row.addCell(WEIGHT_COLUMN, 0);
                 LOGGER.warn("Can't calculate row weight", e);
@@ -74,6 +76,8 @@ public class WeighedResultSet implements ResultSet {
         }
     }
 
+    /*
+     * это близость по атрибутам, она потом понадобится
     public double getRowWeight(WeighedRow row) throws ApplicationException {
         int paramsCount = 0;
         int weightTotal = 0;
@@ -87,6 +91,14 @@ public class WeighedResultSet implements ResultSet {
         }
         //
         return paramsCount == 0 ? 0 : weightTotal / paramsCount;
+    }
+    */
+
+    public double getRowWeight(WeighedRow row) throws ApplicationException {
+        final OWLIndividual ontologyObject = owlService.getIndividual((IRI) row.getCell(SparqlQueryVisitor.OBJECT));
+        final OWLClass individualClass = owlService.getIndividualClass(ontologyObject);
+        final Collection<OWLDomainClass> hierarchy = OWLUtils.getClassesInHierarchy(new OWLDomainClass(individualClass));
+        return (double) processorParams.getProximity() / (hierarchy.size() + 1); // добавляем еще и сам класс
     }
 
     @Override

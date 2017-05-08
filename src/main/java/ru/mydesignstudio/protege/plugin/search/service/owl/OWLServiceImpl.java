@@ -28,6 +28,7 @@ import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
@@ -195,5 +196,23 @@ public class OWLServiceImpl implements OWLService {
             }
         }
         return null;
+    }
+
+    @Override
+    public OWLClass getIndividualClass(OWLIndividual individual) throws ApplicationException {
+        final Set<OWLClassAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.CLASS_ASSERTION);
+        final OWLClassAssertionAxiom targetAxiom = CollectionUtils.findFirst(axioms, new Specification<OWLClassAssertionAxiom>() {
+            @Override
+            public boolean isSatisfied(OWLClassAssertionAxiom axiom) {
+                return OWLUtils.equals(
+                        individual,
+                        axiom.getIndividual()
+                );
+            }
+        });
+        if (targetAxiom == null) {
+            return null;
+        }
+        return targetAxiom.getClassesInSignature().iterator().next();
     }
 }

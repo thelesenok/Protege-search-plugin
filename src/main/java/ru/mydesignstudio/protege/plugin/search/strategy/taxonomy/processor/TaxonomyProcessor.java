@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import static ru.mydesignstudio.protege.plugin.search.utils.OWLUtils.getClassesInHierarchy;
+
 /**
  * Created by abarmin on 04.05.17.
  *
@@ -54,7 +56,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
         /**
          * посмотрим путь до вершины иерархии
          */
-        final Collection<OWLDomainClass> classesInHierarchy = getClassesInHierarchy(domainClass);
+        final Collection<OWLDomainClass> classesInHierarchy = OWLUtils.getClassesInHierarchy(domainClass);
         /**
          * получим все классы, которые имеют указанные общие вершины
          */
@@ -183,28 +185,6 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
             }
         }
         return true;
-    }
-
-    /**
-     * Перечень классов от текущего до вершины
-     * @param domainClass
-     * @throws ApplicationException
-     * @return
-     */
-    private Collection<OWLDomainClass> getClassesInHierarchy(OWLDomainClass domainClass) throws ApplicationException {
-        final LinkedList<OWLDomainClass> hierarchy = new LinkedList<>();
-        OWLDomainClass currentClass = domainClass;
-        // поднимаемся вверх
-        while (currentClass != null && !currentClass.isTopLevelClass()) {
-            final OWLClass parentClass = owlService.getParentClass(currentClass.getOwlClass());
-            if (parentClass == null) {
-                currentClass = null;
-            } else {
-                currentClass = new OWLDomainClass(parentClass);
-                hierarchy.addFirst(currentClass);
-            }
-        }
-        return Collections.unmodifiableCollection(hierarchy);
     }
 
     @Override
