@@ -31,6 +31,13 @@ public class SelectQuery implements QueryObject {
         return Collections.unmodifiableList(whereParts);
     }
 
+    /**
+     * Удалить все условия
+     */
+    public void emptyWhereParts() {
+        whereParts.clear();
+    }
+
     public void addWherePart(WherePart wherePart) {
         whereParts.add(wherePart);
     }

@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
@@ -24,6 +25,7 @@ import ru.mydesignstudio.protege.plugin.search.service.search.serialization.adap
 import ru.mydesignstudio.protege.plugin.search.service.search.serialization.adapter.domain.OWLDomainLiteralAdapter;
 import ru.mydesignstudio.protege.plugin.search.service.search.serialization.adapter.owl.OWLClassAdapter;
 import ru.mydesignstudio.protege.plugin.search.service.search.serialization.adapter.owl.OWLPropertyAdapter;
+import ru.mydesignstudio.protege.plugin.search.service.search.serialization.adapter.query.WherePartAdapter;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -54,6 +56,7 @@ public class SearchStrategySerializationServiceImpl implements SearchStrategySer
         builder.registerTypeAdapter(OWLClass.class, new OWLClassAdapter());
         builder.registerTypeAdapter(OWLProperty.class, new OWLPropertyAdapter());
         builder.registerTypeAdapter(SearchProcessorParams.class, new SearchProcessorParamsAdapter());
+        builder.registerTypeAdapter(WherePart.class, new WherePartAdapter());
         /**
          * какой-то непонятный глюк, что нужно адаптер для
          * каждой стратегии регистрировать отдельно.

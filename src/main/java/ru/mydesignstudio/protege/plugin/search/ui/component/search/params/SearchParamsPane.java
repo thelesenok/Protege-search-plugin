@@ -1,16 +1,22 @@
 package ru.mydesignstudio.protege.plugin.search.ui.component.search.params;
 
 import com.google.common.eventbus.Subscribe;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
+import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategySerializationService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.StrategyComparator;
 import ru.mydesignstudio.protege.plugin.search.ui.event.LookupInstancesEvent;
-import ru.mydesignstudio.protege.plugin.search.ui.event.properties.LoadSearchPropertiesEvent;
-import ru.mydesignstudio.protege.plugin.search.ui.event.properties.LoadedSearchPropertiesEvent;
-import ru.mydesignstudio.protege.plugin.search.ui.event.properties.SaveSearchPropertiesEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -42,9 +48,14 @@ public class SearchParamsPane extends JPanel {
     private JPanel searchButtonContainer = new JPanel();
 
     private Collection<SearchStrategy> enabledStrategies = new HashSet<>();
+    private Collection<JCheckBox> strategySelectors = new HashSet<>();
 
     @Inject
     private SearchStrategyService strategyService;
+    @Inject
+    private SearchStrategySerializationService serializationService;
+    @Inject
+    private ExceptionWrapperService wrapperService;
 
     private final EventBus eventBus = EventBus.getInstance();
 
@@ -102,12 +113,16 @@ public class SearchParamsPane extends JPanel {
                 }
                 final Collection<SearchStrategy> enabledStrategies = getEnabledStrategies();
                 final Collection<LookupParam> lookupParams = getLookupParams(enabledStrategies);
-                eventBus.publish(
-                        new SaveSearchPropertiesEvent(
-                                file,
-                                lookupParams
-                        )
-                );
+                /**
+                 * сохраняем все через сервим
+                 */
+                wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
+                    @Override
+                    public Void run() throws ApplicationException {
+                        serializationService.save(file, lookupParams);
+                        return null;
+                    }
+                });
             }
         });
         loadButton.addActionListener(new ActionListener() {
@@ -120,7 +135,16 @@ public class SearchParamsPane extends JPanel {
                      */
                     return;
                 }
-                eventBus.publish(new LoadSearchPropertiesEvent(file));
+                /**
+                 * загружаем через сервис
+                 */
+                final Collection<LookupParam> params = wrapperService.invokeWrapped(new ExceptionWrappedCallback<Collection<LookupParam>>() {
+                    @Override
+                    public Collection<LookupParam> run() throws ApplicationException {
+                        return serializationService.load(file);
+                    }
+                });
+                applyLookupParams(params);
             }
         });
     }
@@ -183,23 +207,82 @@ public class SearchParamsPane extends JPanel {
     }
 
     /**
-     * Когда параметры поиска загрузили из файла
-     * @param event - событие с данными
+     * Применяем загруженные параметры
+     * @param params - параметры
      */
-    @Subscribe
-    public void onSavedParamsLoadListener(LoadedSearchPropertiesEvent event) {
-        final Collection<LookupParam> params = event.getLookupParams();
+    public void applyLookupParams(Collection<LookupParam> params) {
         /**
          * выключаем все предыдущие стратегии
          */
         for (SearchStrategy strategy : enabledStrategies) {
-            disableStrategy(strategy);
+            disableStrategyCheckbox(strategy);
         }
         /**
          * включим стратегии, загрузим в них параметры
          */
         for (LookupParam lookupParam : params) {
-            enableStrategy(lookupParam.getStrategy());
+            enableStrategyCheckbox(lookupParam.getStrategy());
+            applyStrategyParams(lookupParam.getStrategy(), lookupParam.getStrategyParams());
+        }
+    }
+
+    /**
+     * Применить к указанной стратегии параметры
+     * @param strategy - вот к этой стратегии
+     * @param params - эти параметры
+     */
+    private void applyStrategyParams(SearchStrategy strategy, SearchProcessorParams params) {
+        wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
+            @Override
+            public Void run() throws ApplicationException {
+                final SearchStrategy enabledStrategy = strategyService.getStrategy(strategy.getClass());
+                final SearchStrategyComponent paramsPane = enabledStrategy.getSearchParamsPane();
+                if (paramsPane != null) {
+                    paramsPane.setSearchParams(params);
+                }
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Есть ли уже такая включенная стратегия
+     * @param toCheck - проверяем, включена ли вот эта
+     * @return
+     */
+    private boolean isStrategyEnabled(SearchStrategy toCheck) {
+        if (enabledStrategies.contains(toCheck)) {
+            return true;
+        }
+        return CollectionUtils.some(enabledStrategies, new Specification<SearchStrategy>() {
+            @Override
+            public boolean isSatisfied(SearchStrategy strategy) {
+                return strategy.getClass().equals(toCheck.getClass());
+            }
+        });
+    }
+
+    /**
+     * Включаем галку стратегии руками
+     * @param strategy
+     */
+    private void enableStrategyCheckbox(SearchStrategy strategy) {
+        for (JCheckBox selector : strategySelectors) {
+            if (StringUtils.equalsIgnoreCase(selector.getText(), strategy.getTitle())) {
+                selector.setSelected(true);
+            }
+        }
+    }
+
+    /**
+     * Выключаем галку стратегии
+     * @param strategy
+     */
+    private void disableStrategyCheckbox(SearchStrategy strategy) {
+        for (JCheckBox selector : strategySelectors) {
+            if (StringUtils.equalsIgnoreCase(selector.getText(), strategy.getTitle())) {
+                selector.setSelected(false);
+            }
         }
     }
 
@@ -208,16 +291,24 @@ public class SearchParamsPane extends JPanel {
      * @param strategy - какую именно
      */
     private void enableStrategy(SearchStrategy strategy) {
-        if (enabledStrategies.contains(strategy)) {
+        /**
+         * не включаем стратегию, если она уже включена
+         */
+        if (isStrategyEnabled(strategy)) {
             return;
         }
-        this.enabledStrategies.add(strategy);
+        /**
+         * добавляем в список включенных
+         */
+        enabledStrategies.add(strategy);
         final Component strategyParamsPane = strategy.getSearchParamsPane();
         if (strategyParamsPane == null) {
             return;
         }
-        // добавляем на отдельную закладку
-        this.criteriaContainer.addTab(
+        /**
+         * добавляем на отдельную закладку
+         */
+        criteriaContainer.addTab(
                 strategy.getTitle(),
                 strategy.getSearchParamsPane()
         );
@@ -234,12 +325,25 @@ public class SearchParamsPane extends JPanel {
              */
             return;
         }
+        /**
+         * выключим галку
+         */
+        for (JCheckBox selector : strategySelectors) {
+            if (StringUtils.equalsIgnoreCase(selector.getText(), strategy.getTitle())) {
+                selector.setSelected(false);
+            }
+        }
+        /**
+         * убираем из списка включенных
+         */
         this.enabledStrategies.remove(strategy);
         final Component strategyParamsPane = strategy.getSearchParamsPane();
         if (strategyParamsPane == null) {
             return;
         }
-        // добавляем на отдельную закладку
+        /**
+         * убираем отдельную закладку
+         */
         this.criteriaContainer.remove(
                 strategy.getSearchParamsPane()
         );
@@ -284,6 +388,7 @@ public class SearchParamsPane extends JPanel {
             final JCheckBox strategySelectFlag = new JCheckBox(strategy.getTitle(), strategy.isRequired());
             strategySelectFlag.setEnabled(!strategy.isRequired());
             strategiesContainer.add(strategySelectFlag);
+            strategySelectors.add(strategySelectFlag);
             //
             strategySelectFlag.addItemListener(new ItemListener() {
                 @Override

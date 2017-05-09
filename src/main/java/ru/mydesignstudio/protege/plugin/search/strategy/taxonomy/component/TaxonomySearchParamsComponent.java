@@ -37,4 +37,11 @@ public class TaxonomySearchParamsComponent extends JPanel implements SearchStrat
         );
         return params;
     }
+
+    @Override
+    public void setSearchParams(TaxonomyProcessorParams params) {
+        proximityValueField.setText(
+                String.valueOf(params.getProximity())
+        );
+    }
 }

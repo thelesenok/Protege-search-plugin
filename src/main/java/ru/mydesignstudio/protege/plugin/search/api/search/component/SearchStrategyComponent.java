@@ -10,4 +10,10 @@ public interface SearchStrategyComponent<PARAMS extends SearchProcessorParams> {
      * @return
      */
     PARAMS getSearchParams();
+
+    /**
+     * Загрузить параметры отбора в компонент
+     * @param params
+     */
+    void setSearchParams(PARAMS params);
 }

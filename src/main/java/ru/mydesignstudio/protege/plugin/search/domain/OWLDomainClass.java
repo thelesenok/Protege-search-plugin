@@ -1,6 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.domain;
 
 import org.semanticweb.owlapi.model.OWLClass;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 /**
@@ -44,5 +45,20 @@ public class OWLDomainClass implements OWLDomainObject {
                 owlClass.toStringID(),
                 "#"
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OWLDomainClass that = (OWLDomainClass) o;
+
+        return OWLUtils.equals(this, that);
+    }
+
+    @Override
+    public int hashCode() {
+        return owlClass.hashCode();
     }
 }

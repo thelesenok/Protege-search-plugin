@@ -48,6 +48,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
 
     private JPanel targetContainer = new JPanel(new GridLayout(1, 3));
     private JPanel criteriaContainer = new JPanel(new BorderLayout());
+    private final JComboBox<OWLDomainClass> targetTypeSelector = new JComboBox<OWLDomainClass>();
 
     public AttributiveSearchStrategyParamsComponent() {
         setLayout(new BorderLayout());
@@ -83,8 +84,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     }
 
     private void fillTargetTypeSelector() throws ApplicationException {
-        final JComboBox<OWLDomainClass> typeSelector = new JComboBox<OWLDomainClass>();
-        typeSelector.setRenderer(new JComboboxIconRenderer());
+        targetTypeSelector.setRenderer(new JComboboxIconRenderer());
         CollectionUtils.forEach(CollectionUtils.map(owlService.getClasses(), new Transformer<OWLClass, OWLDomainClass>() {
                     @Override
                     public OWLDomainClass transform(OWLClass item) {
@@ -93,17 +93,17 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
                 }), new Action<OWLDomainClass>() {
                     @Override
                     public void run(OWLDomainClass uiClass) {
-                        typeSelector.addItem(uiClass);
+                        targetTypeSelector.addItem(uiClass);
                     }
                 });
         //
         final JButton addCriteriaButton = new JButton("+");
         //
         targetContainer.add(new Label("Target type"));
-        targetContainer.add(typeSelector);
+        targetContainer.add(targetTypeSelector);
         targetContainer.add(addCriteriaButton);
         //
-        typeSelector.addItemListener(new ItemListener() {
+        targetTypeSelector.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -124,5 +124,27 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     @Override
     public AttributiveProcessorParams getSearchParams() {
         return new AttributiveProcessorParams(selectQuery);
+    }
+
+    @Override
+    public void setSearchParams(AttributiveProcessorParams params) {
+        final SelectQuery loadedQuery = params.getSelectQuery();
+        /**
+         * выберем целевой объект
+         */
+        final OWLDomainClass targetClass = new OWLDomainClass(
+                loadedQuery.getFrom().getOwlClass()
+        );
+        targetTypeSelector.setSelectedItem(targetClass);
+        /**
+         * удалим старые условия поиска
+         */
+        selectQuery.emptyWhereParts();
+        /**
+         * добавим новые условия
+         */
+        for (WherePart wherePart : loadedQuery.getWhereParts()) {
+            selectQuery.addWherePart(wherePart);
+        }
     }
 }

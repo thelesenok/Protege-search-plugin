@@ -7,8 +7,25 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeE
 
 /**
  * Created by abarmin on 12.03.17.
+ *
+ * Сервис оборачивания вызовов с проверяемыми исключения в вызовы
+ * с непроверяемыми исключениями. Похоже на какой-то костыль.
  */
 public class ExceptionWrapperService {
+    /**
+     * Вызвать метод обернув обработку исключений в непроверяемое
+     * @param callback - колбек
+     * @param <T>
+     * @return - результат выполнения
+     */
+    public <T> T invokeWrapped(ExceptionWrappedCallback<T> callback) {
+        try {
+            return callback.run();
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
+
     public <T> T invokeWrapped(Object caller, ExceptionWrappedCallback<T> callback) {
         try {
             return callback.run();

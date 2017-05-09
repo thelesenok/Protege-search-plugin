@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLProperty;
@@ -120,4 +121,12 @@ public interface OWLService {
      * @throws ApplicationException
      */
     Object getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException;
+
+    /**
+     * Элемент перечисления
+     * @param value - значение перечисления
+     * @return
+     * @throws ApplicationException
+     */
+    OWLLiteral getLiteral(String value) throws ApplicationException;
 }

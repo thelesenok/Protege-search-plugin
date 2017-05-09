@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
@@ -31,6 +32,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
+import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -246,5 +248,10 @@ public class OWLServiceImpl implements OWLService {
             return null;
         }
         return targetAxiom.getClassesInSignature().iterator().next();
+    }
+
+    @Override
+    public OWLLiteral getLiteral(String value) throws ApplicationException {
+        return new OWLLiteralImplString(value);
     }
 }
