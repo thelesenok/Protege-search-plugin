@@ -4,4 +4,5 @@
 build.properties
 META-INF/
 target/
-
+.idea
+*.iml

@@ -27,6 +27,7 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.ev
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.CellRendererWithIcon;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.FuzzySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
@@ -72,6 +73,10 @@ public class AttributiveSearchParamsTable extends JTable {
      * Признак включенности поиска по связям
      */
     private boolean isRelationalLookupEnabled = false;
+    /**
+     * Признак включенности нечеткого поиска
+     */
+    private boolean isFuzzyLookupEnabled = false;
 
     public AttributiveSearchParamsTable(SelectQuery selectQuery, OWLService owlService, ExceptionWrapperService wrapperService) {
         super(new CriteriaTableModel(selectQuery));
@@ -244,7 +249,7 @@ public class AttributiveSearchParamsTable extends JTable {
                 operationEditor.setSelectedItem(null);
                 //
                 final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(event.getProperty());
-                final Collection<LogicalOperation> operations = LogicalOperationHelper.getAvailableOperations(ranges);
+                final Collection<LogicalOperation> operations = getAvailableOperationsForLookup(event.getProperty());
                 for (LogicalOperation operation : operations) {
                     operationEditor.addItem(operation);
                 }
@@ -283,7 +288,7 @@ public class AttributiveSearchParamsTable extends JTable {
     @Subscribe
     public void onStrategyToggleEvent(StrategyChangeEvent event) {
         try {
-            if (event.getStrategy().getClass() == RelationalSearchStrategy.class) {
+            if (RelationalSearchStrategy.class.equals(event.getStrategy().getClass())) {
                 isRelationalLookupEnabled = event.isSelected();
                 // надо обновить все выбиралки классов, чтобы
                 // там на выбор был только текущий класс
@@ -291,9 +296,41 @@ public class AttributiveSearchParamsTable extends JTable {
                 // обновим выбиралки свойств - там должны остаться
                 // только data properties
                 updatePropertyEditors();
+            } else if (FuzzySearchStrategy.class.equals(event.getStrategy().getClass())) {
+                isFuzzyLookupEnabled = event.isSelected();
+                // обновим выбиралки логических операций
+                // в строкове поля добавляем fuzzy
+                updateLogicalOperationEditors();
             }
         } catch (ApplicationException e) {
             throw new ApplicationRuntimeException(e);
+        }
+    }
+
+    private Collection<LogicalOperation> getAvailableOperationsForLookup(OWLProperty property) throws ApplicationException {
+        final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(property);
+        final Collection<LogicalOperation> operations = LogicalOperationHelper.getAvailableOperations(ranges);
+        if (isFuzzyLookupEnabled) {
+            if (LogicalOperationHelper.hasStringExpression(ranges)) {
+                operations.add(LogicalOperation.FUZZY_LIKE);
+            }
+        }
+        return operations;
+    }
+
+    private void updateLogicalOperationEditors() throws ApplicationException {
+        for (Map.Entry<Integer, DefaultCellEditor> entry : operationEditors.entrySet()) {
+            final TableCellEditor propertyEditor = getCellEditor(entry.getKey(), 1);
+            final OWLDomainProperty selectedProperty = (OWLDomainProperty) propertyEditor.getCellEditorValue();
+            if (selectedProperty == null) {
+                continue;
+            }
+            final JComboBox<LogicalOperation> operationsEditor = (JComboBox<LogicalOperation>) entry.getValue().getComponent();
+            operationsEditor.removeAllItems();
+            //
+            for (LogicalOperation logicalOperation : getAvailableOperationsForLookup(selectedProperty.getOwlProperty())) {
+                operationsEditor.addItem(logicalOperation);
+            }
         }
     }
 

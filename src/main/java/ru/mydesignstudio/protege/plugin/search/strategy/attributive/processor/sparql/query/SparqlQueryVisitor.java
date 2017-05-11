@@ -128,7 +128,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         final Object value = wherePart.getValue();
         //
         final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(wherePart.getProperty());
-        final WherePartConditionConverter conditionConverter = conditionConverterFactory.getConverter(ranges);
+        final WherePartConditionConverter conditionConverter = conditionConverterFactory.getConverter(ranges, wherePart);
         builder.append(conditionConverter.convert(wherePart, value, variableName));
         builder.append(NEW_LINE);
         //

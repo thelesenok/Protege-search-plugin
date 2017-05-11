@@ -4,6 +4,8 @@ import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor.FuzzyWherePart;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 
 import javax.inject.Inject;
@@ -27,15 +29,20 @@ public class WherePartConditionConverterFactory {
     private DateWherePartConverter dateConverter;
     @Inject
     private EnumerationWherePartConverter enumerationConverter;
+    @Inject
+    private FuzzyWherePartConverter fuzzyConverter;
 
     /**
      * Получить конвертер по набору возможных значений свойств
      * @param ranges - набор свойств
+     * @param wherePart - условие для конвертации
      * @return - конвертер
      * @throws ApplicationException
      */
-    public WherePartConditionConverter getConverter(Collection<OWLPropertyRange> ranges) throws ApplicationException {
-        if (LogicalOperationHelper.hasClassExpression(ranges)) {
+    public WherePartConditionConverter getConverter(Collection<OWLPropertyRange> ranges, WherePart wherePart) throws ApplicationException {
+        if (wherePart instanceof FuzzyWherePart) {
+            return fuzzyConverter;
+        } else if (LogicalOperationHelper.hasClassExpression(ranges)) {
             return individualConverter;
         } else if (LogicalOperationHelper.hasIntegerExpression(ranges)) {
             return integerConverter;

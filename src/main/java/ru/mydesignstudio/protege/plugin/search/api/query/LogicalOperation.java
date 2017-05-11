@@ -8,6 +8,7 @@ package ru.mydesignstudio.protege.plugin.search.api.query;
 public enum LogicalOperation {
     EQUALS,
     LIKE,
+    FUZZY_LIKE,
     CONTAINS,
     EQUALS_NOT,
     STARTS_WITH,
