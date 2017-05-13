@@ -1,7 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Collection;
 

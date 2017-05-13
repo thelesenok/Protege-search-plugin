@@ -1,8 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.testng.Assert;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.TriangularFuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.FuzzyOWLServiceImpl;
@@ -29,11 +29,11 @@ public class FuzzyOWLServiceImplTest {
         final FuzzyFunction fuzzyFunction = service.parseFunction(triangleFunction);
         Assert.assertEquals(TriangularFuzzyFunction.class, fuzzyFunction.getClass());
         //
-        Assert.assertEquals(fuzzyFunction.evaluate(-1), 0.0);
-        Assert.assertEquals(fuzzyFunction.evaluate(0), 0.0);
-        Assert.assertEquals(fuzzyFunction.evaluate(5), 1.0);
-        Assert.assertEquals(fuzzyFunction.evaluate(10), 0.0);
-        Assert.assertEquals(fuzzyFunction.evaluate(3), 0.6);
+        Assert.assertEquals(0.0, fuzzyFunction.evaluate(-1), 0.1);
+        Assert.assertEquals(0.0, fuzzyFunction.evaluate(0), 0.1);
+        Assert.assertEquals(1.0, fuzzyFunction.evaluate(5), 0.1);
+        Assert.assertEquals(0.0, fuzzyFunction.evaluate(10), 0.1);
+        Assert.assertEquals(0.6, fuzzyFunction.evaluate(3), 0.1);
     }
 
 }
