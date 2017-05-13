@@ -42,7 +42,7 @@ import java.util.Set;
  * Created by abarmin on 03.01.17.
  */
 public class OWLServiceImpl implements OWLService {
-    private OWLOntology getOntology() throws ApplicationException {
+    protected OWLOntology getOntology() throws ApplicationException {
         return OntologyConfig.getOntology();
     }
 

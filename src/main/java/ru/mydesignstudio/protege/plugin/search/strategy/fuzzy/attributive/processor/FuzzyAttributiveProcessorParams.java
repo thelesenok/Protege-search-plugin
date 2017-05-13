@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor;
+package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 
@@ -7,16 +7,16 @@ import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProces
  *
  * Параметры нечеткого поиска
  */
-public class FuzzyProcessorParams implements SearchProcessorParams {
+public class FuzzyAttributiveProcessorParams implements SearchProcessorParams {
     /**
      * Количество символов в маске
      */
     private int maskSize = 2;
 
-    public FuzzyProcessorParams() {
+    public FuzzyAttributiveProcessorParams() {
     }
 
-    public FuzzyProcessorParams(int maskSize) {
+    public FuzzyAttributiveProcessorParams(int maskSize) {
         this.maskSize = maskSize;
     }
 

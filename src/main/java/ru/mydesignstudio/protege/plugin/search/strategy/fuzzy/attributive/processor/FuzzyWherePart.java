@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor;
+package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;

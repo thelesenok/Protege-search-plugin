@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor;
+package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
@@ -15,11 +15,11 @@ import java.util.Collection;
  *
  * Процессор для нечеткого поиска
  */
-public class FuzzyProcessor implements SearchProcessor<FuzzyProcessorParams> {
-    private FuzzyProcessorParams processorParams;
+public class FuzzyAttributiveProcessor implements SearchProcessor<FuzzyAttributiveProcessorParams> {
+    private FuzzyAttributiveProcessorParams processorParams;
 
     @Override
-    public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyProcessorParams strategyParams) throws ApplicationException {
+    public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyAttributiveProcessorParams strategyParams) throws ApplicationException {
         processorParams = strategyParams;
         /**
          * отберем все параметры, которые содержат fuzzy условия,
@@ -59,7 +59,7 @@ public class FuzzyProcessor implements SearchProcessor<FuzzyProcessorParams> {
     }
 
     @Override
-    public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, FuzzyProcessorParams strategyParams) throws ApplicationException {
+    public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, FuzzyAttributiveProcessorParams strategyParams) throws ApplicationException {
         return initialResultSet;
     }
 }

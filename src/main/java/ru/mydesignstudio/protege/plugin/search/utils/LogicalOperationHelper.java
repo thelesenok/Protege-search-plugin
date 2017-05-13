@@ -7,10 +7,12 @@ import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Created by abarmin on 05.01.17.
@@ -19,7 +21,7 @@ public class LogicalOperationHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogicalOperationHelper.class);
 
     public static final Collection<LogicalOperation> getAvailableOperations(Collection<OWLPropertyRange> propertyRanges) throws ApplicationException {
-        final Collection<LogicalOperation> operations = new ArrayList<>();
+        final Collection<LogicalOperation> operations = new HashSet<>();
         for (OWLPropertyRange propertyRange : propertyRanges) {
             if (propertyRange instanceof OWLClassExpression) {
                 operations.add(LogicalOperation.EQUALS);
@@ -37,6 +39,8 @@ public class LogicalOperationHelper {
                     operations.add(LogicalOperation.LESS_THAN);
                     operations.add(LogicalOperation.MORE_OR_EQUALS);
                     operations.add(LogicalOperation.LESS_OR_EQUALS);
+                } else if (isFuzzyDatatype(datatype)) {
+                    operations.add(LogicalOperation.EQUALS);
                 } else if (datatype.isDatatype()) {
                     operations.add(LogicalOperation.EQUALS);
                     operations.add(LogicalOperation.MORE_THAN);
@@ -107,6 +111,26 @@ public class LogicalOperationHelper {
             @Override
             public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
                 return (owlPropertyRange instanceof OWLDataOneOf);
+            }
+        });
+    }
+
+    private static final boolean isFuzzyDatatype(OWLDatatype datatype) {
+        final FuzzyOWLService owlService = InjectionUtils.getInstance(FuzzyOWLService.class);
+        try {
+            return owlService.isFuzzyDatatype(datatype);
+        } catch (ApplicationException e) {
+            throw new ApplicationRuntimeException(e);
+        }
+    }
+
+    public static final boolean hasFuzzyExpression(Collection<OWLPropertyRange> ranges) {
+        return CollectionUtils.some(ranges, new Specification<OWLPropertyRange>() {
+            @Override
+            public boolean isSatisfied(OWLPropertyRange range) {
+                // TODO: 13.05.17 как-то иначе, наверное, можно это проверять
+                return (range instanceof OWLDatatype)
+                        && isFuzzyDatatype((OWLDatatype) range);
             }
         });
     }

@@ -5,8 +5,20 @@ import java.util.Collection;
 
 /**
  * Created by abarmin on 04.01.17.
+ *
+ * Вспомогательные функции по работе с коллекциями
  */
 public class CollectionUtils {
+    /**
+     * Переданная коллекция пустая
+     * @param source - коллекция
+     * @param <ITEM> - тип элемента коллекции
+     * @return
+     */
+    public static final <ITEM> boolean isEmpty(Collection<ITEM> source) {
+        return !isNotEmpty(source);
+    }
+
     public static final <ITEM> boolean isNotEmpty(Collection<ITEM> source) {
         if (source == null) {
             return false;

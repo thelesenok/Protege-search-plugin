@@ -14,6 +14,7 @@ import org.protege.owl.rdf.Utilities;
 import org.protege.owl.rdf.api.OwlTripleStore;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.NamespaceUtil;
+import ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set.SparqlResultSet;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,6 +8,7 @@ import org.openrdf.query.TupleQueryResultHandler;
 import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.repository.RepositoryException;
 import org.protege.owl.rdf.api.OwlTripleStore;
+import ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set.SparqlResultSet;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -27,7 +27,8 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.ev
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.CellRendererWithIcon;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.FuzzySearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.FuzzyAttributiveSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.FuzzyOntologySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
@@ -74,9 +75,13 @@ public class AttributiveSearchParamsTable extends JTable {
      */
     private boolean isRelationalLookupEnabled = false;
     /**
-     * Признак включенности нечеткого поиска
+     * Признак включенности нечеткого поиска по атрибутам
      */
-    private boolean isFuzzyLookupEnabled = false;
+    private boolean isFuzzyAttributiveLookupEnabled = false;
+    /**
+     * Признак включенности нечеткого поиска по онтологии
+     */
+    private boolean isFuzzyOntologyLookupEnabled = false;
 
     public AttributiveSearchParamsTable(SelectQuery selectQuery, OWLService owlService, ExceptionWrapperService wrapperService) {
         super(new CriteriaTableModel(selectQuery));
@@ -197,7 +202,26 @@ public class AttributiveSearchParamsTable extends JTable {
     private Collection<OWLProperty> getAvailablePropertiesForLookup(OWLClass owlClass) {
         final Collection<OWLProperty> properties = new ArrayList<>();
         try {
-            properties.addAll(owlService.getDataProperties(owlClass));
+            Collection<OWLDataProperty> dataProperties = owlService.getDataProperties(owlClass);
+            /**
+             * если не включен поиск по нечеткой онтологии,
+             * то убираем нечеткие свойства
+             */
+            if (!isFuzzyOntologyLookupEnabled) {
+                dataProperties = CollectionUtils.filter(dataProperties, new Specification<OWLDataProperty>() {
+                    @Override
+                    public boolean isSatisfied(OWLDataProperty property) {
+                        final Collection<OWLPropertyRange> ranges = wrapperService.invokeWrapped(new ExceptionWrappedCallback<Collection<OWLPropertyRange>>() {
+                            @Override
+                            public Collection<OWLPropertyRange> run() throws ApplicationException {
+                                return owlService.getPropertyRanges(property);
+                            }
+                        });
+                        return !LogicalOperationHelper.hasFuzzyExpression(ranges);
+                    }
+                });
+            }
+            properties.addAll(dataProperties);
             if (isRelationalLookupEnabled) {
                 properties.addAll(owlService.getObjectProperties(owlClass));
             }
@@ -296,11 +320,16 @@ public class AttributiveSearchParamsTable extends JTable {
                 // обновим выбиралки свойств - там должны остаться
                 // только data properties
                 updatePropertyEditors();
-            } else if (FuzzySearchStrategy.class.equals(event.getStrategy().getClass())) {
-                isFuzzyLookupEnabled = event.isSelected();
+            } else if (FuzzyAttributiveSearchStrategy.class.equals(event.getStrategy().getClass())) {
+                isFuzzyAttributiveLookupEnabled = event.isSelected();
                 // обновим выбиралки логических операций
                 // в строкове поля добавляем fuzzy
                 updateLogicalOperationEditors();
+            } else if (FuzzyOntologySearchStrategy.class.equals(event.getStrategy().getClass())) {
+                isFuzzyOntologyLookupEnabled = event.isSelected();
+                // обновим выбиралки свойств - показываем или
+                // не показываем нечеткие свойства
+                updatePropertyEditors();
             }
         } catch (ApplicationException e) {
             throw new ApplicationRuntimeException(e);
@@ -310,7 +339,7 @@ public class AttributiveSearchParamsTable extends JTable {
     private Collection<LogicalOperation> getAvailableOperationsForLookup(OWLProperty property) throws ApplicationException {
         final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(property);
         final Collection<LogicalOperation> operations = LogicalOperationHelper.getAvailableOperations(ranges);
-        if (isFuzzyLookupEnabled) {
+        if (isFuzzyAttributiveLookupEnabled) {
             if (LogicalOperationHelper.hasStringExpression(ranges)) {
                 operations.add(LogicalOperation.FUZZY_LIKE);
             }

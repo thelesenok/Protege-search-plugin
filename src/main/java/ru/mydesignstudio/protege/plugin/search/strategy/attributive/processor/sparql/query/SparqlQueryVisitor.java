@@ -4,10 +4,9 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
@@ -26,8 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by abarmin on 07.01.17.
  */
-public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, WherePartVisitor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlQueryVisitor.class);
+public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, SelectFieldVisitor {
     private static final String DEFAULTS =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
@@ -95,20 +93,20 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         return builder.toString();
     }
 
-    private boolean isSameClasses(FromType fromType, WherePart wherePart) {
+    private boolean isSameClasses(FromType fromType, SelectField wherePart) {
         return fromType.getOwlClass().equals(wherePart.getOwlClass());
     }
 
     @Override
-    public String visit(FromType fromType, WherePart wherePart) throws ApplicationException {
+    public String visit(FromType fromType, SelectField selectField) throws ApplicationException {
         final StringBuilder builder = new StringBuilder();
-        final String propertyName = wherePart.getProperty().getIRI().getFragment();
+        final String propertyName = selectField.getProperty().getIRI().getFragment();
         final String variableName;
         final String leftVariableName;
         // если критерий не принадлежит целевому типу, то нужно добавить связь
         // костылябры, переписать
-        if (!isSameClasses(fromType, wherePart)) {
-            builder.append(createRelationalQuery(getNextVariableName(), fromType.getOwlClass(), wherePart.getOwlClass()));
+        if (!isSameClasses(fromType, selectField)) {
+            builder.append(createRelationalQuery(getNextVariableName(), fromType.getOwlClass(), selectField.getOwlClass()));
             leftVariableName = getCurrentVariableName();
             variableName = getNextVariableName();
         } else {
@@ -117,7 +115,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         }
         // делаем выбор указанного критерия
         builder.append(leftVariableName).append(" ");
-        builder.append(getIRIPrefix(wherePart.getProperty().getIRI()))
+        builder.append(getIRIPrefix(selectField.getProperty().getIRI()))
                 .append(":")
                 .append(propertyName)
                 .append(" ")
@@ -125,12 +123,15 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
                 .append(". ")
                 .append(NEW_LINE);
         // добавляем фильтр на указанный критерий
-        final Object value = wherePart.getValue();
-        //
-        final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(wherePart.getProperty());
-        final WherePartConditionConverter conditionConverter = conditionConverterFactory.getConverter(ranges, wherePart);
-        builder.append(conditionConverter.convert(wherePart, value, variableName));
-        builder.append(NEW_LINE);
+        if (selectField instanceof WherePart) {
+            final WherePart wherePart = (WherePart) selectField;
+            final Object value = wherePart.getValue();
+            //
+            final Collection<OWLPropertyRange> ranges = owlService.getPropertyRanges(selectField.getProperty());
+            final WherePartConditionConverter conditionConverter = conditionConverterFactory.getConverter(ranges, wherePart);
+            builder.append(conditionConverter.convert(wherePart, value, variableName));
+            builder.append(NEW_LINE);
+        }
         //
         return builder.toString();
     }
@@ -142,6 +143,10 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         for (WherePart wherePart : selectQuery.getWhereParts()) {
             final IRI propertyIRI = wherePart.getProperty().getIRI();
             prefixes.put(getIRINamespace(propertyIRI), PREFIX + prefixIndex++);
+        }
+        for (SelectField selectField : selectQuery.getSelectFields()) {
+            final IRI fieldIRI = selectField.getProperty().getIRI();
+            prefixes.put(getIRINamespace(fieldIRI), PREFIX + prefixIndex++);
         }
     }
 
@@ -175,6 +180,13 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
         builder.append(" WHERE ").append(NEW_LINE);
         builder.append(" {").append(NEW_LINE);
         builder.append(visit(selectQuery.getFrom()));
+        if (CollectionUtils.isNotEmpty(selectQuery.getSelectFields())) {
+            for (SelectField selectField : selectQuery.getSelectFields()) {
+                builder.append(
+                        visit(selectQuery.getFrom(), selectField)
+                );
+            }
+        }
         if (CollectionUtils.isNotEmpty(whereParts)) {
             for (WherePart wherePart : whereParts) {
                 builder.append(

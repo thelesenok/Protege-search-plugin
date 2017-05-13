@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor.FuzzyWherePart;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor.FuzzyWherePart;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import java.util.Collection;

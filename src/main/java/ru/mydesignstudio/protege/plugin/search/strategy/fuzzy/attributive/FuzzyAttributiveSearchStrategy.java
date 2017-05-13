@@ -1,9 +1,9 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy;
+package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.component.FuzzyParamsComponent;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.processor.FuzzyProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.component.FuzzyAttributiveParamsComponent;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor.FuzzyAttributiveProcessor;
 
 import javax.inject.Inject;
 import java.awt.Component;
@@ -13,15 +13,15 @@ import java.awt.Component;
  *
  * Нечеткий поиск. Поиск по неполному совпадению текста
  */
-public class FuzzySearchStrategy implements SearchStrategy {
+public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
     @Inject
-    private FuzzyParamsComponent paramsComponent;
+    private FuzzyAttributiveParamsComponent paramsComponent;
     @Inject
-    private FuzzyProcessor fuzzyProcessor;
+    private FuzzyAttributiveProcessor fuzzyAttributiveProcessor;
 
     @Override
     public String getTitle() {
-        return "Fuzzy search strategy";
+        return "Fuzzy attributive lookup";
     }
 
     @Override
@@ -41,6 +41,6 @@ public class FuzzySearchStrategy implements SearchStrategy {
 
     @Override
     public SearchProcessor getSearchProcessor() {
-        return fuzzyProcessor;
+        return fuzzyAttributiveProcessor;
     }
 }

@@ -9,14 +9,18 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategySerializationService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.FuzzyOWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.serialization.SearchStrategySerializationServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.DatatypeCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.MaximumDatatypeCalculator;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
@@ -32,6 +36,8 @@ public class ModuleConfig extends AbstractModule {
         bind(SearchStrategyService.class).to(SearchStrategyServiceImpl.class).in(Singleton.class);
         bind(SearchStrategyRegistry.class).to(SearchStrategyRegistryImpl.class).in(Singleton.class);
         bind(OWLService.class).to(OWLServiceImpl.class);
+        bind(FuzzyOWLService.class).to(FuzzyOWLServiceImpl.class);
+        bind(DatatypeCalculator.class).to(MaximumDatatypeCalculator.class);
         bind(SearchStrategySerializationService.class).to(SearchStrategySerializationServiceImpl.class);
         bindListener(Matchers.any(), new TypeListener() {
             @Override

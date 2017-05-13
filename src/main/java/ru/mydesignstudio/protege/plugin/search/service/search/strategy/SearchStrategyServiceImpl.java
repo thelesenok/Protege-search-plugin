@@ -5,7 +5,8 @@ import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.FuzzySearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.FuzzyAttributiveSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.FuzzyOntologySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.TaxonomySearchStrategy;
 
@@ -29,14 +30,17 @@ public class SearchStrategyServiceImpl implements SearchStrategyService {
     @Inject
     private TaxonomySearchStrategy taxonomySearchStrategy;
     @Inject
-    private FuzzySearchStrategy fuzzySearchStrategy;
+    private FuzzyAttributiveSearchStrategy fuzzyAttributiveSearchStrategy;
+    @Inject
+    private FuzzyOntologySearchStrategy fuzzyOntologySearchStrategy;
 
     @PostConstruct
     public void init() {
         register(attributiveSearchStrategy);
         register(relationalSearchStrategy);
         register(taxonomySearchStrategy);
-        register(fuzzySearchStrategy);
+        register(fuzzyAttributiveSearchStrategy);
+        register(fuzzyOntologySearchStrategy);
     }
 
     @Override

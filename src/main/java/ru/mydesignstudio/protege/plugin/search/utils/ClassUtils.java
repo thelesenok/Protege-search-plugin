@@ -28,4 +28,20 @@ public class ClassUtils {
         }
         return fields;
     }
+
+    /**
+     * Все поля указанного класса с учетом иерархии
+     * @param targetClass - у этого класса ищем поля
+     * @return - коллекция полей
+     */
+    public static final Collection<Field> getFields(Class targetClass) {
+        final Collection<Field> fields = new HashSet<>();
+        if (!Object.class.equals(targetClass.getSuperclass())) {
+            fields.addAll(getFields(targetClass.getSuperclass()));
+        }
+        for (Field field : targetClass.getDeclaredFields()) {
+            fields.add(field);
+        }
+        return fields;
+    }
 }

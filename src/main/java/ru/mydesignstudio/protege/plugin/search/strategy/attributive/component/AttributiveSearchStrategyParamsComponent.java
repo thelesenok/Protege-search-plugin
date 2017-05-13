@@ -123,7 +123,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
 
     @Override
     public AttributiveProcessorParams getSearchParams() {
-        return new AttributiveProcessorParams(selectQuery);
+        return new AttributiveProcessorParams(selectQuery.clone());
     }
 
     @Override

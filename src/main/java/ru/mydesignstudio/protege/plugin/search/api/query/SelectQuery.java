@@ -1,6 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.api.query;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +19,12 @@ public class SelectQuery implements QueryObject {
      * По каким условиям отбираем
      */
     private final List<WherePart> whereParts = new ArrayList<>();
+    /**
+     * Какие поля должны попасть в результаты (кроме полей,
+     * которые уже есть в WherePart)
+     * // TODO: 13.05.17 объединить эти поля
+     */
+    private final Collection<SelectField> fields = new ArrayList<>();
 
     public FromType getFrom() {
         return from;
@@ -52,6 +59,18 @@ public class SelectQuery implements QueryObject {
         }
     }
 
+    public Collection<SelectField> getSelectFields() {
+        return Collections.unmodifiableCollection(fields);
+    }
+
+    /**
+     * Добавить поле в перечень отбираемых
+     * @param field - поле
+     */
+    public void addSelectField(SelectField field) {
+        fields.add(field);
+    }
+
     @Override
     public SelectQuery clone() {
         final SelectQuery query = new SelectQuery();
@@ -60,6 +79,10 @@ public class SelectQuery implements QueryObject {
         for (WherePart wherePart : getWhereParts()) {
             final WherePart clonedWherePart = wherePart.clone();
             query.addWherePart(clonedWherePart);
+        }
+        for (SelectField field : getSelectFields()) {
+            final SelectField clonedField = field.clone();
+            query.addSelectField(clonedField);
         }
         return query;
     }

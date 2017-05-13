@@ -125,4 +125,14 @@ public class OWLUtils {
                 second.toQuotedString()
         );
     }
+
+    /**
+     * Являются ли два свойства эквивалентными
+     * @param first - это
+     * @param second - и это
+     * @return
+     */
+    public static final boolean equals(OWLProperty first, OWLProperty second) {
+        return equals(first.getIRI(), second.getIRI());
+    }
 }
