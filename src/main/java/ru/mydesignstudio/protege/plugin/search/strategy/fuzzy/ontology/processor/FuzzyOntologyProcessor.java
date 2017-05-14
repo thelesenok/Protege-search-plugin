@@ -164,13 +164,15 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
          * то все подходит
          */
         final Collection<OWLDataProperty> properties = owlService.getDataProperties(recordClass);
-        return CollectionUtils.every(properties, new Specification<OWLDataProperty>() {
+        return CollectionUtils.every(values.entrySet(), new Specification<Map.Entry<OWLProperty, OWLDatatype>>() {
             @Override
-            public boolean isSatisfied(OWLDataProperty property) {
-                if (values.containsKey(property)) {
-                    // тут дописать
-                    // datatype от property получить, потом сравнить
-                    final OWLDatatype fuzzyType = values.get(property);
+            public boolean isSatisfied(Map.Entry<OWLProperty, OWLDatatype> entry) {
+                final OWLProperty property = entry.getKey();
+                final OWLDatatype fuzzyType = entry.getValue();
+                if (fuzzyType == null) {
+                    return false;
+                }
+                if (properties.contains(property)) {
                     final OWLDatatype propertyType = wrapperService.invokeWrapped(new ExceptionWrappedCallback<OWLDatatype>() {
                         @Override
                         public OWLDatatype run() throws ApplicationException {
@@ -179,7 +181,7 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
                     });
                     return fuzzyType.equals(propertyType);
                 }
-                return true;
+                return false;
             }
         });
     }
