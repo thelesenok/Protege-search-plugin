@@ -1,6 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.search;
 
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 
 import java.awt.Component;

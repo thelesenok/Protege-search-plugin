@@ -20,6 +20,8 @@ public class Datatype {
     private double b;
     @XmlAttribute(name = "c")
     private double c;
+    @XmlAttribute(name = "d")
+    private double d;
 
     public Datatype() {
     }
@@ -54,5 +56,13 @@ public class Datatype {
 
     public void setC(double c) {
         this.c = c;
+    }
+
+    public double getD() {
+        return d;
+    }
+
+    public void setD(double d) {
+        this.d = d;
     }
 }

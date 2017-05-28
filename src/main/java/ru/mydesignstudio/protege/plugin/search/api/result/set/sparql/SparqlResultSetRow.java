@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.sparql;
 
 import java.util.HashMap;
 import java.util.Map;

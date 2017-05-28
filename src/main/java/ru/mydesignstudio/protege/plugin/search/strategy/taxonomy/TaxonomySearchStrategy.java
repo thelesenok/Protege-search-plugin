@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.component.TaxonomySearchParamsComponent;
 

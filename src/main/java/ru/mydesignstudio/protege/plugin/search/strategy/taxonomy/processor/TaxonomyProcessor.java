@@ -6,11 +6,13 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.strategy.support.SparqlProcessorSupport;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.resultset.WeighedResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
+import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 
@@ -212,14 +214,24 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
      * Объединить все результаты
      * @param sourceData - результат выполнения исходного запроса
      * @param relatedData - результаты выполнения "близких" запросов
+     * @throws ApplicationException - если вдруг что случилось
      * @return - результирующий набор данных
      */
-    private ResultSet mergeResultSets(ResultSet sourceData, Collection<ResultSet> relatedData) {
-        final WeighedResultSet resultSet = new WeighedResultSet(initialQuery, sourceData, processorParams);
+    private ResultSet mergeResultSets(ResultSet sourceData, Collection<ResultSet> relatedData) throws ApplicationException {
+        final WeighedResultSet resultSet = new WeighedResultSet(sourceData, getRowWeightCalculator());
         InjectionUtils.injectInstances(resultSet);
         for (ResultSet relatedDatum : relatedData) {
             resultSet.addResultSet(relatedDatum);
         }
         return resultSet;
+    }
+
+    /**
+     * Калькулятор для вычисления веса строки
+     * @return - объект калькулятора
+     * @throws ApplicationException
+     */
+    public WeighedRowWeightCalculator getRowWeightCalculator() throws ApplicationException {
+        return new TaxonomyRowWeightCalculator(processorParams);
     }
 }

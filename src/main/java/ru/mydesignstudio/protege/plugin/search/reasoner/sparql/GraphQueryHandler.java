@@ -5,7 +5,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.protege.owl.rdf.api.OwlTripleStore;
-import ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set.SparqlResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.sparql.SparqlResultSet;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.resultset;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 

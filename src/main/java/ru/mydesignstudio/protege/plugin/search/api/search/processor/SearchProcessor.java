@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.api.search.collector;
+package ru.mydesignstudio.protege.plugin.search.api.search.processor;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;

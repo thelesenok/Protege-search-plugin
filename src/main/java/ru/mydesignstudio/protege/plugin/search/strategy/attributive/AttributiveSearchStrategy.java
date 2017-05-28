@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive;
 
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
 

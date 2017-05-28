@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.strategy.attributive.proximity.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -7,9 +7,8 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainLiteral;
+import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
-
-import javax.inject.Inject;
 
 /**
  * Created by abarmin on 08.05.17.
@@ -17,8 +16,11 @@ import javax.inject.Inject;
  * Калькулятор близости по признаку "Равно"
  */
 public class ProximityCalculatorEquals implements ProximityCalculator {
-    @Inject
-    private OWLService owlService;
+    private final OWLService owlService;
+
+    public ProximityCalculatorEquals() {
+        owlService = InjectionUtils.getInstance(OWLService.class);
+    }
 
     @Override
     public double calculate(final Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {

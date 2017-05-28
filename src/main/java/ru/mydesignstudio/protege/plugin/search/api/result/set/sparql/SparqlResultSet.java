@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.sparql;
 
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;

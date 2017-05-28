@@ -1,10 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor;
 
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
@@ -12,23 +8,21 @@ import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
-import ru.mydesignstudio.protege.plugin.search.reasoner.sparql.result.set.SparqlResultSet;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.DatatypeCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.result.set.FuzzyWeighedResultSet;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.weight.calculator.FuzzyOntologyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
-import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,8 +37,6 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
     private FuzzyOWLService fuzzyOWLService;
     @Inject
     private DatatypeCalculator datatypeCalculator;
-    @Inject
-    private ExceptionWrapperService wrapperService;
 
     private Collection<WherePart> fuzzyConditions = new ArrayList<>();
 
@@ -100,18 +92,25 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
             values.put(fuzzyWherePart.getProperty(), datatype);
         }
         /**
-         * сделаем проход поиска с учетом вычисленных типов данных
+         * конвертируем в подходящий resultset
          */
-        final SparqlResultSet resultSet = new SparqlResultSet(getColumnNames(initialResultSet));
-        for (int rowIndex = 0; rowIndex < initialResultSet.getRowCount(); rowIndex++) {
-            // TODO: 13.05.17 не очень надежный способ, не факт, что в первом столбце запись
-            final IRI recordIRI = (IRI) initialResultSet.getResult(rowIndex, 0);
-            final OWLIndividual record = owlService.getIndividual(recordIRI);
-            if (isValidRow(selectQuery.getFrom().getOwlClass(), record, values)) {
-                addRow(resultSet, initialResultSet, rowIndex);
-            }
-        }
-        return resultSet;
+        return new FuzzyWeighedResultSet(
+                initialResultSet,
+                getWeightCalculator(selectQuery, strategyParams, fuzzyConditions),
+                selectQuery,
+                values
+        );
+    }
+
+    /**
+     * Объект для вычисления степени схожести строки
+     * @param selectQuery - запрос, по которому получен экземпляр
+     * @param strategyParams - параметры процессора
+     * @param fuzzyParts - нечеткие параметры из запрос (из selectQuery эти параметры убраны)
+     * @return
+     */
+    private WeighedRowWeightCalculator getWeightCalculator(SelectQuery selectQuery, FuzzyOntologyProcessorParams strategyParams, Collection<WherePart> fuzzyParts) {
+        return new FuzzyOntologyRowWeightCalculator(selectQuery, strategyParams, fuzzyParts);
     }
 
     /**
@@ -149,67 +148,5 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
          * подходящий тип данных.
          */
         return datatypeCalculator.calculate(functionValues);
-    }
-
-    /**
-     * Подходит ли запись из результатов
-     * @param record - запись, которую проверяем
-     * @param values - набор нечетких свойств
-     * @return
-     * @throws ApplicationException
-     */
-    private boolean isValidRow(OWLClass recordClass, OWLIndividual record, Map<OWLProperty, OWLDatatype> values) throws ApplicationException {
-        /**
-         * пройдем по всем свойствам, если свойство есть в values и тип совпадает,
-         * то все подходит
-         */
-        final Collection<OWLDataProperty> properties = owlService.getDataProperties(recordClass);
-        return CollectionUtils.every(values.entrySet(), new Specification<Map.Entry<OWLProperty, OWLDatatype>>() {
-            @Override
-            public boolean isSatisfied(Map.Entry<OWLProperty, OWLDatatype> entry) {
-                final OWLProperty property = entry.getKey();
-                final OWLDatatype fuzzyType = entry.getValue();
-                if (fuzzyType == null) {
-                    return false;
-                }
-                if (properties.contains(property)) {
-                    final OWLDatatype propertyType = wrapperService.invokeWrapped(new ExceptionWrappedCallback<OWLDatatype>() {
-                        @Override
-                        public OWLDatatype run() throws ApplicationException {
-                            return fuzzyOWLService.getPropertyDatatype(record, property);
-                        }
-                    });
-                    return fuzzyType.equals(propertyType);
-                }
-                return false;
-            }
-        });
-    }
-
-    /**
-     * Скопировать строку из исходного сета в целевой
-     * @param resultSet - в этот копируем
-     * @param initialResultSet - из этого копируем
-     * @param rowIndex - это номер строки для копирования
-     */
-    private void addRow(SparqlResultSet resultSet, ResultSet initialResultSet, int rowIndex) {
-        final List<Object> row = new ArrayList<>();
-        for (int colIndex = 0; colIndex < initialResultSet.getColumnCount(); colIndex++) {
-            row.add(initialResultSet.getResult(rowIndex, colIndex));
-        }
-        resultSet.addRow(row);
-    }
-
-    /**
-     * Получить названия столбцов
-     * @param initialResultSet - исходный resultSet
-     * @return
-     */
-    private List<String> getColumnNames(ResultSet initialResultSet) {
-        final List<String> names = new ArrayList<>();
-        for (int index = 0; index < initialResultSet.getColumnCount(); index++) {
-            names.add(initialResultSet.getColumnName(index));
-        }
-        return names;
     }
 }

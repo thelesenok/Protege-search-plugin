@@ -3,8 +3,8 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
-import ru.mydesignstudio.protege.plugin.search.strategy.support.SparqlProcessorSupport;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 
 /**
  * Created by abarmin on 12.03.17.

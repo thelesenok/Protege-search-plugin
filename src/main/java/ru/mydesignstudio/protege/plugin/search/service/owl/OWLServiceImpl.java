@@ -24,7 +24,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.EmptyResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;

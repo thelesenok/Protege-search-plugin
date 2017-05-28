@@ -5,7 +5,10 @@ import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.collector.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.weight.calculator.FuzzyRowWeightCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +63,18 @@ public class FuzzyAttributiveProcessor implements SearchProcessor<FuzzyAttributi
 
     @Override
     public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, FuzzyAttributiveProcessorParams strategyParams) throws ApplicationException {
-        return initialResultSet;
+        /**
+         * Результирующий набор данных будет с учетом схожести результатов
+         */
+        return new WeighedResultSet(initialResultSet, getWeightCalculator(selectQuery));
+    }
+
+    /**
+     * Объект для вычисления веса строки
+     * @param selectQuery - запрос, по которому отбирались записи
+     * @return
+     */
+    private WeighedRowWeightCalculator getWeightCalculator(SelectQuery selectQuery) {
+        return new FuzzyRowWeightCalculator(selectQuery, processorParams);
     }
 }

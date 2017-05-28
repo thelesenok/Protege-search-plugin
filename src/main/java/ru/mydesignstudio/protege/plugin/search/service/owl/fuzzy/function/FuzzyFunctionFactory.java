@@ -2,6 +2,9 @@ package ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.function;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.LeftShoulderFuzzyFunction;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.RightSoulderFuzzyFunction;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.TrapezoidalFuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.TriangularFuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.FuzzyOWL2;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
@@ -26,11 +29,30 @@ public class FuzzyFunctionFactory {
                     description.getDatatype().getB(),
                     description.getDatatype().getC()
             );
-        } else {
-            throw new ApplicationException(String.format(
-                    "Function %s is not supported",
-                    functionType
-            ));
         }
+        if (StringUtils.equalsIgnoreCase("trapezoidal", functionType)) {
+            return new TrapezoidalFuzzyFunction(
+                    description.getDatatype().getA(),
+                    description.getDatatype().getB(),
+                    description.getDatatype().getC(),
+                    description.getDatatype().getD()
+            );
+        }
+        if (StringUtils.equalsIgnoreCase("leftshoulder", functionType)) {
+            return new LeftShoulderFuzzyFunction(
+                    description.getDatatype().getA(),
+                    description.getDatatype().getB()
+            );
+        }
+        if (StringUtils.equalsIgnoreCase("rightshoulder", functionType)) {
+            return new RightSoulderFuzzyFunction(
+                    description.getDatatype().getA(),
+                    description.getDatatype().getB()
+            );
+        }
+        throw new ApplicationException(String.format(
+                "Function %s is not supported",
+                functionType
+        ));
     }
 }
