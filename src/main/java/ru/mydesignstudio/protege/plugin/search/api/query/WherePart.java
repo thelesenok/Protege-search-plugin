@@ -6,8 +6,27 @@ package ru.mydesignstudio.protege.plugin.search.api.query;
  * Ограничивающая часть запроса
  */
 public class WherePart extends SelectField implements QueryObject {
+    /**
+     * Через какой логический оператор данное условие
+     * соединяется с предыдущим
+     */
+    private LogicalOperation concatOperation;
+    /**
+     * Условие сравнения
+     */
     private LogicalOperation logicalOperation;
+    /**
+     * С чем сравниваем
+     */
     private Object value;
+
+    public LogicalOperation getConcatOperation() {
+        return concatOperation;
+    }
+
+    public void setConcatOperation(LogicalOperation concatOperation) {
+        this.concatOperation = concatOperation;
+    }
 
     public LogicalOperation getLogicalOperation() {
         return logicalOperation;
@@ -32,6 +51,7 @@ public class WherePart extends SelectField implements QueryObject {
         clone.setLogicalOperation(getLogicalOperation());
         clone.setProperty(getProperty());
         clone.setValue(getValue());
+        clone.setLogicalOperation(getLogicalOperation());
         return clone;
     }
 }

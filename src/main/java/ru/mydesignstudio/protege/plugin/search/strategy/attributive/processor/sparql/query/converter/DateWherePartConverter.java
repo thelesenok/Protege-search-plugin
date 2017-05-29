@@ -38,7 +38,7 @@ public class DateWherePartConverter implements WherePartConditionConverter<Strin
             throw new ApplicationException(e);
         }
 
-        builder.append("FILTER(");
+        builder.append("(");
         if (LogicalOperation.EQUALS.equals(operation)) {
             builder.append("(");
             builder.append(variableName + " >= \"" + DATE_FORMAT.format(sourceDate) + "\"^^xsd:dateTime");

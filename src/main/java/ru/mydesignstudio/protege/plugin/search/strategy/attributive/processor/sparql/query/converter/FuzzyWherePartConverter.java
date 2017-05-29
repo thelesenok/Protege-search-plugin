@@ -30,7 +30,7 @@ public class FuzzyWherePartConverter implements WherePartConditionConverter<Stri
         //
         final LogicalOperation operation = wherePart.getLogicalOperation();
         final StringBuilder builder = new StringBuilder();
-        builder.append("FILTER(");
+        builder.append("(");
         if (LogicalOperation.FUZZY_LIKE.equals(operation)) {
             final Collection<String> parts = new HashSet<>();
             for (String partValue : createAvailableValues(value, fuzzyWherePart.getMaskSize())) {

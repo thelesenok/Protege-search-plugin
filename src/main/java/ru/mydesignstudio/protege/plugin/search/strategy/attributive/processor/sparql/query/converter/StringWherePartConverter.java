@@ -16,7 +16,7 @@ public class StringWherePartConverter implements WherePartConditionConverter<Str
     public String convert(WherePart wherePart, String value, String variableName) throws ApplicationException {
         final LogicalOperation operation = wherePart.getLogicalOperation();
         final StringBuilder builder = new StringBuilder();
-        builder.append("FILTER(");
+        builder.append("(");
         if (LogicalOperation.EQUALS.equals(operation)) {
             builder.append("STR(" + variableName + ") = \"" + value + "\"");
         } else if (LogicalOperation.EQUALS_NOT.equals(operation)) {
