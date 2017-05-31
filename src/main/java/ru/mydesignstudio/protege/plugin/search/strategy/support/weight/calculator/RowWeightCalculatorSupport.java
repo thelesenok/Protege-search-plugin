@@ -10,8 +10,8 @@ import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.ProximityCalculatorFactory;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.ProximityCalculatorFactory;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.ProximityCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 /**

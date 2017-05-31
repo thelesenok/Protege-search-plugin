@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;

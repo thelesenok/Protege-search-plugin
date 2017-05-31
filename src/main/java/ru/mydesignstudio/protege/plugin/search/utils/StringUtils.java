@@ -1,6 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Created by abarmin on 04.01.17.
@@ -64,5 +65,18 @@ public class StringUtils {
             );
         }
         return new String();
+    }
+
+    /**
+     * Конвертировать строку в коллекцию символов
+     * @param source - эту строку конвертируем
+     * @return
+     */
+    public static final Collection<Character> toCharCollection(String source) {
+        final Collection<Character> characters = new LinkedList<>();
+        for (int i = 0; i < source.length(); i++) {
+            characters.add(source.charAt(i));
+        }
+        return characters;
     }
 }

@@ -1,14 +1,7 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculator;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorEndsWith;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorEquals;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorFuzzyLike;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorLike;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorNotEquals;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator.ProximityCalculatorStartsWith;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 
 /**

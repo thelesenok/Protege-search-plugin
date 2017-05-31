@@ -1,4 +1,4 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.proximity.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -6,7 +6,10 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
+
+import java.util.Collection;
 
 /**
  * Created by abarmin on 28.05.17.
@@ -65,5 +68,20 @@ public abstract class ProximityCalculatorSupport implements ProximityCalculator 
         }
         final Object propertyValue = getPropertyValue(individual, property);
         return ((OWLLiteralImplString) propertyValue).getLiteral();
+    }
+
+    /**
+     * Количество общих букв в двух строках
+     * @param first - между этой строкой
+     * @param second - и вот этой
+     * @return - число общих букв
+     * @throws ApplicationException
+     */
+    public int getCommonSymbols(String first, String second) throws ApplicationException {
+        final Collection<Character> firstChars = StringUtils.toCharCollection(first);
+        final Collection<Character> secondChars = StringUtils.toCharCollection(second);
+        //
+        firstChars.retainAll(secondChars);
+        return firstChars.size();
     }
 }
