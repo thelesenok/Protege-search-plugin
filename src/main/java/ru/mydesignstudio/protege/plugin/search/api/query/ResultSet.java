@@ -14,6 +14,13 @@ public interface ResultSet {
     String getColumnName(int col);
 
     /**
+     * Индекс столбца с указанным названием
+     * @param name - название столбца
+     * @return - индекс или исключение
+     */
+    int getColumnIndex(String name);
+
+    /**
      * Содержимое указанной ячейки результатов
      * @param row
      * @param col

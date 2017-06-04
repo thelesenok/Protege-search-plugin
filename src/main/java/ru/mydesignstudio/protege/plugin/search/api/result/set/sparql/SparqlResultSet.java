@@ -1,8 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.sparql;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,26 @@ public class SparqlResultSet implements ResultSet {
         for (int index = 0; index < columnNames.size(); index++) {
             this.columnNames.put(index, columnNames.get(index));
         }
+    }
+
+    @Override
+    public int getColumnIndex(String name) {
+        final Map.Entry<Integer, String> entry = CollectionUtils.findFirst(columnNames.entrySet(), new Specification<Map.Entry<Integer, String>>() {
+            @Override
+            public boolean isSatisfied(Map.Entry<Integer, String> entry) {
+                return StringUtils.equalsIgnoreCase(
+                        entry.getValue(),
+                        name
+                );
+            }
+        });
+        if (entry == null) {
+            throw new ApplicationRuntimeException(String.format(
+                    "There is no column with name %s",
+                    name
+            ));
+        }
+        return entry.getKey();
     }
 
     public void addRow(List<Object> row) {

@@ -3,13 +3,18 @@ package ru.mydesignstudio.protege.plugin.search.ui.component.search.results;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.results.action.ApplyUsagesAction;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.results.cell.ResultCellEditor;
+import ru.mydesignstudio.protege.plugin.search.ui.component.search.results.cell.ResultCellRenderer;
 import ru.mydesignstudio.protege.plugin.search.ui.event.LookupInstancesEvent;
 import ru.mydesignstudio.protege.plugin.search.ui.model.table.ResultSetModel;
+import ru.mydesignstudio.protege.plugin.search.utils.Action;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -55,5 +60,50 @@ public class SearchResultsViewComponent extends JPanel {
     private void createResultsTable(ResultSet resultSet) {
         final ResultSetModel resultSetModel = new ResultSetModel(resultSet);
         resultsTable.setModel(resultSetModel);
+        //
+        final Action<Integer> acceptAction = createAcceptAction(resultSet);
+        final Action<Integer> declineAction = createDeclineAction(resultSet);
+        //
+        resultsTable.getColumnModel().getColumn(getAcceptButtonColumnIndex(resultSetModel)).setCellRenderer(new ResultCellRenderer("Accept"));
+        resultsTable.getColumnModel().getColumn(getAcceptButtonColumnIndex(resultSetModel)).setCellEditor(new ResultCellEditor("Accept", acceptAction));
+        resultsTable.getColumnModel().getColumn(getDeclineButtonColumnIndex(resultSetModel)).setCellRenderer(new ResultCellRenderer("Decline"));
+        resultsTable.getColumnModel().getColumn(getDeclineButtonColumnIndex(resultSetModel)).setCellEditor(new ResultCellEditor("Decline", declineAction));
+    }
+
+    /**
+     * Построить действие, которое увеличивает счетчик отказов записи
+     * @param resultSet
+     * @return
+     */
+    private Action<Integer> createDeclineAction(ResultSet resultSet) {
+        return new ApplyUsagesAction(resultSet, FieldConstants.DECLINES_COUNT);
+    }
+
+    /**
+     * Построить дейсвтие, которое увеличивает счетчик использований записи
+     * @param resultSet
+     * @return
+     */
+    private Action<Integer> createAcceptAction(ResultSet resultSet) {
+        return new ApplyUsagesAction(resultSet, FieldConstants.USAGES_COUNT);
+    }
+
+
+    /**
+     * Порядковый номер колонки для кнопки "Использовать"
+     * @param resultSetModel
+     * @return
+     */
+    private int getAcceptButtonColumnIndex(ResultSetModel resultSetModel) {
+        return resultSetModel.getColumnCount() - 2;
+    }
+
+    /**
+     * Порядковый номер колонки для кнопки "Отклонить"
+     * @param resultSetModel
+     * @return
+     */
+    private int getDeclineButtonColumnIndex(ResultSetModel resultSetModel) {
+        return resultSetModel.getColumnCount() - 1;
     }
 }

@@ -36,6 +36,18 @@ public class ProximityCalculatorFactory {
         if (LogicalOperation.EQUALS_NOT.equals(operation)) {
             return new ProximityCalculatorNotEquals();
         }
+        if (LogicalOperation.MORE_THAN.equals(operation)) {
+            return new ProximityCalculatorMoreThan();
+        }
+        if (LogicalOperation.MORE_OR_EQUALS.equals(operation)) {
+            return new ProximityCalculatorMoreThanOrEquals();
+        }
+        if (LogicalOperation.LESS_THAN.equals(operation)) {
+            return new ProximityCalculatorLessThan();
+        }
+        if (LogicalOperation.LESS_OR_EQUALS.equals(operation)) {
+            return new ProximityCalculatorLessThanOrEquals();
+        }
         throw new ApplicationException(String.format(
                 "Can't find calculator for %s operation",
                 operation

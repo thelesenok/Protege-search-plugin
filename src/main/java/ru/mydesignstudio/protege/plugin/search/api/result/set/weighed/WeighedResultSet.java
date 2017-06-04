@@ -3,8 +3,12 @@ package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +40,26 @@ public class WeighedResultSet implements ResultSet {
         }
         this.weightCalculator = weightCalculator;
         addResultSet(resultSet);
+    }
+
+    @Override
+    public int getColumnIndex(String name) {
+        final Map.Entry<Integer, String> entry = CollectionUtils.findFirst(columnNames.entrySet(), new Specification<Map.Entry<Integer, String>>() {
+            @Override
+            public boolean isSatisfied(Map.Entry<Integer, String> entry) {
+                return StringUtils.equalsIgnoreCase(
+                        entry.getValue(),
+                        name
+                );
+            }
+        });
+        if (entry == null) {
+            throw new ApplicationRuntimeException(String.format(
+                    "There is no column with name %s",
+                    name
+            ));
+        }
+        return entry.getKey();
     }
 
     /**

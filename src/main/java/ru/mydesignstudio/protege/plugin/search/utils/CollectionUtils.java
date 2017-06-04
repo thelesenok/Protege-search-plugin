@@ -34,6 +34,32 @@ public class CollectionUtils {
         });
     }
 
+    /**
+     * Прогнать коллекцию через трансформер.
+     * За неимением stream-ов делаем так вот
+     * @param source - исходная коллекция
+     * @param transformer - трансформер
+     * @param <SOURCE> - тип элемента исходной коллекции
+     * @param <DESTINATION> - тип элемента целевой коллекции
+     * @return - трансформированная коллекция
+     */
+    public static final <SOURCE, DESTINATION> Collection<DESTINATION> flatMap(Collection<SOURCE> source, Transformer<SOURCE, Collection<DESTINATION>> transformer) {
+        final Collection<DESTINATION> destinations = new ArrayList<DESTINATION>();
+        for (SOURCE item : source) {
+            destinations.addAll(transformer.transform(item));
+        }
+        return destinations;
+    }
+
+    /**
+     * Прогнать коллекцию через трансформер.
+     * За неимением stream-ов делаем так вот
+     * @param source - исходная коллекция
+     * @param transformer - трансформер
+     * @param <SOURCE> - тип элемента исходной коллекции
+     * @param <DESTINATION> - тип элемента целевой коллекции
+     * @return - трансформированная коллекция
+     */
     public static final <SOURCE, DESTINATION> Collection<DESTINATION> map(Collection<SOURCE> source, Transformer<SOURCE, DESTINATION> transformer) {
         final Collection<DESTINATION> destination = new ArrayList<DESTINATION>();
         for (SOURCE item : source) {
