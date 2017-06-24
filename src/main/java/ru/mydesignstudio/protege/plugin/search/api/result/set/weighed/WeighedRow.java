@@ -1,7 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 
-import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +27,6 @@ public class WeighedRow {
      * @return
      */
     public Object getCell(String columnName) {
-        if (StringUtils.equalsIgnoreCase(WEIGHT_COLUMN, columnName)) {
-            return String.format(
-                    "%.2f",
-                    cells.get(WEIGHT_COLUMN)
-            );
-        }
         return cells.get(columnName);
     }
 
@@ -42,7 +34,7 @@ public class WeighedRow {
      * Установить вес текущей строки
      * @param weight - вес
      */
-    public void setWeight(double weight) {
+    public void setWeight(Weight weight) {
         cells.put(WEIGHT_COLUMN, weight);
     }
 }

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
@@ -99,8 +99,12 @@ public class WeighedResultSet implements ResultSet {
         return true;
     }
 
-    public double getRowWeight(WeighedRow row) throws ApplicationException {
-        return weightCalculator.calculate(row);
+    public Weight getRowWeight(WeighedRow row) throws ApplicationException {
+        final Weight weight = Weight.noneWeight();
+        weight.addWeight(
+                weightCalculator.calculate(row)
+        );
+        return weight;
     }
 
     @Override

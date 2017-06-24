@@ -1,5 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
+import ru.mydesignstudio.protege.plugin.search.utils.function.BinaryFunction;
+import ru.mydesignstudio.protege.plugin.search.utils.function.Function;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -115,5 +118,24 @@ public class CollectionUtils {
             }
         }
         return target;
+    }
+
+    /**
+     * Редуцировать коллекцию
+     * @param source - исходная коллекция
+     * @param defaultValue - начальное значение, от которого редуцируем
+     * @param getter - функция получения значения из каждого элемента
+     * @param reducer - редуктор
+     * @param <ITEM> - тип элемента в коллекции
+     * @param <VALUE> - тип выходного значения
+     * @return
+     */
+    public static final <ITEM, VALUE> VALUE reduce(Collection<ITEM> source, VALUE defaultValue, Function<ITEM, VALUE> getter, BinaryFunction<VALUE, VALUE, VALUE> reducer) {
+        VALUE value = defaultValue;
+        for (ITEM item : source) {
+            VALUE valueFromItem = getter.run(item);
+            value = reducer.run(value, valueFromItem);
+        }
+        return value;
     }
 }

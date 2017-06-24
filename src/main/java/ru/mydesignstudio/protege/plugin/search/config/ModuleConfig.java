@@ -9,6 +9,8 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculatorDefault;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
@@ -36,6 +38,7 @@ public class ModuleConfig extends AbstractModule {
         bind(SearchStrategyService.class).to(SearchStrategyServiceImpl.class).in(Singleton.class);
         bind(SearchStrategyRegistry.class).to(SearchStrategyRegistryImpl.class).in(Singleton.class);
         bind(OWLService.class).to(OWLServiceImpl.class);
+        bind(WeightCalculator.class).to(WeightCalculatorDefault.class);
         bind(FuzzyOWLService.class).to(FuzzyOWLServiceImpl.class);
         bind(DatatypeCalculator.class).to(MaximumDatatypeCalculator.class);
         bind(SearchStrategySerializationService.class).to(SearchStrategySerializationServiceImpl.class);

@@ -10,7 +10,7 @@ import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProces
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;

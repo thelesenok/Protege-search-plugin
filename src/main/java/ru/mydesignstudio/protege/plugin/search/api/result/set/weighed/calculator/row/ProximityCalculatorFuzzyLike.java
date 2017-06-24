@@ -1,8 +1,9 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 /**
@@ -12,7 +13,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  */
 public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public double calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
         final String propertyValue = getPropertyAsString(individual, property);
         final String targetValue = (String) targetObjectValue;
         //
@@ -20,7 +21,7 @@ public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport imp
             /**
              * Проверим самый простой случай, когда значения совпадают
              */
-            return 1;
+            return Weight.maxWeight();
         }
         /**
          * Посчитаем количество общих букв, так как похожесть по
@@ -36,6 +37,7 @@ public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport imp
                 validCharacters = validCharacters + 0.5;
             }
         }
-        return validCharacters / propertyValue.length();
+        final double doubleValue = validCharacters / propertyValue.length();
+        return new Weight(doubleValue, 1);
     }
 }

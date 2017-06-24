@@ -8,7 +8,8 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationExceptio
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
@@ -38,11 +39,11 @@ public class FuzzyOntologyRowWeightCalculator extends RowWeightCalculatorSupport
     }
 
     @Override
-    public double calculate(WeighedRow row) throws ApplicationException {
+    public Weight calculate(WeighedRow row) throws ApplicationException {
         /**
          * Сначала вычислим значение на основе атрибутов
          */
-        final double byAttributes = super.calculate(row);
+        final Weight byAttributes = super.calculate(row);
         /**
          * А теперь пройдем по нечетким критериям
          * Здесь нужно решить обратную задачу - насколько значение
@@ -50,20 +51,15 @@ public class FuzzyOntologyRowWeightCalculator extends RowWeightCalculatorSupport
          * Т.е. в записи указано "подросток", диапазон 6-18, пользователь
          * указал 12. Вычисляем, насколько 12 подходит под значение "подросток".
          */
-        double fuzzyValue = 0;
-        /**
-         * Пройдем по всем нечетким параметрам
-         */
         for (WherePart fuzzyPart : fuzzyParts) {
             final OWLDatatype propertyDatatype = getPropertyDatatype(row, fuzzyPart.getProperty());
-            fuzzyValue += getDatatypeFunctionValue(propertyDatatype, Integer.parseInt((String) fuzzyPart.getValue()));
+            final double fuzzyValue = getDatatypeFunctionValue(propertyDatatype, Integer.parseInt((String) fuzzyPart.getValue()));
+            byAttributes.addWeight(new Weight(fuzzyValue, 1));
         }
         /**
-         * Среднее арифметическое
+         * Вычислением полного веса займется другая часть
          */
-        return (byAttributes +
-                (fuzzyParts.size() == 0 ? 1 : (fuzzyValue / fuzzyParts.size()))
-        ) / 2;
+        return byAttributes;
     }
 
     private double getDatatypeFunctionValue(OWLDatatype propertyDatatype, int value) throws ApplicationException {

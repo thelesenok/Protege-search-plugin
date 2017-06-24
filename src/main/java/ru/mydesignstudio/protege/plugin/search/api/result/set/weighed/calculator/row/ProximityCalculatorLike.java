@@ -1,8 +1,9 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 
 /**
  * Created by abarmin on 28.05.17.
@@ -11,7 +12,7 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationExceptio
  */
 public class ProximityCalculatorLike extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public double calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
         /**
          * like только с буквами. Считаем, сколько букв совпало
          */
@@ -20,6 +21,7 @@ public class ProximityCalculatorLike extends ProximityCalculatorSupport implemen
         /**
          * Вычисляем и все
          */
-        return (double) getCommonSymbols(propertyValue, targetValue) / propertyValue.length();
+        final double doubleValue = (double) getCommonSymbols(propertyValue, targetValue) / propertyValue.length();
+        return new Weight(doubleValue, 1);
     }
 }

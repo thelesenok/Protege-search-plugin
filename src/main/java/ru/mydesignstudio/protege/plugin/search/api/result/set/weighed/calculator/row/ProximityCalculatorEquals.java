@@ -1,14 +1,16 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainLiteral;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 /**
  * Created by abarmin on 08.05.17.
@@ -23,7 +25,7 @@ public class ProximityCalculatorEquals implements ProximityCalculator {
     }
 
     @Override
-    public double calculate(final Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(final Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
         final Object propertyValue = owlService.getPropertyValue(individual, property);
         if (property instanceof OWLDataProperty) {
             // вероятнее всего, targetValue - OWLDomainLiteral
@@ -32,7 +34,14 @@ public class ProximityCalculatorEquals implements ProximityCalculator {
                 return OWLUtils.equals(
                         domainLiteral.getLiteral(),
                         (OWLLiteral) propertyValue
-                ) ? 1 : 0;
+                ) ? Weight.maxWeight() : Weight.minWeight();
+            } else if (targetValue instanceof String) {
+                final String stringValue = (String) targetValue;
+                final OWLLiteral literalPropertyValue = (OWLLiteral) propertyValue;
+                return StringUtils.equalsIgnoreCase(
+                        stringValue,
+                        literalPropertyValue.getLiteral()
+                ) ? Weight.maxWeight() : Weight.minWeight();
             } else {
                 throw new ApplicationException(String.format(
                         "Unsupported value type, %s",

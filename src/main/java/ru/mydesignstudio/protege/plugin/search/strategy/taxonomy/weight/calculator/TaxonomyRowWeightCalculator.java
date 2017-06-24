@@ -4,10 +4,11 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
@@ -30,10 +31,14 @@ public class TaxonomyRowWeightCalculator implements WeighedRowWeightCalculator {
     }
 
     @Override
-    public double calculate(WeighedRow row) throws ApplicationException {
+    public Weight calculate(WeighedRow row) throws ApplicationException {
         final OWLIndividual ontologyObject = owlService.getIndividual((IRI) row.getCell(SparqlQueryVisitor.OBJECT));
         final OWLClass individualClass = owlService.getIndividualClass(ontologyObject);
         final Collection<OWLDomainClass> hierarchy = OWLUtils.getClassesInHierarchy(new OWLDomainClass(individualClass));
-        return (double) processorParams.getProximity() / (hierarchy.size() + 1); // добавляем еще и сам класс
+        double doubleValue = (double) processorParams.getProximity() / (hierarchy.size() + 1);// добавляем еще и сам класс
+        if (doubleValue > 1) {
+            doubleValue = 1;
+        }
+        return new Weight(doubleValue, 1);
     }
 }

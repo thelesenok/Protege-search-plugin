@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.weight.calculator;
 
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculator.RowWeightCalculatorSupport;
 

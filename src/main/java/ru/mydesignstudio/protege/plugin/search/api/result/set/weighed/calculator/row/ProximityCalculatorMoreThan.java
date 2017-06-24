@@ -1,8 +1,9 @@
-package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 
 /**
  * Created by abarmin on 04.06.17.
@@ -11,7 +12,7 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationExceptio
  */
 public class ProximityCalculatorMoreThan implements ProximityCalculator {
     @Override
-    public double calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
-        return 1;
+    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+        return Weight.maxWeight();
     }
 }

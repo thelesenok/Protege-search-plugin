@@ -5,6 +5,9 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
@@ -27,6 +30,7 @@ public class ResultSetModel extends AbstractTableModel {
     private final Map<Integer, String> additionalColumnNames = new HashMap<>();
     private final OWLService owlService;
     private final ExceptionWrapperService wrapperService;
+    private final WeightCalculator weightCalculator;
 
     public ResultSetModel(ResultSet resultSet) {
         this.resultSet = resultSet;
@@ -37,6 +41,7 @@ public class ResultSetModel extends AbstractTableModel {
         //
         owlService = InjectionUtils.getInstance(OWLService.class);
         wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
+        weightCalculator = InjectionUtils.getInstance(WeightCalculator.class);
     }
 
     @Override
@@ -71,6 +76,19 @@ public class ResultSetModel extends AbstractTableModel {
                     final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(SparqlQueryVisitor.OBJECT));
                     final OWLIndividual individual = owlService.getIndividual(individualIRI);
                     return owlService.getPropertyValue(individual, FieldConstants.DECLINES_COUNT);
+                }
+            });
+        }
+        /**
+         * Вес выводится отдельным обработчиком
+         */
+        if (StringUtils.equalsIgnoreCase(getColumnName(columnIndex), WeighedRow.WEIGHT_COLUMN)) {
+            return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Object>() {
+                @Override
+                public Object run() throws ApplicationException {
+                    final Weight weight = (Weight) resultSet.getResult(rowIndex, resultSet.getColumnIndex(WeighedRow.WEIGHT_COLUMN));
+                    final double calculatedWeight = weightCalculator.calculate(weight);
+                    return String.format("%.2f", calculatedWeight);
                 }
             });
         }
