@@ -172,4 +172,12 @@ public interface OWLService {
      * @throws ApplicationException
      */
     void saveOntology() throws ApplicationException;
+
+    /**
+     * Классы, которые указаны эквивалентными у переданного
+     * @param owlClass - от этого класса вычисляем
+     * @return - коллекция эквивалентных классов
+     * @throws ApplicationException
+     */
+    Collection<OWLClass> getEqualClasses(OWLClass owlClass) throws ApplicationException;
 }

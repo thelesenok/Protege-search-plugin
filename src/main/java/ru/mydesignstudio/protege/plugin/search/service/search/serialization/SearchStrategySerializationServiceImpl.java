@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
@@ -38,6 +39,7 @@ import java.util.Collection;
 /**
  * Created by abarmin on 08.05.17.
  */
+@Component
 public class SearchStrategySerializationServiceImpl implements SearchStrategySerializationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchStrategySerializationServiceImpl.class);
 

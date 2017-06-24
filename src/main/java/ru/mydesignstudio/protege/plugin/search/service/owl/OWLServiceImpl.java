@@ -7,19 +7,23 @@ import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLDataRange;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLProperty;
@@ -486,6 +490,102 @@ public class OWLServiceImpl implements OWLService {
             }
         }
         return null;
+    }
+
+    @Override
+    public Collection<OWLClass> getEqualClasses(OWLClass owlClass) throws ApplicationException {
+        final Set<OWLEquivalentClassesAxiom> axioms = getOntology().getAxioms(AxiomType.EQUIVALENT_CLASSES);
+        final Collection<OWLEquivalentClassesAxiom> filteredAxioms = CollectionUtils.filter(axioms, new Specification<OWLEquivalentClassesAxiom>() {
+            @Override
+            public boolean isSatisfied(OWLEquivalentClassesAxiom axiom) {
+                return CollectionUtils.some(axiom.getClassExpressions(), new Specification<OWLClassExpression>() {
+                    @Override
+                    public boolean isSatisfied(OWLClassExpression expression) {
+                        if (!(expression instanceof OWLClass)) {
+                            return false;
+                        }
+                        final OWLClass expressionClass = (OWLClass) expression;
+                        return OWLUtils.equals(
+                                expressionClass,
+                                owlClass
+                        );
+                    }
+                });
+            }
+        });
+        final Collection<OWLClass> equalClasses = new ArrayList<>();
+        for (OWLEquivalentClassesAxiom axiom : filteredAxioms) {
+            /**
+             * Аксиомы как Person and (hasParent some Person)
+             */
+            final Collection<OWLObjectIntersectionOf> intersections = CollectionUtils.map(
+                    CollectionUtils.filter(axiom.getClassExpressions(), new Specification<OWLClassExpression>() {
+                        @Override
+                        public boolean isSatisfied(OWLClassExpression expression) {
+                            return expression instanceof OWLObjectIntersectionOf;
+                        }
+                    }),
+                    new Transformer<OWLClassExpression, OWLObjectIntersectionOf>() {
+                        @Override
+                        public OWLObjectIntersectionOf transform(OWLClassExpression item) {
+                            return (OWLObjectIntersectionOf) item;
+                        }
+                    }
+            );
+            final Collection<OWLClassExpression> operands = CollectionUtils.flatMap(intersections, new Transformer<OWLObjectIntersectionOf, Collection<OWLClassExpression>>() {
+                @Override
+                public Collection<OWLClassExpression> transform(OWLObjectIntersectionOf item) {
+                    return item.getOperands();
+                }
+            });
+            equalClasses.addAll(CollectionUtils.map(
+                    CollectionUtils.filter(operands, new Specification<OWLClassExpression>() {
+                        @Override
+                        public boolean isSatisfied(OWLClassExpression expression) {
+                            return expression instanceof OWLClass;
+                        }
+                    }),
+                    new Transformer<OWLClassExpression, OWLClass>() {
+                        @Override
+                        public OWLClass transform(OWLClassExpression item) {
+                            return (OWLClass) item;
+                        }
+                    }
+            ));
+            /**
+             * Аксиомы вида WOW or StarCraft or Diablo
+             */
+            final Collection<OWLObjectUnionOf> unions = CollectionUtils.map(
+                    CollectionUtils.filter(axiom.getClassExpressions(), new Specification<OWLClassExpression>() {
+                        @Override
+                        public boolean isSatisfied(OWLClassExpression expression) {
+                            return expression instanceof OWLObjectUnionOf;
+                        }
+                    }),
+                    new Transformer<OWLClassExpression, OWLObjectUnionOf>() {
+                        @Override
+                        public OWLObjectUnionOf transform(OWLClassExpression item) {
+                            return (OWLObjectUnionOf) item;
+                        }
+                    }
+            );
+            final Collection<OWLClass> foundClasses = CollectionUtils.map(
+                    CollectionUtils.flatMap(unions, new Transformer<OWLObjectUnionOf, Collection<OWLClassExpression>>() {
+                        @Override
+                        public Collection<OWLClassExpression> transform(OWLObjectUnionOf item) {
+                            return item.getOperands();
+                        }
+                    }),
+                    new Transformer<OWLClassExpression, OWLClass>() {
+                        @Override
+                        public OWLClass transform(OWLClassExpression item) {
+                            return (OWLClass) item;
+                        }
+                    }
+            );
+            equalClasses.addAll(foundClasses);
+        }
+        return equalClasses;
     }
 
     @Override
