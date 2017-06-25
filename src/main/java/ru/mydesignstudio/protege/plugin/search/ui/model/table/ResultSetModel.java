@@ -4,14 +4,13 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
@@ -63,7 +62,7 @@ public class ResultSetModel extends AbstractTableModel {
             return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Object>() {
                 @Override
                 public Object run() throws ApplicationException {
-                    final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(SparqlQueryVisitor.OBJECT));
+                    final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(FieldConstants.OBJECT_IRI));
                     final OWLIndividual individual = owlService.getIndividual(individualIRI);
                     return owlService.getPropertyValue(individual, FieldConstants.USAGES_COUNT);
                 }
@@ -73,7 +72,7 @@ public class ResultSetModel extends AbstractTableModel {
             return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Object>() {
                 @Override
                 public Object run() throws ApplicationException {
-                    final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(SparqlQueryVisitor.OBJECT));
+                    final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(FieldConstants.OBJECT_IRI));
                     final OWLIndividual individual = owlService.getIndividual(individualIRI);
                     return owlService.getPropertyValue(individual, FieldConstants.DECLINES_COUNT);
                 }
@@ -82,13 +81,17 @@ public class ResultSetModel extends AbstractTableModel {
         /**
          * Вес выводится отдельным обработчиком
          */
-        if (StringUtils.equalsIgnoreCase(getColumnName(columnIndex), WeighedRow.WEIGHT_COLUMN)) {
+        if (StringUtils.equalsIgnoreCase(getColumnName(columnIndex), FieldConstants.WEIGHT)) {
             return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Object>() {
                 @Override
                 public Object run() throws ApplicationException {
-                    final Weight weight = (Weight) resultSet.getResult(rowIndex, resultSet.getColumnIndex(WeighedRow.WEIGHT_COLUMN));
-                    final double calculatedWeight = weightCalculator.calculate(weight);
-                    return String.format("%.2f", calculatedWeight);
+                    final ResultSetRow resultSetRow = resultSet.getRow(rowIndex);
+                    if (resultSetRow instanceof WeighedRow) {
+                        final WeighedRow weighedRow = (WeighedRow) resultSetRow;
+                        final double calculatedWeight = weightCalculator.calculate(weighedRow.getWeight());
+                        return String.format("%.2f", calculatedWeight);
+                    }
+                    return "-";
                 }
             });
         }

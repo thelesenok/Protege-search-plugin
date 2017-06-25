@@ -1,141 +1,131 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.owlapi.model.IRI;
+import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.sparql.SparqlResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow.WEIGHT_COLUMN;
 
 /**
  * Created by abarmin on 06.05.17.
  *
  * Взвешенные результаты
  */
-public class WeighedResultSet implements ResultSet {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WeighedResultSet.class);
-
+public class WeighedResultSet extends SparqlResultSet implements ResultSet {
     private final WeighedRowWeightCalculator weightCalculator;
-    private final Set<WeighedRow> rows = new HashSet<>();
-    private final Map<Integer, String> columnNames = new HashMap<>();
+    private final ExceptionWrapperService wrapperService;
 
     public WeighedResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) {
-        if (!(resultSet instanceof WeighedResultSet)) {
-            /**
-             * Добавим столбец с весом если этого еще не сделали ранее
-             */
-            columnNames.put(columnNames.size(), WEIGHT_COLUMN);
-        }
         this.weightCalculator = weightCalculator;
-        addResultSet(resultSet);
+        wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
+        /**
+         * если нет столбца с весом, добавим его
+         */
+        if (!columnNames.containsKey(FieldConstants.WEIGHT)) {
+            columnNames.put(columnNames.size(), FieldConstants.WEIGHT);
+        }
+        /**
+         * скопируем названия столбцов, они потом нужны для вывода результатов
+         */
+        for (String sourceColumnName : resultSet.getColumnNames()) {
+            if (!columnNames.containsKey(sourceColumnName) &&
+                    !StringUtils.equalsIgnoreCase(sourceColumnName, FieldConstants.WEIGHT)) {
+                columnNames.put(columnNames.size(), sourceColumnName);
+            }
+        }
+        /**
+         * объединяем ResultSet-ы
+         */
+        wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
+            @Override
+            public Void run() throws ApplicationException {
+                addResultSet(resultSet);
+                return null;
+            }
+        });
     }
 
-    @Override
-    public int getColumnIndex(String name) {
-        final Map.Entry<Integer, String> entry = CollectionUtils.findFirst(columnNames.entrySet(), new Specification<Map.Entry<Integer, String>>() {
+    /**
+     * Получить строку для записи с указанным IRI
+     * @param rowIri - IRI записи
+     * @return - строка или исключение о несущствовании такой строки
+     */
+    private WeighedRow getRow(IRI rowIri) {
+        final WeighedRow existingRow = (WeighedRow) CollectionUtils.findFirst(rows.values(), new Specification<ResultSetRow>() {
             @Override
-            public boolean isSatisfied(Map.Entry<Integer, String> entry) {
-                return StringUtils.equalsIgnoreCase(
-                        entry.getValue(),
-                        name
+            public boolean isSatisfied(ResultSetRow weighedRow) {
+                return OWLUtils.equals(
+                        weighedRow.getObjectIRI(),
+                        rowIri
                 );
             }
         });
-        if (entry == null) {
-            throw new ApplicationRuntimeException(String.format(
-                    "There is no column with name %s",
-                    name
-            ));
-        }
-        return entry.getKey();
+        Validation.assertNotNull(String.format(
+                "There is no row with IRI %s",
+                rowIri
+        ), existingRow);
+        return existingRow;
     }
 
     /**
      * Добавить набор данных к взвешенному результату
      * @param resultSet - что добавляем
+     * @throws ApplicationException - в случае невозможности взвешивать строки
      */
-    public void addResultSet(ResultSet resultSet) {
-        for (int rowIndex = 0; rowIndex < resultSet.getRowCount(); rowIndex++) {
-            final WeighedRow row = new WeighedRow();
-            for (int colIndex = 0; colIndex < resultSet.getColumnCount(); colIndex++) {
-                final Object result = resultSet.getResult(rowIndex, colIndex);
-                final String columnName = resultSet.getColumnName(colIndex);
-                //
-                if (!columnNames.containsValue(columnName)) {
-                    columnNames.put(columnNames.size(), columnName);
+    public void addResultSet(ResultSet resultSet) throws ApplicationException {
+        for (ResultSetRow sourceRow : resultSet.getRows()) {
+            if (containsRow(sourceRow)) {
+                /**
+                 * такая запись здесь уже была, проверим, взвешенная ли она
+                 */
+                final WeighedRow existingRow = getRow(sourceRow.getObjectIRI());
+                if (sourceRow instanceof WeighedRow) {
+                    /**
+                     * взвешенная, добавляем ее вес к весу имеющейся записи
+                     */
+                    final WeighedRow sourceWeighedRow = (WeighedRow) sourceRow;
+                    existingRow.addWeight(sourceWeighedRow.getWeight());
+                } else {
+                    /**
+                     * нет, это обычная строка, ее нужно сначала взвесить
+                     */
+                    final Weight calculatedWeight = weightCalculator.calculate(sourceRow);
+                    existingRow.addWeight(calculatedWeight);
                 }
-                row.addCell(columnName, result);
-            }
-            if (isValidRow(row)) {
-                try {
-                    row.setWeight(getRowWeight(row));
-                } catch (ApplicationException e) {
-                    row.addCell(WEIGHT_COLUMN, 0);
-                    LOGGER.warn("Can't calculate row weight", e);
+                /**
+                 * теперь нужно проверить атрибуты, вдруг можно что скопировать
+                 */
+                for (String sourceColumnName : resultSet.getColumnNames()) {
+                    if (existingRow.getValue(sourceColumnName) == null && sourceRow.getValue(sourceColumnName) != null) {
+                        existingRow.setValue(sourceColumnName, sourceRow.getValue(sourceColumnName));
+                    }
                 }
-                rows.add(row);
+            } else {
+                /**
+                 * такой записи еще не было, в этом ResultSet-е. Перед этим надо проверить, взвешенная она или нет
+                 */
+                final WeighedRow rowToAdd;
+                if (sourceRow instanceof WeighedRow) {
+                    rowToAdd = (WeighedRow) sourceRow;
+                } else {
+                    final Weight calculatedWeight = weightCalculator.calculate(sourceRow);
+                    rowToAdd = new WeighedRowDefaultImpl(sourceRow, calculatedWeight);
+                }
+                /**
+                 * просто добавляем к имеющимся
+                 */
+                addRow(rowToAdd);
             }
         }
-    }
-
-    /**
-     * Походит ли строка для добавления в результат
-     * @param row - строка для проверки
-     * @return
-     */
-    protected boolean isValidRow(WeighedRow row) {
-        return true;
-    }
-
-    public Weight getRowWeight(WeighedRow row) throws ApplicationException {
-        final Weight weight = Weight.noneWeight();
-        weight.addWeight(
-                weightCalculator.calculate(row)
-        );
-        return weight;
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return columnNames.get(col);
-    }
-
-    @Override
-    public Object getResult(int row, int col) {
-        // не очень быстрая имплементация, но
-        // сейчас не до этого
-        final List<WeighedRow> orderedRows = new LinkedList<>(rows);
-        final WeighedRow weighedRow = orderedRows.get(row);
-        if (weighedRow == null) {
-            return null;
-        }
-        final String columnName = getColumnName(col);
-        return weighedRow.getCell(columnName);
-    }
-
-    @Override
-    public int getRowCount() {
-        return rows.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.size();
-    }
-
-    protected Set<WeighedRow> getRows() {
-        return rows;
     }
 }

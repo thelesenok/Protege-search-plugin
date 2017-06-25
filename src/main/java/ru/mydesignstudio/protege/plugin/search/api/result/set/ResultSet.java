@@ -1,4 +1,6 @@
-package ru.mydesignstudio.protege.plugin.search.api.query;
+package ru.mydesignstudio.protege.plugin.search.api.result.set;
+
+import java.util.Collection;
 
 /**
  * Created by abarmin on 08.01.17.
@@ -6,6 +8,14 @@ package ru.mydesignstudio.protege.plugin.search.api.query;
  * Результаты выполнения запроса
  */
 public interface ResultSet {
+    /**
+     * Названия всех столбцов
+     * @return - коллекция с названиями столбцов
+     * @deprecated - использовать {@link ResultSetRow}
+     */
+    @Deprecated
+    Collection<String> getColumnNames();
+
     /**
      * Название столбца с указанным номером
      * @param col
@@ -39,4 +49,23 @@ public interface ResultSet {
      * @return
      */
     int getColumnCount();
+
+    /**
+     * Строки в наборе результатов
+     * @return - коллекция строк
+     */
+    Collection<ResultSetRow> getRows();
+
+    /**
+     * Запись по порядковому номеру
+     * @param rowIndex - порядковый номер записи
+     * @return - запись
+     */
+    ResultSetRow getRow(int rowIndex);
+
+    /**
+     * Удалить строку из результатов
+     * @param row - строка для удаления
+     */
+    void removeRow(ResultSetRow row);
 }

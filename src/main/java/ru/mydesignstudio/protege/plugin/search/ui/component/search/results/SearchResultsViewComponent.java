@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
 import ru.mydesignstudio.protege.plugin.search.ui.component.search.results.action.ApplyUsagesAction;

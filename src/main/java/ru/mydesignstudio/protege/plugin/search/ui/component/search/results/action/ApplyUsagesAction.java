@@ -5,12 +5,12 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
+import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.utils.Action;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
@@ -43,7 +43,7 @@ public class ApplyUsagesAction implements Action<Integer> {
         /**
          * Определим запись по номеру строки
          */
-        final IRI recordIri = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(SparqlQueryVisitor.OBJECT));
+        final IRI recordIri = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(FieldConstants.OBJECT_IRI));
         final OWLIndividual record = wrapperService.invokeWrapped(new ExceptionWrappedCallback<OWLIndividual>() {
             @Override
             public OWLIndividual run() throws ApplicationException {

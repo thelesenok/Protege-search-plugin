@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
@@ -23,8 +23,22 @@ public class AttributiveProcessor extends SparqlProcessorSupport implements Sear
 
     @Override
     public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, AttributiveProcessorParams strategyParams) throws ApplicationException {
-        final ResultSet resultSet = collect(selectQuery);
-        return new WeighedResultSet(resultSet, getWeightCalculator(selectQuery, strategyParams));
+        /**
+         * делаем выборку данных по атрибутам
+         */
+        final ResultSet dataResultSet = collect(selectQuery);
+        /**
+         * взвешиваем их
+         */
+        final WeighedResultSet resultSet = new WeighedResultSet(dataResultSet, getWeightCalculator(selectQuery, strategyParams));
+        /**
+         * добавляем предыдущие данные
+         */
+        resultSet.addResultSet(initialResultSet);
+        /**
+         * на выход
+         */
+        return resultSet;
     }
 
     private WeighedRowWeightCalculator getWeightCalculator(SelectQuery selectQuery, SearchProcessorParams processorParams) {

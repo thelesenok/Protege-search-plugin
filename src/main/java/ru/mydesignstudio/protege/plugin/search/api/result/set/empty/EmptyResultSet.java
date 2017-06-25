@@ -1,6 +1,11 @@
-package ru.mydesignstudio.protege.plugin.search.api.query;
+package ru.mydesignstudio.protege.plugin.search.api.result.set.empty;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by abarmin on 12.03.17.
@@ -34,5 +39,27 @@ public class EmptyResultSet implements ResultSet {
                 "There is no column with name %s",
                 name
         ));
+    }
+
+    @Override
+    public Collection<ResultSetRow> getRows() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<String> getColumnNames() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void removeRow(ResultSetRow row) {
+        /**
+         * ничего не делаем, так как в этом наборе нет никаких данных
+         */
+    }
+
+    @Override
+    public ResultSetRow getRow(int rowIndex) {
+        return null;
     }
 }

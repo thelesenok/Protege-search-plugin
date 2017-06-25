@@ -1,7 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 
 /**
@@ -16,5 +16,5 @@ public interface WeighedRowWeightCalculator {
      * @return - вес (0..1)
      * @throws ApplicationException
      */
-    Weight calculate(WeighedRow row) throws ApplicationException;
+    Weight calculate(ResultSetRow row) throws ApplicationException;
 }

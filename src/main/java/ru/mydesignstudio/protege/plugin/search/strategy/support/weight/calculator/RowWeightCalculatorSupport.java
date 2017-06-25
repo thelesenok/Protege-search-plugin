@@ -1,18 +1,16 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculator;
 
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorFactory;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorFactory;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 /**
@@ -35,7 +33,7 @@ public abstract class RowWeightCalculatorSupport implements WeighedRowWeightCalc
     }
 
     @Override
-    public Weight calculate(WeighedRow row) throws ApplicationException {
+    public Weight calculate(ResultSetRow row) throws ApplicationException {
         /**
          * Здесь общая имплементация, которая берет каждое условие
          * в исходном запросе и проверяет соответствующее ему значение.
@@ -43,7 +41,7 @@ public abstract class RowWeightCalculatorSupport implements WeighedRowWeightCalc
          */
         final Weight totalWeight = Weight.noneWeight();
         //
-        final OWLIndividual ontologyObject = owlService.getIndividual((IRI) row.getCell(SparqlQueryVisitor.OBJECT));
+        final OWLIndividual ontologyObject = owlService.getIndividual(row.getObjectIRI());
         //
         for (WherePart wherePart : selectQuery.getWhereParts()) {
             final ProximityCalculator calculator = calculatorFactory.getCalculator(wherePart.getLogicalOperation(), processorParams);

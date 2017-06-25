@@ -14,4 +14,12 @@ public interface FieldConstants {
      * Количество отказов в использовании
      */
     String DECLINES_COUNT = "declinesCount";
+    /**
+     * Идентификатор записи
+     */
+    String OBJECT_IRI = "object";
+    /**
+     * Степень схожести
+     */
+    String WEIGHT = "weight";
 }

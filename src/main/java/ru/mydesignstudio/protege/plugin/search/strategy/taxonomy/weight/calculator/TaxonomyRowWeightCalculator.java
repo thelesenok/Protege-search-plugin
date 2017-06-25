@@ -1,15 +1,13 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator;
 
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
@@ -31,8 +29,8 @@ public class TaxonomyRowWeightCalculator implements WeighedRowWeightCalculator {
     }
 
     @Override
-    public Weight calculate(WeighedRow row) throws ApplicationException {
-        final OWLIndividual ontologyObject = owlService.getIndividual((IRI) row.getCell(SparqlQueryVisitor.OBJECT));
+    public Weight calculate(ResultSetRow row) throws ApplicationException {
+        final OWLIndividual ontologyObject = owlService.getIndividual(row.getObjectIRI());
         final OWLClass individualClass = owlService.getIndividualClass(ontologyObject);
         final Collection<OWLDomainClass> hierarchy = OWLUtils.getClassesInHierarchy(new OWLDomainClass(individualClass));
         double doubleValue = (double) processorParams.getProximity() / (hierarchy.size() + 1);// добавляем еще и сам класс

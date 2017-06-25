@@ -1,40 +1,22 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 
-import java.util.HashMap;
-import java.util.Map;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 
 /**
  * Created by abarmin on 06.05.17.
  *
  * Строка взвешенных результатов
  */
-public class WeighedRow {
-    public static final String WEIGHT_COLUMN = "weight";
-    private final Map<String, Object> cells = new HashMap<>();
-
+public interface WeighedRow extends ResultSetRow {
     /**
-     * Добавить ячейку к строке
-     * @param columnName - название столбца
-     * @param value - значение ячейки
+     * Получить вес текущей строки
+     * @return - вес строки
      */
-    public void addCell(String columnName, Object value) {
-        cells.put(columnName, value);
-    }
-
-    /**
-     * Получить значение ячейки с указанным названием
-     * @param columnName - название столбца
-     * @return
-     */
-    public Object getCell(String columnName) {
-        return cells.get(columnName);
-    }
+    Weight getWeight();
 
     /**
      * Установить вес текущей строки
      * @param weight - вес
      */
-    public void setWeight(Weight weight) {
-        cells.put(WEIGHT_COLUMN, weight);
-    }
+    void addWeight(Weight weight);
 }

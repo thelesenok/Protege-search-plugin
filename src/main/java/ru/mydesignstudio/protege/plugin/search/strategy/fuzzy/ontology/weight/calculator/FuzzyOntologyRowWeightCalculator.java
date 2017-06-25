@@ -7,14 +7,13 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculator.RowWeightCalculatorSupport;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
@@ -39,7 +38,7 @@ public class FuzzyOntologyRowWeightCalculator extends RowWeightCalculatorSupport
     }
 
     @Override
-    public Weight calculate(WeighedRow row) throws ApplicationException {
+    public Weight calculate(ResultSetRow row) throws ApplicationException {
         /**
          * Сначала вычислим значение на основе атрибутов
          */
@@ -73,8 +72,8 @@ public class FuzzyOntologyRowWeightCalculator extends RowWeightCalculatorSupport
      * @param property - свойство
      * @return
      */
-    private OWLDatatype getPropertyDatatype(WeighedRow row, OWLProperty property) throws ApplicationException {
-        final IRI iri = (IRI) row.getCell(SparqlQueryVisitor.OBJECT);
+    private OWLDatatype getPropertyDatatype(ResultSetRow row, OWLProperty property) throws ApplicationException {
+        final IRI iri = row.getObjectIRI();
         final OWLIndividual record = owlService.getIndividual(iri);
         return fuzzyOWLService.getPropertyDatatype(record, property);
     }

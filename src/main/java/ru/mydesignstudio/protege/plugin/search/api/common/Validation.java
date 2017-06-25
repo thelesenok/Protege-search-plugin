@@ -11,7 +11,26 @@ public class Validation {
      */
     public static final void assertTrue(String message, boolean value) {
         if (!value) {
-            throw new IllegalArgumentException(message);
+            fail(message);
         }
+    }
+
+    /**
+     * Проверка на существование значения
+     * @param message - сообщение, которое будет выдано в случае отсутствия значения
+     * @param value - что проверяем
+     */
+    public static final void assertNotNull(String message, Object value) {
+        if (value == null) {
+            fail(message);
+        }
+    }
+
+    /**
+     * Выбросить исключение с указанным сообщением
+     * @param message - сообщение исключения
+     */
+    private static final void fail(String message) {
+        throw new IllegalArgumentException(message);
     }
 }

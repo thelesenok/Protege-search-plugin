@@ -1,23 +1,32 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor;
 
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.DatatypeCalculator;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.result.set.FuzzyWeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.weight.calculator.FuzzyOntologyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -37,6 +46,8 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
     private FuzzyOWLService fuzzyOWLService;
     @Inject
     private DatatypeCalculator datatypeCalculator;
+    @Inject
+    private ExceptionWrapperService wrapperService;
 
     private Collection<WherePart> fuzzyConditions = new ArrayList<>();
 
@@ -92,14 +103,64 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
             values.put(fuzzyWherePart.getProperty(), datatype);
         }
         /**
-         * конвертируем в подходящий resultset
+         * пройдем по всем записям из initialResultSet и уберем оттуда все, которые не подходят по условиям
+         * нечеткого поиска
          */
-        return new FuzzyWeighedResultSet(
-                initialResultSet,
-                getWeightCalculator(selectQuery, strategyParams, fuzzyConditions),
-                selectQuery,
-                values
+        for (ResultSetRow sourceRow : initialResultSet.getRows()) {
+            if (!isValidFuzzyRow(sourceRow, selectQuery, values)) {
+                initialResultSet.removeRow(sourceRow);
+            }
+        }
+        /**
+         * а теперь делаем из этого обычный взвешенный набор данных
+         */
+        return new WeighedResultSet(initialResultSet, getWeightCalculator(selectQuery, strategyParams, fuzzyConditions));
+    }
+
+    protected boolean isValidFuzzyRow(ResultSetRow row, SelectQuery fuzzyQuery, Map<OWLProperty, OWLDatatype> fuzzyValues) throws ApplicationException {
+        final IRI recordIRI = (IRI) row.getValue(FieldConstants.OBJECT_IRI);
+        final OWLIndividual record = owlService.getIndividual(recordIRI);
+        return isValidFuzzyRow(
+                fuzzyQuery.getFrom().getOwlClass(),
+                record,
+                fuzzyValues
         );
+    }
+
+    /**
+     * Подходит ли запись из результатов
+     * @param recordClass - класс записи, который отбираем
+     * @param record - запись, которую проверяем
+     * @param values - набор нечетких свойств
+     * @return - признак того, что запись подходит
+     * @throws ApplicationException
+     */
+    private boolean isValidFuzzyRow(OWLClass recordClass, OWLIndividual record, Map<OWLProperty, OWLDatatype> values) throws ApplicationException {
+        /**
+         * пройдем по всем свойствам, если свойство есть в fuzzyValues и тип совпадает,
+         * то все подходит
+         */
+        final Collection<OWLDataProperty> properties = owlService.getDataProperties(recordClass);
+        return CollectionUtils.every(values.entrySet(), new Specification<Map.Entry<OWLProperty, OWLDatatype>>() {
+            @Override
+            public boolean isSatisfied(Map.Entry<OWLProperty, OWLDatatype> entry) {
+                final OWLProperty property = entry.getKey();
+                final OWLDatatype fuzzyType = entry.getValue();
+                if (fuzzyType == null) {
+                    return false;
+                }
+                if (properties.contains(property)) {
+                    final OWLDatatype propertyType = wrapperService.invokeWrapped(new ExceptionWrappedCallback<OWLDatatype>() {
+                        @Override
+                        public OWLDatatype run() throws ApplicationException {
+                            return fuzzyOWLService.getPropertyDatatype(record, property);
+                        }
+                    });
+                    return fuzzyType.equals(propertyType);
+                }
+                return false;
+            }
+        });
     }
 
     /**

@@ -35,7 +35,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
     private static final String PREFIX = "prfx";
-    public static final String OBJECT = "object";
+    private static final String OBJECT = "object";
     private static final AtomicInteger variableIndex = new AtomicInteger(0);
     private static final String NEW_LINE = "\n";
     private final Map<String, String> prefixes = new HashMap<String, String>();

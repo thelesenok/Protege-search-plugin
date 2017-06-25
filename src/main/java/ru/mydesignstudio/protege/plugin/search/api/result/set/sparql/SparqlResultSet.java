@@ -1,11 +1,15 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.sparql;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +18,11 @@ import java.util.Map;
  * Created by abarmin on 07.01.17.
  */
 public class SparqlResultSet implements ResultSet {
-    private final Map<Integer, String> columnNames = new HashMap<>();
-    private final Map<Integer, SparqlResultSetRow> rows = new HashMap<>();
+    protected final Map<Integer, String> columnNames = new HashMap<>();
+    protected final Map<Integer, ResultSetRow> rows = new HashMap<>();
+
+    public SparqlResultSet() {
+    }
 
     public SparqlResultSet(List<String> columnNames) {
         for (int index = 0; index < columnNames.size(); index++) {
@@ -43,11 +50,25 @@ public class SparqlResultSet implements ResultSet {
         return entry.getKey();
     }
 
+    /**
+     * Добавить запись к остальным результатам
+     * @param resultSetRow - объект записи
+     */
+    public void addRow(ResultSetRow resultSetRow) {
+        rows.put(rows.size(), resultSetRow);
+    }
+
+    /**
+     * Добавить запись из результатов поиска Sparql
+     * @param row - строка из результатов поиск
+     * @deprecated - криво выглядит, придумать как переписать ровно
+     */
+    @Deprecated
     public void addRow(List<Object> row) {
         assert(row.size() == columnNames.size());
         final SparqlResultSetRow sparqlRow = new SparqlResultSetRow();
         for (int index = 0; index < row.size(); index++) {
-            sparqlRow.addCellValue(
+            sparqlRow.setValue(
                     getColumnName(index),
                     row.get(index)
             );
@@ -58,15 +79,18 @@ public class SparqlResultSet implements ResultSet {
     }
 
     /**
-     * Есть ли переданная строка среди уже добавленных
-     * @param row - добавляемая строка
-     * @return
+     * Есть ли уже в ResultSet-е строка для указанной записи
+     * @param row - вот для этой записи проверяем
+     * @return - признак присутствия
      */
-    public boolean containsRow(SparqlResultSetRow row) {
-        return CollectionUtils.some(rows.values(), new Specification<SparqlResultSetRow>() {
+    public boolean containsRow(ResultSetRow row) {
+        return CollectionUtils.some(rows.values(), new Specification<ResultSetRow>() {
             @Override
-            public boolean isSatisfied(SparqlResultSetRow availableRow) {
-                return availableRow.equals(row);
+            public boolean isSatisfied(ResultSetRow weighedRow) {
+                return OWLUtils.equals(
+                        weighedRow.getObjectIRI(),
+                        row.getObjectIRI()
+                );
             }
         });
     }
@@ -79,13 +103,46 @@ public class SparqlResultSet implements ResultSet {
         return rows.size();
     }
 
+    @Override
+    public Collection<String> getColumnNames() {
+        return Collections.unmodifiableCollection(columnNames.values());
+    }
+
     public String getColumnName(int col) {
         return columnNames.get(col);
     }
 
+    @Override
     public Object getResult(int row, int col) {
-        return rows.get(row).getCellValue(
-                getColumnName(col)
-        );
+        final ResultSetRow weighedRow = rows.get(row);
+        final String columnName = getColumnName(col);
+        return weighedRow.getValue(columnName);
+    }
+
+    @Override
+    public Collection<ResultSetRow> getRows() {
+        return Collections.unmodifiableCollection(rows.values());
+    }
+
+    @Override
+    public void removeRow(ResultSetRow row) {
+        /**
+         * определим порядковый номер удаляемой записи
+         */
+        Integer rowIndex = null;
+        for (Map.Entry<Integer, ResultSetRow> entry : rows.entrySet()) {
+            if (OWLUtils.equals(entry.getValue().getObjectIRI(), row.getObjectIRI())) {
+                rowIndex = entry.getKey();
+            }
+        }
+        if (rowIndex == null) {
+            return;
+        }
+        rows.remove(rowIndex);
+    }
+
+    @Override
+    public ResultSetRow getRow(int rowIndex) {
+        return rows.get(rowIndex);
     }
 }
