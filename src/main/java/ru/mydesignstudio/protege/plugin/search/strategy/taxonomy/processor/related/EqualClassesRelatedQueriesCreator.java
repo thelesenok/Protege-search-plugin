@@ -4,9 +4,9 @@ import org.semanticweb.owlapi.model.OWLClass;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class EqualClassesRelatedQueriesCreator extends NearestNeighboursRelatedQ
     }
 
     @Override
-    public Collection<SelectQuery> create(SelectQuery initialQuery, TaxonomyProcessorParams processorParams) throws ApplicationException {
+    public Collection<SelectQuery> create(SelectQuery initialQuery, SearchProcessorParams searchProcessorParams) throws ApplicationException {
         final Collection<SelectQuery> relatedQueries = new ArrayList<>();
         /**
          * получим класс, по которому ищем

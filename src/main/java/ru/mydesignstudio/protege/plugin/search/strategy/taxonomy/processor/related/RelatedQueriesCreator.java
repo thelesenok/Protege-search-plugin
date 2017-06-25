@@ -2,7 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.rela
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 
 import java.util.Collection;
 
@@ -19,5 +19,5 @@ public interface RelatedQueriesCreator {
      * @return - коллекция похожих запросов
      * @throws ApplicationException
      */
-    Collection<SelectQuery> create(SelectQuery initialQuery, TaxonomyProcessorParams processorParams) throws ApplicationException;
+    Collection<SelectQuery> create(SelectQuery initialQuery, SearchProcessorParams processorParams) throws ApplicationException;
 }

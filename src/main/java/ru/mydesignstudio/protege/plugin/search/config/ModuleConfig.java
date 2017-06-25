@@ -16,8 +16,10 @@ import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategySerializationService;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyService;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.related.RelatedClassFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.FuzzyOWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.RelatedClassFactoryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.serialization.SearchStrategySerializationServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyServiceImpl;
@@ -38,6 +40,7 @@ public class ModuleConfig extends AbstractModule {
         bind(SearchStrategyService.class).to(SearchStrategyServiceImpl.class).in(Singleton.class);
         bind(SearchStrategyRegistry.class).to(SearchStrategyRegistryImpl.class).in(Singleton.class);
         bind(OWLService.class).to(OWLServiceImpl.class);
+        bind(RelatedClassFactory.class).to(RelatedClassFactoryImpl.class);
         bind(WeightCalculator.class).to(WeightCalculatorDefault.class);
         bind(FuzzyOWLService.class).to(FuzzyOWLServiceImpl.class);
         bind(DatatypeCalculator.class).to(MaximumDatatypeCalculator.class);

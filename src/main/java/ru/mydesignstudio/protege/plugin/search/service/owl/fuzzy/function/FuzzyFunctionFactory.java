@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.function;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.LeftShoulderFuzzyFunction;
@@ -14,6 +15,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  *
  * Фабрика функций принадлежности
  */
+@Component
 public class FuzzyFunctionFactory {
     /**
      * Сгенерировать функцию принадлежности на основе описания

@@ -6,6 +6,7 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationExceptio
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
@@ -35,7 +36,8 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
     }
 
     @Override
-    public Collection<SelectQuery> create(SelectQuery initialQuery, TaxonomyProcessorParams processorParams) throws ApplicationException {
+    public Collection<SelectQuery> create(SelectQuery initialQuery, SearchProcessorParams searchProcessorParams) throws ApplicationException {
+        final TaxonomyProcessorParams processorParams = (TaxonomyProcessorParams) searchProcessorParams;
         final Collection<SelectQuery> relatedQueries = new ArrayList<>();
         /**
          * получим класс, по которому ищем

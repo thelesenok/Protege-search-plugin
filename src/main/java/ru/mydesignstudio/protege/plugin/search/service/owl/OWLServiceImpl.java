@@ -32,14 +32,15 @@ import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.RemoveAxiom;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.empty.EmptyResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.empty.EmptyResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
+import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilder;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.DataTypeUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
@@ -49,6 +50,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 import uk.ac.manchester.cs.owl.owlapi.concurrent.ConcurrentOWLOntologyImpl;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -62,6 +64,9 @@ import java.util.Set;
  * https://github.com/phillord/owl-api/blob/master/contract/src/test/java/org/coode/owlapi/examples/Examples.java
  */
 public class OWLServiceImpl implements OWLService {
+    @Inject
+    private OwlClassHierarchyBuilder hierarchyBuilder;
+
     protected OWLOntology getOntology() throws ApplicationException {
         return OntologyConfig.getOntology();
     }
@@ -326,8 +331,25 @@ public class OWLServiceImpl implements OWLService {
 
     @Override
     public OWLClass getIndividualClass(OWLIndividual individual) throws ApplicationException {
+        /**
+         * Получим все классы, в которые указанный individual по иерархии входит. Самая сложность заключается в том,
+         * чтобы потом взять самый нижний по иерархии
+         */
         final Collection<OWLClass> classes = getIndividualClasses(individual);
-        return classes.iterator().next();
+        /**
+         * Пойдем самым тупым путем - посчитаем длину иерархии от текущего класса до вершины иерархии. Класс с
+         * самым длинным путем и является наиболее конкретным классом individual-а
+         */
+        OWLClass suitableClass = null;
+        int length = 0;
+        for (OWLClass owlClass : classes) {
+            final Collection<OWLClass> path = hierarchyBuilder.build(owlClass);
+            if (path.size() > length) {
+                length = path.size();
+                suitableClass = owlClass;
+            }
+        }
+        return suitableClass;
     }
 
     @Override

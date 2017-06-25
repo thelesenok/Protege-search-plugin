@@ -16,8 +16,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorOrder(XmlAccessOrder.UNDEFINED)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FuzzyOWL2 {
-    @XmlElement(name = "Datatype")
+    /**
+     * Тип функции принадлежности
+     */
+    @XmlElement(name = "Datatype", required = false)
     private Datatype datatype;
+    /**
+     * Схожие классы с указанной заранее мерой сходства
+     */
+    @XmlElement(name = "Concept", required = false)
+    private Concept concept;
+
+    public Concept getConcept() {
+        return concept;
+    }
+
+    public void setConcept(Concept concept) {
+        this.concept = concept;
+    }
 
     public Datatype getDatatype() {
         return datatype;

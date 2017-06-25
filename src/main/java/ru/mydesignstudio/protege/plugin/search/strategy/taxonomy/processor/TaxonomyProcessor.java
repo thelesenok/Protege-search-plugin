@@ -1,31 +1,18 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor;
 
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
-import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.EqualClassesRelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.NearestNeighboursRelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
-import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -35,11 +22,6 @@ import java.util.Collection;
  * Искалка с учетом таксономии
  */
 public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchProcessor<TaxonomyProcessorParams> {
-    @Inject
-    private OWLService owlService;
-    @Inject
-    private ExceptionWrapperService wrapperService;
-
     private final RelatedQueriesCreator nearestNeighboursCreator = new NearestNeighboursRelatedQueriesCreator();
     private final RelatedQueriesCreator equalClassesCreator = new EqualClassesRelatedQueriesCreator();
 
@@ -115,7 +97,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
          */
         for (ResultSet relatedSet : relatedData) {
             for (ResultSetRow row : relatedSet.getRows()) {
-                if (!isValidRow(row, selectQuery)) {
+                if (!containsSelectQueryConditionFields(row, selectQuery)) {
                     relatedSet.removeRow(row);
                 }
             }
@@ -124,59 +106,6 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
          * объединим результаты и вычислим близость
          */
         return mergeResultSets(initialResultSet, relatedData);
-    }
-
-    /**
-     * Является ли запись подходящей под исходные условия поиска
-     * @param row - строка для проверки
-     * @param selectQuery - исходные условия отбора записей
-     * @return - признак того, что запись подходит
-     * @throws ApplicationException - если не удается получить запись
-     */
-    private boolean isValidRow(ResultSetRow row, SelectQuery selectQuery) throws ApplicationException {
-        /**
-         * пока сделаем проверку самым простым образом, что экземпляр записи из конкретной строки содержит
-         * свойства, по которым мы пытались искать
-         */
-        final OWLIndividual individual = owlService.getIndividual(row.getObjectIRI());
-        final Collection<OWLClass> classes = owlService.getIndividualClasses(individual);
-        /**
-         * в это месте надо придумать, как быть с условиями, которые объединены через OR, а не через AND
-         */
-        return CollectionUtils.every(selectQuery.getWhereParts(), new Specification<WherePart>() {
-            @Override
-            public boolean isSatisfied(WherePart wherePart) {
-                final OWLProperty property = wherePart.getProperty();
-                return CollectionUtils.some(classes, new Specification<OWLClass>() {
-                    @Override
-                    public boolean isSatisfied(OWLClass owlClass) {
-                        final Collection<OWLDataProperty> dataProperties = wrapperService.invokeWrapped(new ExceptionWrappedCallback<Collection<OWLDataProperty>>() {
-                            @Override
-                            public Collection<OWLDataProperty> run() throws ApplicationException {
-                                return owlService.getDataProperties(owlClass);
-                            }
-                        });
-                        final Collection<OWLObjectProperty> objectProperties = wrapperService.invokeWrapped(new ExceptionWrappedCallback<Collection<OWLObjectProperty>>() {
-                            @Override
-                            public Collection<OWLObjectProperty> run() throws ApplicationException {
-                                return owlService.getObjectProperties(owlClass);
-                            }
-                        });
-                        return CollectionUtils.some(dataProperties, new Specification<OWLDataProperty>() {
-                            @Override
-                            public boolean isSatisfied(OWLDataProperty dataProperty) {
-                                return OWLUtils.equals(property, dataProperty);
-                            }
-                        }) || CollectionUtils.some(objectProperties, new Specification<OWLObjectProperty>() {
-                            @Override
-                            public boolean isSatisfied(OWLObjectProperty objectProperty) {
-                                return OWLUtils.equals(property, objectProperty);
-                            }
-                        });
-                    }
-                });
-            }
-        });
     }
 
     /**
