@@ -9,10 +9,22 @@ import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProces
  * Параметры атрибутивного поиска
  */
 public class AttributiveProcessorParams implements SearchProcessorParams {
+    /**
+     * Запрос для поиска
+     */
     private final SelectQuery selectQuery;
+    /**
+     * При расчете веса записи использовать веса атрибутов
+     */
+    private final boolean useAttributeWeights;
 
-    public AttributiveProcessorParams(SelectQuery selectQuery) {
+    public AttributiveProcessorParams(SelectQuery selectQuery, boolean useAttributeWeights) {
         this.selectQuery = selectQuery;
+        this.useAttributeWeights = useAttributeWeights;
+    }
+
+    public boolean isUseAttributeWeights() {
+        return useAttributeWeights;
     }
 
     public SelectQuery getSelectQuery() {

@@ -40,7 +40,16 @@ public class Weight {
      * @return
      */
     public static final Weight maxWeight() {
-        return new Weight(1, 1);
+        return maxWeight(1);
+    }
+
+    /**
+     * Максимальный вес с учетом указанного множителя
+     * @param multiplicator - множитель
+     * @return
+     */
+    public static final Weight maxWeight(double multiplicator) {
+        return new Weight(1, multiplicator);
     }
 
     /**
@@ -48,7 +57,16 @@ public class Weight {
      * @return
      */
     public static final Weight minWeight() {
-        return new Weight(0, 1);
+        return minWeight(1);
+    }
+
+    /**
+     * Минимальный вес с учетом указанного множителя
+     * @param multiplicator - множитель
+     * @return
+     */
+    public static final Weight minWeight(double multiplicator) {
+        return new Weight(0, multiplicator);
     }
 
     /**

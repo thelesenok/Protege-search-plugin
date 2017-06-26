@@ -10,9 +10,9 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
  *
  * Калькулятор для логической операции "Больше чем"
  */
-public class ProximityCalculatorMoreThan implements ProximityCalculator {
+public class ProximityCalculatorMoreThan extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
-        return Weight.maxWeight();
+    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
+        return Weight.maxWeight(getPropertyWeight(property, usePropertyWeight));
     }
 }

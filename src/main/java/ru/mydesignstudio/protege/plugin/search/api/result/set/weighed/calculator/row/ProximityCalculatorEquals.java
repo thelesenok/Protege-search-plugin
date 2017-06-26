@@ -17,7 +17,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  *
  * Калькулятор близости по признаку "Равно"
  */
-public class ProximityCalculatorEquals implements ProximityCalculator {
+public class ProximityCalculatorEquals extends ProximityCalculatorSupport implements ProximityCalculator {
     private final OWLService owlService;
 
     public ProximityCalculatorEquals() {
@@ -25,7 +25,7 @@ public class ProximityCalculatorEquals implements ProximityCalculator {
     }
 
     @Override
-    public Weight calculate(final Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(final Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         final Object propertyValue = owlService.getPropertyValue(individual, property);
         if (property instanceof OWLDataProperty) {
             // вероятнее всего, targetValue - OWLDomainLiteral
@@ -34,14 +34,18 @@ public class ProximityCalculatorEquals implements ProximityCalculator {
                 return OWLUtils.equals(
                         domainLiteral.getLiteral(),
                         (OWLLiteral) propertyValue
-                ) ? Weight.maxWeight() : Weight.minWeight();
+                ) ?
+                        Weight.maxWeight(getPropertyWeight(property, usePropertyWeight)) :
+                        Weight.minWeight(getPropertyWeight(property, usePropertyWeight));
             } else if (targetValue instanceof String) {
                 final String stringValue = (String) targetValue;
                 final OWLLiteral literalPropertyValue = (OWLLiteral) propertyValue;
                 return StringUtils.equalsIgnoreCase(
                         stringValue,
                         literalPropertyValue.getLiteral()
-                ) ? Weight.maxWeight() : Weight.minWeight();
+                ) ?
+                        Weight.maxWeight(getPropertyWeight(property, usePropertyWeight)) :
+                        Weight.minWeight(getPropertyWeight(property, usePropertyWeight));
             } else {
                 throw new ApplicationException(String.format(
                         "Unsupported value type, %s",

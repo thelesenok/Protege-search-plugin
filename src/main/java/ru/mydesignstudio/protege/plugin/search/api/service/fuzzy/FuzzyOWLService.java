@@ -18,6 +18,13 @@ import java.util.Collection;
  */
 public interface FuzzyOWLService extends OWLService {
     /**
+     * Получить вес атрибута. Вес указывается в аннотации
+     * @param property - атрибут
+     * @return - вес атрибута
+     * @throws ApplicationException
+     */
+    double getPropertyWeigth(OWLProperty property) throws ApplicationException;
+    /**
      * Классы, которые в аннотации указаны как сходные с определенной степенью
      * @param owlClass - класс, для которого ищем связанные
      * @return - коллекция схожих классов

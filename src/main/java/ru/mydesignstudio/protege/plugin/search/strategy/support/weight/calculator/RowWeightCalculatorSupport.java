@@ -11,6 +11,7 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 /**
@@ -42,10 +43,18 @@ public abstract class RowWeightCalculatorSupport implements WeighedRowWeightCalc
         final Weight totalWeight = Weight.noneWeight();
         //
         final OWLIndividual ontologyObject = owlService.getIndividual(row.getObjectIRI());
+        final boolean useAttributeWeights = (processorParams instanceof AttributiveProcessorParams) ?
+                ((AttributiveProcessorParams) processorParams).isUseAttributeWeights() :
+                false;
         //
         for (WherePart wherePart : selectQuery.getWhereParts()) {
             final ProximityCalculator calculator = calculatorFactory.getCalculator(wherePart.getLogicalOperation(), processorParams);
-            final Weight partWeight = calculator.calculate(wherePart.getValue(), ontologyObject, wherePart.getProperty());
+            final Weight partWeight = calculator.calculate(
+                    wherePart.getValue(),
+                    ontologyObject,
+                    wherePart.getProperty(),
+                    useAttributeWeights
+            );
             totalWeight.addWeight(partWeight);
         }
         //

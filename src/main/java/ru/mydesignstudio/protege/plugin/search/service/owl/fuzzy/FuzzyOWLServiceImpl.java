@@ -16,6 +16,7 @@ import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyF
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.related.RelatedClassFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.function.FuzzyFunctionFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.PropertyWeightFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.FuzzySimilarClass;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Concept;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Datatype;
@@ -37,28 +38,49 @@ import java.util.Set;
  * Created by abarmin on 13.05.17.
  */
 public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLService {
+    private static final int DEFAULT_PROPERTY_WEIGHT = 1;
+
     @Inject
     private FuzzyFunctionFactory functionFactory;
     @Inject
     private RelatedClassFactory relatedClassFactory;
+    @Inject
+    private PropertyWeightFactory propertyWeightFactory;
 
-    private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity datatype) throws ApplicationException {
+    private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity owlEntity) throws ApplicationException {
         final Set<OWLAnnotationAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.ANNOTATION_ASSERTION);
         final Collection<OWLAnnotationAssertionAxiom> annotationAssertionAxioms = CollectionUtils.filter(axioms, new Specification<OWLAnnotationAssertionAxiom>() {
             @Override
             public boolean isSatisfied(OWLAnnotationAssertionAxiom axiom) {
                 final IRI subject = (IRI) axiom.getSubject();
-                return OWLUtils.equals(subject, datatype.getIRI());
+                return OWLUtils.equals(subject, owlEntity.getIRI());
             }
         });
         return annotationAssertionAxioms;
     }
 
-    private OWLAnnotationAssertionAxiom getFuzzyAxiom(Collection<OWLAnnotationAssertionAxiom> axioms) throws ApplicationException {
+    @Override
+    public double getPropertyWeigth(OWLProperty property) throws ApplicationException {
+        final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(property);
+        final OWLAnnotationAssertionAxiom propertyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.PROPERTY);
+        if (propertyAxiom == null) {
+            /**
+             * Нет информации о весе свойства, используем вес по умолчанию
+             */
+            return DEFAULT_PROPERTY_WEIGHT;
+        }
+        /**
+         * Получим xml и пропустим его через фабрику
+         */
+        final String xmlString = ((OWLLiteral) propertyAxiom.getValue()).getLiteral();
+        return propertyWeightFactory.build(xmlString);
+    }
+
+    private OWLAnnotationAssertionAxiom getFuzzyAxiom(Collection<OWLAnnotationAssertionAxiom> axioms, FuzzyAnnotationType annotationType) throws ApplicationException {
         return CollectionUtils.findFirst(axioms, new Specification<OWLAnnotationAssertionAxiom>() {
             @Override
             public boolean isSatisfied(OWLAnnotationAssertionAxiom axiom) {
-                return  StringUtils.equalsIgnoreCase(axiom.getProperty().getIRI().getFragment(), "fuzzyLabel");
+                return  StringUtils.equalsIgnoreCase(axiom.getProperty().getIRI().getFragment(), annotationType.getType());
             }
         });
     }
@@ -66,7 +88,7 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
     @Override
     public Collection<FuzzySimilarClass> getFuzzySimilarClasses(OWLClass owlClass) throws ApplicationException {
         final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(owlClass);
-        final OWLAnnotationAssertionAxiom fuzzyAxiom = getFuzzyAxiom(annotations);
+        final OWLAnnotationAssertionAxiom fuzzyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.CLASS_OR_DATATYPE);
         if (fuzzyAxiom == null) {
             return Collections.emptyList();
         }
@@ -91,12 +113,12 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
         if (CollectionUtils.isEmpty(annotationAxioms)) {
             return false;
         }
-        return getFuzzyAxiom(annotationAxioms) != null;
+        return getFuzzyAxiom(annotationAxioms, FuzzyAnnotationType.CLASS_OR_DATATYPE) != null;
     }
 
     @Override
     public FuzzyFunction getFuzzyFunction(OWLDatatype datatype) throws ApplicationException {
-        final OWLAnnotationAssertionAxiom axiom = getFuzzyAxiom(getAnnotations(datatype));
+        final OWLAnnotationAssertionAxiom axiom = getFuzzyAxiom(getAnnotations(datatype), FuzzyAnnotationType.CLASS_OR_DATATYPE);
         if (axiom == null) {
             throw new ApplicationException(String.format(
                     "Datatype %s is not fuzzy",

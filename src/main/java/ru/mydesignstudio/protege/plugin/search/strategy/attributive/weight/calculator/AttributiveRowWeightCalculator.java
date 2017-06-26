@@ -2,7 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.weight.calc
 
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
-import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculator.RowWeightCalculatorSupport;
 
 /**
@@ -11,7 +11,7 @@ import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculato
  * Калькулятор веса строки для атрибутивного поиска
  */
 public class AttributiveRowWeightCalculator extends RowWeightCalculatorSupport implements WeighedRowWeightCalculator {
-    public AttributiveRowWeightCalculator(SelectQuery selectQuery, SearchProcessorParams params) {
+    public AttributiveRowWeightCalculator(SelectQuery selectQuery, AttributiveProcessorParams params) {
         super(selectQuery, params);
     }
 }

@@ -12,7 +12,7 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
  */
 public class ProximityCalculatorLike extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         /**
          * like только с буквами. Считаем, сколько букв совпало
          */
@@ -22,6 +22,6 @@ public class ProximityCalculatorLike extends ProximityCalculatorSupport implemen
          * Вычисляем и все
          */
         final double doubleValue = (double) getCommonSymbols(propertyValue, targetValue) / propertyValue.length();
-        return new Weight(doubleValue, 1);
+        return new Weight(doubleValue, getPropertyWeight(property, usePropertyWeight));
     }
 }

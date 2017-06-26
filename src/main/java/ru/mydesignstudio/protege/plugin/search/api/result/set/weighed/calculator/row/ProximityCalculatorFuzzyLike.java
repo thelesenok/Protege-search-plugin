@@ -13,7 +13,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  */
 public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         final String propertyValue = getPropertyAsString(individual, property);
         final String targetValue = (String) targetObjectValue;
         //
@@ -21,7 +21,7 @@ public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport imp
             /**
              * Проверим самый простой случай, когда значения совпадают
              */
-            return Weight.maxWeight();
+            return Weight.maxWeight(getPropertyWeight(property, usePropertyWeight));
         }
         /**
          * Посчитаем количество общих букв, так как похожесть по
@@ -38,6 +38,6 @@ public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport imp
             }
         }
         final double doubleValue = validCharacters / propertyValue.length();
-        return new Weight(doubleValue, 1);
+        return new Weight(doubleValue, getPropertyWeight(property, usePropertyWeight));
     }
 }

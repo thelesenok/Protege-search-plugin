@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -53,13 +54,17 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
 
     private SelectQuery selectQuery;
 
-    private JPanel targetContainer = new JPanel(new GridLayout(1, 3));
+    private JPanel targetContainer = new JPanel(new GridLayout(1, 4));
     private JPanel criteriaContainer = new JPanel(new BorderLayout());
     private final JComboBox<OWLDomainClass> targetTypeSelector = new JComboBox<OWLDomainClass>();
     /**
      * Операция объединения условий по умолчанию
      */
     private LogicalOperation defaultConcatOperation = LogicalOperation.AND;
+    /**
+     * Использовать веса атрибутов при расчете веса записи
+     */
+    private boolean useAttributeWeights = false;
 
     public AttributiveSearchStrategyParamsComponent() {
         setLayout(new BorderLayout());
@@ -130,6 +135,17 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
                 selectQuery.addWherePart(new WherePart());
             }
         });
+        // добавим галку "Использовать веса атрибутов"
+        final JCheckBox useAttributesWeightControl = new JCheckBox("Use attribute weights");
+        useAttributesWeightControl.setSelected(useAttributeWeights);
+        useAttributesWeightControl.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                final JCheckBox source = (JCheckBox) e.getSource();
+                useAttributeWeights = source.isSelected();
+            }
+        });
+        targetContainer.add(useAttributesWeightControl);
     }
 
     /**
@@ -176,7 +192,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
             }
             isFirstWherePart = false;
         }
-        return new AttributiveProcessorParams(clonedQuery);
+        return new AttributiveProcessorParams(clonedQuery, useAttributeWeights);
     }
 
     @Override

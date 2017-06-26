@@ -16,8 +16,9 @@ public interface ProximityCalculator {
      * @param targetValue - с этим свойством сравниваем
      * @param individual - объект, у которого ищем свойство
      * @param property - свойство
+     * @param usePropertyWeight - использовать вес атрибута
      * @return
      * @throws ApplicationException
      */
-    Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException;
+    Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException;
 }

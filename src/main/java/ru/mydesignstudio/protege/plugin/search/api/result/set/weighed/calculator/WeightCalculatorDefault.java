@@ -45,7 +45,7 @@ public class WeightCalculatorDefault implements WeightCalculator {
     private double getTotalWeight(Weight weight) {
         double totalWeight = 0;
         if (isValidWeight(weight)) {
-            totalWeight += weight.getWeight();
+            totalWeight += (weight.getWeight() * weight.getMultiplicator());
         }
         for (Weight childWeight : weight.getChildren()) {
             totalWeight += getTotalWeight(childWeight);

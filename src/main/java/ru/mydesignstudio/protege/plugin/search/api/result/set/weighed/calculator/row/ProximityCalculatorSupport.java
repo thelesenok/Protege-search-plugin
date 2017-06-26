@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
@@ -18,9 +19,25 @@ import java.util.Collection;
  */
 public abstract class ProximityCalculatorSupport implements ProximityCalculator {
     private final OWLService owlService;
+    private final FuzzyOWLService fuzzyOWLService;
 
     public ProximityCalculatorSupport() {
         owlService = InjectionUtils.getInstance(OWLService.class);
+        fuzzyOWLService = InjectionUtils.getInstance(FuzzyOWLService.class);
+    }
+
+    /**
+     * Получить вес указанного свойства. Если вес не должен учитываться, возвращает 1
+     * @param property - свойство, для которого необходимо узать вес
+     * @param usePropertyWeight - использовать ли вес при расчете
+     * @return - вес
+     * @throws ApplicationException
+     */
+    public double getPropertyWeight(OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
+        if (!usePropertyWeight) {
+            return 1;
+        }
+        return fuzzyOWLService.getPropertyWeigth(property);
     }
 
     /**

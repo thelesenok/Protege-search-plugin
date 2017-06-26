@@ -10,12 +10,12 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
  *
  * Калькулатор "не равно"
  */
-public class ProximityCalculatorNotEquals implements ProximityCalculator {
+public class ProximityCalculatorNotEquals extends ProximityCalculatorSupport implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         /**
          * Все время единица, так как уже отобрано sparql запросом
          */
-        return Weight.maxWeight();
+        return Weight.maxWeight(getPropertyWeight(property, usePropertyWeight));
     }
 }

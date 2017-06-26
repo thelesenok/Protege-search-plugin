@@ -12,7 +12,7 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
  */
 public class ProximityCalculatorLessThan implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property) throws ApplicationException {
+    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         return Weight.maxWeight();
     }
 }
