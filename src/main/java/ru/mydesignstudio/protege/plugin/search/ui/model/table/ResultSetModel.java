@@ -37,6 +37,7 @@ public class ResultSetModel extends AbstractTableModel {
         additionalColumnNames.put(1, DECLINES_COLUMN);
         additionalColumnNames.put(2, "Accept");
         additionalColumnNames.put(3, "Decline");
+        additionalColumnNames.put(4, "To SWRL");
         //
         owlService = InjectionUtils.getInstance(OWLService.class);
         wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
