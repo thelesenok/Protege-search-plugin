@@ -14,6 +14,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.IndividualToSwrlConverter;
+import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.SwrlPrefixResolver;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartsCollectionSwrlConverter;
@@ -28,20 +29,22 @@ public class SelectQueryToSwrlConverterTest {
     private SelectQueryToSwrlConverter converter;
     @Mock
     private OWLService owlService;
+    private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
+        prefixResolver = new SwrlPrefixResolver();
         converter = new SelectQueryToSwrlConverter(
-                new FromTypeSwrlConverter(),
-                new IndividualToSwrlConverter(owlService),
+                new FromTypeSwrlConverter(prefixResolver),
+                new IndividualToSwrlConverter(owlService, prefixResolver),
                 new WherePartsCollectionSwrlConverter(
-                        new WherePartSwrlConverter()
+                        new WherePartSwrlConverter(prefixResolver)
                 )
         );
         /**
          * Обучим моки правильному поведению
          */
-        Mockito.doReturn(new OWLClassImpl(IRI.create("prefix", "Parent")))
+        Mockito.doReturn(new OWLClassImpl(IRI.create("http://www.owl-ontologies.com/generations.owl#", "Parent")))
                 .when(owlService).getIndividualClass(Mockito.any(OWLIndividual.class));
     }
 
@@ -49,7 +52,7 @@ public class SelectQueryToSwrlConverterTest {
     public void covert() throws Exception {
         final SelectQuery query = new SelectQuery();
         query.setFrom(new FromType(new OWLClassImpl(
-                IRI.create("prefix", "Person")
+                IRI.create("http://www.owl-ontologies.com/generations.owl#", "Person")
         )));
         query.addWherePart(
                 WherePartBuilder.builder()
@@ -65,11 +68,11 @@ public class SelectQueryToSwrlConverterTest {
                         .build()
         );
         final OWLIndividual individual = new OWLNamedIndividualImpl(
-                IRI.create("Ivan")
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/family_example.owl#", "Ivan")
         );
         final String swrl = converter.covert(individual, query);
         //
-        Assert.assertEquals("SWRL conversion fails", "Person(?object) ^ property1(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value1\") ^ property2(?object, ?prop1) ^ swrlb:greaterThan(?prop1, 2) -> Parent(Ivan)", swrl);
+        Assert.assertEquals("SWRL conversion fails", "generations:Person(?object) ^ my_custom_prefix:property1(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value1\") ^ my_custom_prefix:property2(?object, ?prop1) ^ swrlb:greaterThan(?prop1, 2) -> generations:Parent(family_example:Ivan)", swrl);
     }
 
 }

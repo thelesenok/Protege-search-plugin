@@ -16,7 +16,7 @@ public class WherePartSwrlConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        wherePartConverter = new WherePartSwrlConverter();
+        wherePartConverter = new WherePartSwrlConverter(new SwrlPrefixResolver());
     }
 
     @Test
@@ -27,7 +27,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 0);
         //
-        Assert.assertEquals("Concat operation check fails", "property0(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value0\")", swrl);
+        Assert.assertEquals("Concat operation check fails", "my_custom_prefix:property0(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value0\")", swrl);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 1);
         //
-        Assert.assertEquals("Equal converter fails", "^ property1(?object, ?prop1) ^ swrlb:stringEqualIgnoreCase(?prop1, \"value1\")", swrl);
+        Assert.assertEquals("Equal converter fails", "^ my_custom_prefix:property1(?object, ?prop1) ^ swrlb:stringEqualIgnoreCase(?prop1, \"value1\")", swrl);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 2);
         //
-        Assert.assertEquals("Like converter fails", "^ property2(?object, ?prop2) ^ swrlb:matches(?prop2, \"value2\")", swrl);
+        Assert.assertEquals("Like converter fails", "^ my_custom_prefix:property2(?object, ?prop2) ^ swrlb:matches(?prop2, \"value2\")", swrl);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 3);
         //
-        Assert.assertEquals("Contains converter fails", "^ property3(?object, ?prop3) ^ swrlb:contains(?prop3, \"value3\")", swrl);
+        Assert.assertEquals("Contains converter fails", "^ my_custom_prefix:property3(?object, ?prop3) ^ swrlb:contains(?prop3, \"value3\")", swrl);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 4);
         //
-        Assert.assertEquals("Not equals converter fails", "^ property4(?object, ?prop4) ^ swrlb:notEqual(?prop4, \"value4\")", swrl);
+        Assert.assertEquals("Not equals converter fails", "^ my_custom_prefix:property4(?object, ?prop4) ^ swrlb:notEqual(?prop4, \"value4\")", swrl);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 5);
         //
-        Assert.assertEquals("Starts with converter fails", "^ property5(?object, ?prop5) ^ swrlb:startsWith(?prop5, \"value5\")", swrl);
+        Assert.assertEquals("Starts with converter fails", "^ my_custom_prefix:property5(?object, ?prop5) ^ swrlb:startsWith(?prop5, \"value5\")", swrl);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 6);
         //
-        Assert.assertEquals("Ends with converter fails", "^ property6(?object, ?prop6) ^ swrlb:endsWith(?prop6, \"value6\")", swrl);
+        Assert.assertEquals("Ends with converter fails", "^ my_custom_prefix:property6(?object, ?prop6) ^ swrlb:endsWith(?prop6, \"value6\")", swrl);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 7);
         //
-        Assert.assertEquals("More than converter fails", "^ property7(?object, ?prop7) ^ swrlb:greaterThan(?prop7, 7)", swrl);
+        Assert.assertEquals("More than converter fails", "^ my_custom_prefix:property7(?object, ?prop7) ^ swrlb:greaterThan(?prop7, 7)", swrl);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 8);
         //
-        Assert.assertEquals("More or equals converter fails", "^ property8(?object, ?prop8) ^ swrlb:greaterThanOrEqual(?prop8, 8)", swrl);
+        Assert.assertEquals("More or equals converter fails", "^ my_custom_prefix:property8(?object, ?prop8) ^ swrlb:greaterThanOrEqual(?prop8, 8)", swrl);
     }
 
     @Test
@@ -135,7 +135,7 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 9);
         //
-        Assert.assertEquals("Less than converter fails", "^ property9(?object, ?prop9) ^ swrlb:lessThan(?prop9, 9)", swrl);
+        Assert.assertEquals("Less than converter fails", "^ my_custom_prefix:property9(?object, ?prop9) ^ swrlb:lessThan(?prop9, 9)", swrl);
     }
 
     @Test
@@ -147,6 +147,6 @@ public class WherePartSwrlConverterTest {
                 .build();
         final String swrl = wherePartConverter.convert(wherePart, 10);
         //
-        Assert.assertEquals("Less or equals converter fails", "^ property10(?object, ?prop10) ^ swrlb:lessThanOrEqual(?prop10, 10)", swrl);
+        Assert.assertEquals("Less or equals converter fails", "^ my_custom_prefix:property10(?object, ?prop10) ^ swrlb:lessThanOrEqual(?prop10, 10)", swrl);
     }
 }

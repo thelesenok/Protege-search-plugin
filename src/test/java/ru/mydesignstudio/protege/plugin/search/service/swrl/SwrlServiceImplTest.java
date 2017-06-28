@@ -19,9 +19,11 @@ import ru.mydesignstudio.protege.plugin.search.api.service.SwrlService;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.SelectQueryToSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.IndividualToSwrlConverter;
+import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.SwrlPrefixResolver;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartsCollectionSwrlConverter;
+import ru.mydesignstudio.protege.plugin.search.service.swrl.rule.engine.SwrlEngineManager;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
@@ -38,23 +40,29 @@ public class SwrlServiceImplTest {
     @Mock
     private OWLService owlService;
     private SwrlService swrlService;
+    private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
+        prefixResolver = new SwrlPrefixResolver();
         swrlService = new SwrlServiceImpl(
                 new SelectQueryToSwrlConverter(
-                        new FromTypeSwrlConverter(),
-                        new IndividualToSwrlConverter(owlService),
+                        new FromTypeSwrlConverter(prefixResolver),
+                        new IndividualToSwrlConverter(
+                                owlService,
+                                prefixResolver
+                        ),
                         new WherePartsCollectionSwrlConverter(
-                                new WherePartSwrlConverter()
+                                new WherePartSwrlConverter(prefixResolver)
                         )
                 ),
-                owlService
+                owlService,
+                new SwrlEngineManager(owlService)
         );
         /**
          * Обучим моки правильному поведению
          */
-        Mockito.doReturn(new OWLClassImpl(IRI.create("prefix", "Parent")))
+        Mockito.doReturn(new OWLClassImpl(IRI.create("http://www.owl-ontologies.com/generations.owl#", "Parent")))
                 .when(owlService).getIndividualClass(Mockito.any(OWLIndividual.class));
         Mockito.doAnswer(new Answer<OWLIndividual>() {
             @Override
@@ -69,7 +77,7 @@ public class SwrlServiceImplTest {
     public void convertToSwrl() throws Exception {
         final SelectQuery query = new SelectQuery();
         query.setFrom(new FromType(new OWLClassImpl(
-                IRI.create("prefix", "Person")
+                IRI.create("http://www.owl-ontologies.com/generations.owl#", "Person")
         )));
         query.addWherePart(
                 WherePartBuilder.builder()
@@ -85,7 +93,7 @@ public class SwrlServiceImplTest {
                         .build()
         );
         //
-        final IRI individualIri = IRI.create("Ivan");
+        final IRI individualIri = IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/family_example.owl#", "Ivan");
         final Collection<LookupParam> lookupParams = Collections.singleton(
                 new LookupParam(
                         new AttributiveSearchStrategy(),
@@ -97,7 +105,7 @@ public class SwrlServiceImplTest {
         //
         final String swrl = swrlService.convertToSwrl(individualIri, lookupParams);
         //
-        Assert.assertEquals("SWRL conversion fails", "Person(?object) ^ property1(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value1\") ^ property2(?object, ?prop1) ^ swrlb:greaterThan(?prop1, 2) -> Parent(Ivan)", swrl);
+        Assert.assertEquals("SWRL conversion fails", "generations:Person(?object) ^ my_custom_prefix:property1(?object, ?prop0) ^ swrlb:stringEqualIgnoreCase(?prop0, \"value1\") ^ my_custom_prefix:property2(?object, ?prop1) ^ swrlb:greaterThan(?prop1, 2) -> generations:Parent(family_example:Ivan)", swrl);
     }
 
 }

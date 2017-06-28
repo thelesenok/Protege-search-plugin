@@ -25,6 +25,7 @@ import ru.mydesignstudio.protege.plugin.search.service.search.serialization.Sear
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyRegistryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.search.strategy.SearchStrategyServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.SwrlServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.service.swrl.rule.engine.SwrlEngineManager;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.DatatypeCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.MaximumDatatypeCalculator;
 
@@ -45,6 +46,7 @@ public class ModuleConfig extends AbstractModule {
         bind(RelatedClassFactory.class).to(RelatedClassFactoryImpl.class);
         bind(WeightCalculator.class).to(WeightCalculatorDefault.class);
         bind(SwrlService.class).to(SwrlServiceImpl.class);
+        bind(SwrlEngineManager.class).in(Singleton.class);
         bind(FuzzyOWLService.class).to(FuzzyOWLServiceImpl.class);
         bind(DatatypeCalculator.class).to(MaximumDatatypeCalculator.class);
         bind(SearchStrategySerializationService.class).to(SearchStrategySerializationServiceImpl.class);

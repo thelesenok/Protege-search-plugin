@@ -15,15 +15,15 @@ public class FromTypeSwrlConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        fromTypeConverter = new FromTypeSwrlConverter();
+        fromTypeConverter = new FromTypeSwrlConverter(new SwrlPrefixResolver());
     }
 
     @Test
     public void convert() throws Exception {
         final FromType fromType = new FromType(new OWLClassImpl(
-                IRI.create("prefix", "Person")
+                IRI.create("http://www.owl-ontologies.com/generations.owl#", "Person")
         ));
-        Assert.assertEquals("FromType converter failed", "Person(?object)", fromTypeConverter.convert(fromType));
+        Assert.assertEquals("FromType converter failed", "generations:Person(?object)", fromTypeConverter.convert(fromType));
     }
 
 }

@@ -1,6 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy;
 
 import org.semanticweb.owlapi.model.OWLClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
@@ -15,6 +17,8 @@ import java.util.Collection;
  */
 @Component
 public class OwlClassHierarchyBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OwlClassHierarchyBuilder.class);
+
     @Inject
     private OWLService owlService;
 
@@ -28,6 +32,10 @@ public class OwlClassHierarchyBuilder {
         final Collection<OWLClass> classes = new ArrayList<>();
         OWLClass parentClass = owlService.getParentClass(currentClass);
         while (parentClass != null) {
+            if (classes.contains(parentClass)) {
+                LOGGER.error("Cycle in classes hierarchy");
+                return classes;
+            }
             classes.add(parentClass);
             parentClass = owlService.getParentClass(parentClass);
         }

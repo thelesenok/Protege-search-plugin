@@ -1,6 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.swrlapi.core.SWRLAPIRule;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 
@@ -20,4 +21,13 @@ public interface SwrlService {
      * @throws ApplicationException
      */
     String convertToSwrl(IRI individualIri, Collection<LookupParam> lookupParams) throws ApplicationException;
+
+    /**
+     * Создать SWRL-правило
+     * @param ruleName - название правила
+     * @param swrlRule - текст правила
+     * @return - объект правила
+     * @throws ApplicationException
+     */
+    SWRLAPIRule createSwrlRule(String ruleName, String swrlRule) throws ApplicationException;
 }

@@ -56,6 +56,37 @@ public class StringUtils {
         return new String();
     }
 
+    /**
+     * Подстрока от начала до последнего вхождения delimiter-а
+     * @param source - исходная строка
+     * @param delimiter - разделитель
+     * @return - подстрока
+     */
+    public static final String substringBeforeLast(String source, String delimiter) {
+        if (source.indexOf(delimiter) > -1) {
+            return source.substring(
+                    0,
+                    source.lastIndexOf(delimiter)
+            );
+        }
+        return new String();
+    }
+
+    /**
+     * Подстрока от последнего вхождения delimiter-а до конца
+     * @param source - исходная строка
+     * @param delimiter - разделитель
+     * @return - подстрока
+     */
+    public static final String substringAfterLast(String source, String delimiter) {
+        if (source.indexOf(delimiter) > -1) {
+            return source.substring(
+                    source.lastIndexOf(delimiter) + 1
+            );
+        }
+        return new String();
+    }
+
     public static final String substringAfter(String source, String delimiter) {
         if (source.indexOf(delimiter) > -1) {
             return source.substring(

@@ -24,6 +24,9 @@ import java.util.Map;
 public class ResultSetModel extends AbstractTableModel {
     private static final String USAGES_COLUMN = "Usages";
     private static final String DECLINES_COLUMN = "Declines";
+    private static final String ACCEPT_COLUM = "Accept";
+    private static final String DECLINE_COLUMN = "Decline";
+    private static final String TO_SWRL_COLUMN = "To SWRL";
 
     private final ResultSet resultSet;
     private final Map<Integer, String> additionalColumnNames = new HashMap<>();
@@ -35,9 +38,9 @@ public class ResultSetModel extends AbstractTableModel {
         this.resultSet = resultSet;
         additionalColumnNames.put(0, USAGES_COLUMN);
         additionalColumnNames.put(1, DECLINES_COLUMN);
-        additionalColumnNames.put(2, "Accept");
-        additionalColumnNames.put(3, "Decline");
-        additionalColumnNames.put(4, "To SWRL");
+        additionalColumnNames.put(2, ACCEPT_COLUM);
+        additionalColumnNames.put(3, DECLINE_COLUMN);
+        additionalColumnNames.put(4, TO_SWRL_COLUMN);
         //
         owlService = InjectionUtils.getInstance(OWLService.class);
         wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
@@ -51,7 +54,7 @@ public class ResultSetModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return resultSet.getColumnCount() + 4;
+        return resultSet.getColumnCount() + 5;
     }
 
     @Override

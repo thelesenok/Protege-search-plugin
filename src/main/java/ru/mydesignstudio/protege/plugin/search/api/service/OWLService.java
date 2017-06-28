@@ -7,6 +7,7 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
@@ -20,6 +21,15 @@ import java.util.Collection;
  * Created by abarmin on 03.01.17.
  */
 public interface OWLService {
+    /**
+     * Онтология, с которой в данной момент работаем
+     * @return - объект онтологии
+     * @throws ApplicationException
+     * @deprecated - онтологий может быть больше одной одновременно
+     */
+    @Deprecated
+    OWLOntology getOntology() throws ApplicationException;
+
     /**
      * Зарегистрированные классы
      *

@@ -24,22 +24,25 @@ public class IndividualToSwrlConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        individualConverter = new IndividualToSwrlConverter(owlService);
+        individualConverter = new IndividualToSwrlConverter(
+                owlService,
+                new SwrlPrefixResolver()
+        );
         /**
          * Обучим моки правильному поведению
          */
-        Mockito.doReturn(new OWLClassImpl(IRI.create("prefix", "Parent")))
+        Mockito.doReturn(new OWLClassImpl(IRI.create("http://www.owl-ontologies.com/generations.owl#", "Parent")))
                 .when(owlService).getIndividualClass(Mockito.any(OWLIndividual.class));
     }
 
     @Test
     public void convert() throws Exception {
         final OWLNamedIndividualImpl individual = new OWLNamedIndividualImpl(
-                IRI.create("Ivan")
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/family_example.owl#", "Ivan")
         );
         final String swrl = individualConverter.convert(individual);
         //
-        Assert.assertEquals("Individual converter fails", "Parent(Ivan)", swrl);
+        Assert.assertEquals("Individual converter fails", "generations:Parent(family_example:Ivan)", swrl);
     }
 
 }

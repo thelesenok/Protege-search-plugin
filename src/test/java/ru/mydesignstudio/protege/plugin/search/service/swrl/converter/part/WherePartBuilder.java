@@ -32,7 +32,9 @@ public class WherePartBuilder {
     }
 
     public WherePartBuilder property(String propertyName) {
-        wherePart.setProperty(new OWLDataPropertyImpl(IRI.create("prefix", propertyName)));
+        wherePart.setProperty(new OWLDataPropertyImpl(
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", propertyName)
+        ));
         return this;
     }
 

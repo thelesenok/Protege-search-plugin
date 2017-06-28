@@ -67,7 +67,8 @@ public class OWLServiceImpl implements OWLService {
     @Inject
     private OwlClassHierarchyBuilder hierarchyBuilder;
 
-    protected OWLOntology getOntology() throws ApplicationException {
+    @Override
+    public OWLOntology getOntology() throws ApplicationException {
         return OntologyConfig.getOntology();
     }
 
@@ -169,7 +170,9 @@ public class OWLServiceImpl implements OWLService {
             for (OWLClass childClass : axiom.getSubClass().getClassesInSignature()) {
                 if (child.equals(childClass)) {
                     final Set<OWLClass> parentClasses = axiom.getSuperClass().getClassesInSignature();
-                    return parentClasses.iterator().next();
+                    return parentClasses.isEmpty() ?
+                            null :
+                            parentClasses.iterator().next();
                 }
             }
         }

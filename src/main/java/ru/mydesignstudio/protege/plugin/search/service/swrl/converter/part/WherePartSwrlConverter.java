@@ -7,6 +7,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -17,6 +18,13 @@ import java.util.Collection;
  */
 @Component
 public class WherePartSwrlConverter implements CollectionItemSwrlConverter<WherePart> {
+    private final SwrlPrefixResolver prefixResolver;
+
+    @Inject
+    public WherePartSwrlConverter(SwrlPrefixResolver prefixResolver) {
+        this.prefixResolver = prefixResolver;
+    }
+
     @Override
     public String convert(WherePart part, int partNumber) throws ApplicationException {
         final Collection<String> parts = new ArrayList<>();
@@ -96,9 +104,16 @@ public class WherePartSwrlConverter implements CollectionItemSwrlConverter<Where
      * @param property - свойство
      * @param partNumber - порядковый номер свойства
      * @return - строковое представление
+     * @throws ApplicationException - если не может вычислить префикс
      */
-    private String convertProperty(OWLProperty property, int partNumber) {
-        return property.getIRI().getFragment() + "(?object, ?prop" + partNumber + ")";
+    private String convertProperty(OWLProperty property, int partNumber) throws ApplicationException {
+        final Collection<String> parts = new ArrayList<>();
+        parts.add(prefixResolver.extractPrefix(property.getIRI()));
+        parts.add(":");
+        parts.add(property.getIRI().getFragment());
+        parts.add("(?object, ?prop" + partNumber + ")");
+        //
+        return StringUtils.join(parts, "");
     }
 
     /**

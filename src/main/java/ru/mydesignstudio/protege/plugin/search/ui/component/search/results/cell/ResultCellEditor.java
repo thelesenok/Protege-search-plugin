@@ -43,8 +43,11 @@ public class ResultCellEditor extends DefaultCellEditor {
     @Override
     public Object getCellEditorValue() {
         if (isPushed) {
-            callback.run(currentRowIndex);
-            isPushed = false;
+            try {
+                callback.run(currentRowIndex);
+            } finally {
+                isPushed = false;
+            }
         }
         return super.getCellEditorValue();
     }

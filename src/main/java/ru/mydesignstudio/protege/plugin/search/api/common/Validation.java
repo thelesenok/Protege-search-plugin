@@ -6,6 +6,14 @@ package ru.mydesignstudio.protege.plugin.search.api.common;
 public class Validation {
     /**
      * Проверка на корректность условия
+     * @param message - сообщение, которое будет выведено в случае истинности условия
+     * @param value - что проверяем
+     */
+    public static final void assertFalse(String message, boolean value) {
+        assertTrue(message, !value);
+    }
+    /**
+     * Проверка на корректность условия
      * @param message - сообщение, которое будет выдано в случае ложности условия
      * @param value - что проверяем
      */
