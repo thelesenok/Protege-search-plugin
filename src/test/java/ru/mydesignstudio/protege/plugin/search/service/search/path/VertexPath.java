@@ -60,21 +60,21 @@ public class VertexPath {
     public class VertexPathBuilder {
         public VertexPathBuilder from(String className) {
             VertexPath.this.setFromClass(new OWLClassImpl(
-                    IRI.create("dummy", className)
+                    IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", className)
             ));
             return this;
         }
 
         public VertexPathBuilder to(String className) {
             VertexPath.this.setToPath(new OWLClassImpl(
-                    IRI.create("dummy", className)
+                    IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", className)
             ));
             return this;
         }
 
         public VertexPathBuilder through(String propertyName) {
             VertexPath.this.setProperty(new OWLObjectPropertyImpl(
-                    IRI.create("dummy", propertyName)
+                    IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", propertyName)
             ));
             return this;
         }

@@ -3,6 +3,7 @@ package ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part;
 import org.semanticweb.owlapi.model.IRI;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataPropertyImpl;
 
 /**
@@ -29,6 +30,13 @@ public class WherePartBuilder {
     public WherePartBuilder or() {
         wherePart.setConcatOperation(LogicalOperation.OR);
         return this;
+    }
+
+    public WherePartBuilder property(String propertyName, String className) {
+        wherePart.setOwlClass(new OWLClassImpl(
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", className)
+        ));
+        return property(propertyName);
     }
 
     public WherePartBuilder property(String propertyName) {

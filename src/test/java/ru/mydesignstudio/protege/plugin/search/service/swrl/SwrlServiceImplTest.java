@@ -15,7 +15,10 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
 import ru.mydesignstudio.protege.plugin.search.api.service.SwrlService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.SelectQueryToSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.IndividualToSwrlConverter;
@@ -39,12 +42,15 @@ import java.util.Collections;
 public class SwrlServiceImplTest {
     @Mock
     private OWLService owlService;
+    private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlService swrlService;
+    private PathBuilder pathBuilder;
     private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
         prefixResolver = new SwrlPrefixResolver();
+        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         swrlService = new SwrlServiceImpl(
                 new SelectQueryToSwrlConverter(
                         new FromTypeSwrlConverter(prefixResolver),
@@ -53,7 +59,7 @@ public class SwrlServiceImplTest {
                                 prefixResolver
                         ),
                         new WherePartsCollectionSwrlConverter(
-                                new WherePartSwrlConverter(prefixResolver)
+                                new WherePartSwrlConverter(prefixResolver, pathBuilder)
                         )
                 ),
                 owlService,
@@ -81,14 +87,14 @@ public class SwrlServiceImplTest {
         )));
         query.addWherePart(
                 WherePartBuilder.builder()
-                        .property("property1")
+                        .property("property1", "Person")
                         .equalTo("value1")
                         .build()
         );
         query.addWherePart(
                 WherePartBuilder.builder()
                         .and()
-                        .property("property2")
+                        .property("property2", "Person")
                         .moreThan(2)
                         .build()
         );

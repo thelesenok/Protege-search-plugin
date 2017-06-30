@@ -21,6 +21,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -96,19 +97,25 @@ public class ShortestPathBuilder implements PathBuilder {
 		/**
 		 * Проверим, что есть путь из source в destination
 		 */
-		final List<OWLClass> targetPath = CollectionUtils.findFirst(allPaths, new Specification<List<OWLClass>>() {
+		final Collection<List<OWLClass>> suitablePaths = CollectionUtils.filter(allPaths, new Specification<List<OWLClass>>() {
 			@Override
 			public boolean isSatisfied(List<OWLClass> path) {
 				return isDestinationReached(path, destinationClass);
 			}
 		});
-		if (targetPath == null) {
+		if (suitablePaths.isEmpty()) {
 			throw new ApplicationException(String.format(
 					"There is no path from %s to %s",
 					sourceClass,
 					destinationClass
 			));
 		}
+		final List<OWLClass> targetPath = CollectionUtils.min(suitablePaths, new Comparator<List<OWLClass>>() {
+			@Override
+			public int compare(List<OWLClass> first, List<OWLClass> second) {
+				return Integer.compare(first.size(), second.size());
+			}
+		});
 		return targetPath;
 	}
 

@@ -108,7 +108,7 @@ public class TestPathBuilder {
         return this;
     }
 
-    public static class OWLDummyPropertyRange extends OWLObjectPropertyImpl implements OWLPropertyRange {
+    private static class OWLDummyPropertyRange extends OWLObjectPropertyImpl implements OWLPropertyRange {
         private final Set<OWLClass> classes;
 
         public OWLDummyPropertyRange(Collection<OWLClass> classes) {

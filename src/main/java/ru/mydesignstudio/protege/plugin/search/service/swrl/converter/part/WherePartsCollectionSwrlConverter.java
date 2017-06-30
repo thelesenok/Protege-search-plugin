@@ -1,6 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part;
 
+import org.semanticweb.owlapi.model.OWLClass;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
+import ru.mydesignstudio.protege.plugin.search.api.common.Pair;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
@@ -15,7 +17,7 @@ import java.util.Collection;
  * Конвертер коллекции параметров в SWRL правило
  */
 @Component
-public class WherePartsCollectionSwrlConverter implements SwrlConverter<Collection<WherePart>> {
+public class WherePartsCollectionSwrlConverter implements SwrlConverter<Pair<OWLClass, Collection<WherePart>>> {
     private final WherePartSwrlConverter wherePartConverter;
 
     @Inject
@@ -24,15 +26,15 @@ public class WherePartsCollectionSwrlConverter implements SwrlConverter<Collecti
     }
 
     @Override
-    public String convert(Collection<WherePart> parts) throws ApplicationException {
+    public String convert(Pair<OWLClass, Collection<WherePart>> pair) throws ApplicationException {
         final StringBuilder builder = new StringBuilder();
         /**
          * Конвертируем части по отдельности
          */
         int index = 0;
         final Collection<String> swrlPart = new ArrayList<>();
-        for (WherePart part : parts) {
-            swrlPart.add(wherePartConverter.convert(part, index));
+        for (WherePart part : pair.getSecond()) {
+            swrlPart.add(wherePartConverter.convert(new Pair<>(pair.getFirst(), part), index));
             index++;
         }
         /**

@@ -100,13 +100,13 @@ public class ShortestPathBuilderTest {
 
     private OWLProperty buildProperty(String propertyName) {
         return new OWLObjectPropertyImpl(
-                IRI.create("dummy", propertyName)
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", propertyName)
         );
     }
 
     private OWLClass buildClass(String className) {
         return new OWLClassImpl(
-                IRI.create("dummy", className)
+                IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/my_custom_prefix.owl#", className)
         );
     }
 }

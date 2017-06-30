@@ -2,6 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.service.swrl.converter;
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
+import ru.mydesignstudio.protege.plugin.search.api.common.Pair;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
@@ -45,7 +46,9 @@ public class SelectQueryToSwrlConverter {
          * Конвертируем параметры поиска
          */
         builder.append(" ^ ");
-        builder.append(wherePartsCollectionConverter.convert(selectQuery.getWhereParts()));
+        builder.append(wherePartsCollectionConverter.convert(
+                new Pair<>(selectQuery.getFrom().getOwlClass(), selectQuery.getWhereParts())
+        ));
         builder.append(" -> ");
         /**
          * Конвертируем результат

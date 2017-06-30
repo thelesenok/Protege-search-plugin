@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import ru.mydesignstudio.protege.plugin.search.api.common.Pair;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 
 import java.util.Arrays;
@@ -35,19 +36,19 @@ public class WherePartsCollectionSwrlConverterTest {
             public String answer(InvocationOnMock invocationOnMock) throws Throwable {
                 return "^ MOCK";
             }
-        }).when(wherePartConverter).convert(Mockito.any(WherePart.class), Mockito.anyInt());
+        }).when(wherePartConverter).convert(Mockito.any(Pair.class), Mockito.anyInt());
     }
 
     @Test
     public void testIsEmpty() throws Exception {
-        final String swrl = converter.convert(Collections.emptyList());
+        final String swrl = converter.convert(new Pair<>(null, Collections.emptyList()));
         Assert.assertEquals("Fail empty collection", "", swrl);
     }
 
     @Test
     public void testSingleWherePart() throws Exception {
         final WherePart wherePart = new WherePart();
-        final String swrl = converter.convert(Collections.singletonList(wherePart));
+        final String swrl = converter.convert(new Pair<>(null, Collections.singletonList(wherePart)));
         //
         Assert.assertEquals("Fail single part conversion", "^ MOCK", swrl);
     }
@@ -58,7 +59,7 @@ public class WherePartsCollectionSwrlConverterTest {
                 new WherePart(),
                 new WherePart()
         );
-        final String swrl = converter.convert(parts);
+        final String swrl = converter.convert(new Pair<>(null, parts));
         //
         Assert.assertEquals("Fail multi part conversion", "^ MOCK ^ MOCK", swrl);
     }

@@ -12,6 +12,11 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
+import ru.mydesignstudio.protege.plugin.search.service.search.path.TestPathBuilder;
+import ru.mydesignstudio.protege.plugin.search.service.search.path.VertexPath;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.IndividualToSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.SwrlPrefixResolver;
@@ -29,16 +34,19 @@ public class SelectQueryToSwrlConverterTest {
     private SelectQueryToSwrlConverter converter;
     @Mock
     private OWLService owlService;
+    private PathBuilder pathBuilder;
+    private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
         prefixResolver = new SwrlPrefixResolver();
+        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         converter = new SelectQueryToSwrlConverter(
                 new FromTypeSwrlConverter(prefixResolver),
                 new IndividualToSwrlConverter(owlService, prefixResolver),
                 new WherePartsCollectionSwrlConverter(
-                        new WherePartSwrlConverter(prefixResolver)
+                        new WherePartSwrlConverter(prefixResolver, pathBuilder)
                 )
         );
         /**
@@ -56,14 +64,14 @@ public class SelectQueryToSwrlConverterTest {
         )));
         query.addWherePart(
                 WherePartBuilder.builder()
-                        .property("property1")
+                        .property("property1", "Person")
                         .equalTo("value1")
                         .build()
         );
         query.addWherePart(
                 WherePartBuilder.builder()
                         .and()
-                        .property("property2")
+                        .property("property2", "Person")
                         .moreThan(2)
                         .build()
         );

@@ -5,6 +5,8 @@ import ru.mydesignstudio.protege.plugin.search.utils.function.Function;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by abarmin on 04.01.17.
@@ -69,6 +71,17 @@ public class CollectionUtils {
             destination.add(transformer.transform(item));
         }
         return destination;
+    }
+
+    /**
+     * Найти минимальный элемет в коллекции
+     * @param source - коллекция
+     * @param comparator - компаратор
+     * @param <ITEM> - тип элемента в коллекции
+     * @return
+     */
+    public static final <ITEM> ITEM min(Collection<ITEM> source, Comparator<ITEM> comparator) {
+        return Collections.min(source, comparator);
     }
 
     /**
