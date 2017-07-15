@@ -2,15 +2,20 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.s
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 
 /**
  * Created by abarmin on 05.02.17.
+ * 
+ * Where part converter for numeric operations
  */
-public class IntegerWherePartConverter implements WherePartConditionConverter<String> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IntegerWherePartConverter.class);
+@Component
+public class NumericWherePartConverter implements WherePartConditionConverter<String> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NumericWherePartConverter.class);
 
     @Override
     public String convert(WherePart wherePart, String stringValue, String variableName) throws ApplicationException {

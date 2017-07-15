@@ -1,18 +1,19 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Created by abarmin on 05.01.17.
@@ -93,14 +94,21 @@ public class LogicalOperationHelper {
         });
     }
 
-    public static final boolean hasIntegerExpression(Collection<OWLPropertyRange> propertyRanges) {
+    /**
+     * Does designated property ranges set contains numeric datatypes
+     * @param propertyRanges set of property ranges
+     * @return
+     */
+    public static final boolean hasNumericExpression(Collection<OWLPropertyRange> propertyRanges) {
         return CollectionUtils.every(propertyRanges, new Specification<OWLPropertyRange>() {
             @Override
             public boolean isSatisfied(OWLPropertyRange owlPropertyRange) {
-                if (owlPropertyRange instanceof OWLDatatype) {
-                    final OWLDatatype datatype = (OWLDatatype) owlPropertyRange;
-                    return datatype.isInteger();
-                }
+            	if (owlPropertyRange instanceof OWLDatatype) {
+            		final OWLDatatype datatype = (OWLDatatype) owlPropertyRange;
+            		return datatype.isInteger()
+            				|| datatype.isDouble()
+            				|| datatype.isFloat();
+            	}
                 return false;
             }
         });
