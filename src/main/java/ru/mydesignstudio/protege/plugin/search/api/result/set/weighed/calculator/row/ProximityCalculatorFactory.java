@@ -1,16 +1,28 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
+import javax.inject.Inject;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 
 /**
  * Created by abarmin on 08.05.17.
  *
  * Фабрика классов для вычисления близости
  */
+@Component
 public class ProximityCalculatorFactory {
-    /**
+	private final OWLService owlService;
+		
+	@Inject
+    public ProximityCalculatorFactory(OWLService owlService) {
+		this.owlService = owlService;
+	}
+
+	/**
      * Получить калькулятор для указанной логической операции
      * @param operation - для какой логической операции нужен калькулятор
      * @param params - дополнительные параметры калькулятора
@@ -19,7 +31,7 @@ public class ProximityCalculatorFactory {
      */
     public ProximityCalculator getCalculator(LogicalOperation operation, SearchProcessorParams params) throws ApplicationException {
         if (LogicalOperation.EQUALS.equals(operation)) {
-            return new ProximityCalculatorEquals();
+            return new ProximityCalculatorEquals(owlService);
         }
         if (LogicalOperation.FUZZY_LIKE.equals(operation)) {
             return new ProximityCalculatorFuzzyLike();
