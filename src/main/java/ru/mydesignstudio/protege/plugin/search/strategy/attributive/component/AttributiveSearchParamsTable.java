@@ -45,6 +45,7 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.ed
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.editor.ButtonCellRenderer;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.ChangeClassEvent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.ChangePropertyEvent;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.CleanConditionsEvent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.RemoveRowEvent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.model.CriteriaTableModel;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.CellRendererWithIcon;
@@ -73,6 +74,7 @@ public class AttributiveSearchParamsTable extends JTable {
     private Map<Integer, DefaultCellEditor> valueEditors = new HashMap<>();
 
     private EventBus eventBus = EventBus.getInstance();
+    private final CriteriaTableModel paramsTableModel;
     /**
      * Признак включенности поиска по связям
      */
@@ -87,12 +89,13 @@ public class AttributiveSearchParamsTable extends JTable {
     private boolean isFuzzyOntologyLookupEnabled = false;
 
     public AttributiveSearchParamsTable(SelectQuery selectQuery, OWLService owlService, ExceptionWrapperService wrapperService) {
-        super(new CriteriaTableModel(selectQuery));
-        //
         eventBus.register(this);
         this.selectQuery = selectQuery;
         this.owlService = owlService;
         this.wrapperService = wrapperService;
+        //
+        paramsTableModel = new CriteriaTableModel(selectQuery);
+        this.setModel(paramsTableModel);
         //
         getColumnModel().getColumn(0).setCellRenderer(createCellRendererWithIcons());
         getColumnModel().getColumn(1).setCellRenderer(createCellRendererWithIcons());
@@ -403,5 +406,11 @@ public class AttributiveSearchParamsTable extends JTable {
     @Subscribe
     public void onRemoveRowEvent(RemoveRowEvent event) {
         selectQuery.removeWherePart(event.getCurrentRow());
+    }
+    
+    @Subscribe
+    public void onCleanConditionsEvent(CleanConditionsEvent event) {
+    		/** We need just update view */
+    		this.paramsTableModel.fireTableDataChanged();
     }
 }

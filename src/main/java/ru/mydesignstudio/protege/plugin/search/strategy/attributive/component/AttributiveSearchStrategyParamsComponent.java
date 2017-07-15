@@ -1,25 +1,12 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component;
 
-import com.google.common.eventbus.Subscribe;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
-import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
-import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.service.EventBus;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.ui.event.concat.ConcatOperationChangeEvent;
-import ru.mydesignstudio.protege.plugin.search.utils.Action;
-import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -32,31 +19,51 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+
+import org.semanticweb.owlapi.model.OWLClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.eventbus.Subscribe;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
+import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.CleanConditionsEvent;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.ui.event.concat.ConcatOperationChangeEvent;
+import ru.mydesignstudio.protege.plugin.search.utils.Action;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 /**
  * Created by abarmin on 03.01.17.
  */
+@VisualComponent
 public class AttributiveSearchStrategyParamsComponent extends JPanel implements SearchStrategyComponent<AttributiveProcessorParams> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AttributiveSearchStrategyParamsComponent.class);
-    @Inject
-    private OWLService owlService;
-    @Inject
-    private ExceptionWrapperService wrapperService;
+    
+    private final OWLService owlService;
+    private final ExceptionWrapperService wrapperService;
 
     private EventBus eventBus = EventBus.getInstance();
 
     private SelectQuery selectQuery;
 
-    private JPanel targetContainer = new JPanel(new GridLayout(1, 4));
-    private JPanel criteriaContainer = new JPanel(new BorderLayout());
-    private final JComboBox<OWLDomainClass> targetTypeSelector = new JComboBox<OWLDomainClass>();
+    private final JPanel targetContainer = new JPanel(new GridLayout(1, 5));
+    private final JPanel criteriaContainer = new JPanel(new BorderLayout());
+    
+
+	private final JComboBox<OWLDomainClass> targetTypeSelector = new JComboBox<OWLDomainClass>();
     /**
      * Операция объединения условий по умолчанию
      */
@@ -66,13 +73,17 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
      */
     private boolean useAttributeWeights = false;
 
-    public AttributiveSearchStrategyParamsComponent() {
-        setLayout(new BorderLayout());
-        add(targetContainer, BorderLayout.NORTH);
-        add(criteriaContainer, BorderLayout.CENTER);
-        //
-        selectQuery = new SelectQuery();
-        selectQuery.addWherePart(new WherePart());
+    @Inject
+    public AttributiveSearchStrategyParamsComponent(OWLService owlService, ExceptionWrapperService wrapperService) {
+	    	this.owlService = owlService;
+	    	this.wrapperService = wrapperService;
+	    	//
+	    	setLayout(new BorderLayout());
+	    	add(targetContainer, BorderLayout.NORTH);
+	    	add(criteriaContainer, BorderLayout.CENTER);
+	    	//
+	    	selectQuery = new SelectQuery();
+	    	selectQuery.addWherePart(new WherePart());
     }
 
     @PostConstruct
@@ -146,6 +157,18 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
             }
         });
         targetContainer.add(useAttributesWeightControl);
+        // add "Clear all conditions" action
+        final JButton cleanAllConditionsControl = new JButton("Clean all conditions");
+        targetContainer.add(cleanAllConditionsControl);
+        cleanAllConditionsControl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectQuery.emptyWhereParts();
+				selectQuery.addWherePart(new WherePart());
+				/** Publishing remove all conditions event to update conditions table immediately */
+				eventBus.publish(new CleanConditionsEvent());
+			}
+		});
     }
 
     /**

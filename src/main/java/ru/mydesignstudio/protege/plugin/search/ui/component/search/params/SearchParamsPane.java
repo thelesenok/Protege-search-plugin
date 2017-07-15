@@ -1,6 +1,29 @@
 package ru.mydesignstudio.protege.plugin.search.ui.component.search.params;
 
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.TreeSet;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+
 import com.google.common.eventbus.Subscribe;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
@@ -18,53 +41,36 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.TreeSet;
-
 /**
  * Created by abarmin on 03.01.17.
  */
+@SuppressWarnings("serial")
 public class SearchParamsPane extends JPanel {
-    private JPanel strategiesContainer = new JPanel(new FlowLayout());
-    private JTabbedPane criteriaContainer = new JTabbedPane();
-    private JPanel searchButtonContainer = new JPanel();
+    private final JPanel strategiesContainer = new JPanel(new FlowLayout());
+    private final JTabbedPane criteriaContainer = new JTabbedPane();
+    private final JPanel searchButtonContainer = new JPanel();
 
-    private Collection<SearchStrategy> enabledStrategies = new HashSet<>();
-    private Collection<JCheckBox> strategySelectors = new HashSet<>();
+    private final Collection<SearchStrategy> enabledStrategies = new HashSet<>();
+    private final Collection<JCheckBox> strategySelectors = new HashSet<>();
 
-    @Inject
-    private SearchStrategyService strategyService;
-    @Inject
-    private SearchStrategySerializationService serializationService;
-    @Inject
-    private ExceptionWrapperService wrapperService;
+    private final SearchStrategyService strategyService;
+    private final SearchStrategySerializationService serializationService;
+    private final ExceptionWrapperService wrapperService;
 
     private final EventBus eventBus = EventBus.getInstance();
 
-    public SearchParamsPane() {
-        setLayout(new BorderLayout());
-        add(strategiesContainer, BorderLayout.NORTH);
-        add(criteriaContainer, BorderLayout.CENTER);
-        add(searchButtonContainer, BorderLayout.SOUTH);
-    }
+    @Inject
+    public SearchParamsPane(SearchStrategyService strategyService,
+			SearchStrategySerializationService serializationService, ExceptionWrapperService wrapperService) {
+		this.strategyService = strategyService;
+		this.serializationService = serializationService;
+		this.wrapperService = wrapperService;
+		//
+		setLayout(new BorderLayout());
+		add(strategiesContainer, BorderLayout.NORTH);
+		add(criteriaContainer, BorderLayout.CENTER);
+		add(searchButtonContainer, BorderLayout.SOUTH);
+	}
 
     @PostConstruct
     public void init() {

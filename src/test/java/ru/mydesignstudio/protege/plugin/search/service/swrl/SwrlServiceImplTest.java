@@ -1,5 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.swrl;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
+
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
@@ -28,12 +32,11 @@ import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.Where
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartsCollectionSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.rule.engine.SwrlEngineManager;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLNamedIndividualImpl;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Created by abarmin on 27.06.17.
@@ -102,7 +105,10 @@ public class SwrlServiceImplTest {
         final IRI individualIri = IRI.create("https://wiki.csc.calpoly.edu/OntologyTutorial/family_example.owl#", "Ivan");
         final Collection<LookupParam> lookupParams = Collections.singleton(
                 new LookupParam(
-                        new AttributiveSearchStrategy(),
+                        new AttributiveSearchStrategy(
+                        		new AttributiveSearchStrategyParamsComponent(owlService, wrapperService),
+                        		new AttributiveProcessor()
+                        	),
                         new AttributiveProcessorParams(
                                 query, false
                         )

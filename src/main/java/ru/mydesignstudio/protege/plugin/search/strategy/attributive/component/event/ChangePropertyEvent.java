@@ -2,14 +2,16 @@ package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.e
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;
+
 import ru.mydesignstudio.protege.plugin.search.api.Event;
 
 /**
  * Created by abarmin on 10.01.17.
  */
+@SuppressWarnings("rawtypes")
 public class ChangePropertyEvent implements Event {
     private final OWLClass owlClass;
-    private final OWLProperty property;
+	private final OWLProperty property;
     private final int editingRow;
 
     public ChangePropertyEvent(OWLClass owlClass, OWLProperty property, int editingRow) {
