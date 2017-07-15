@@ -1,15 +1,15 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
-import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 
 /**
  * Created by abarmin on 11.03.17.
@@ -18,7 +18,7 @@ public class DateWherePartConverter implements WherePartConditionConverter<Strin
     private static final Logger LOGGER = LoggerFactory.getLogger(DateWherePartConverter.class);
     private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T00:00:00+00:00'";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN);
-    private static final String SOURCE_FORMAT_PATTERN = "dd.mm.yyyy";
+    private static final String SOURCE_FORMAT_PATTERN = "dd.MM.yyyy";
     private static final SimpleDateFormat SOURCE_DATE_FORMAT = new SimpleDateFormat(SOURCE_FORMAT_PATTERN);
 
     @Override
@@ -29,10 +29,9 @@ public class DateWherePartConverter implements WherePartConditionConverter<Strin
         final Date nextDayDate;
         try {
             sourceDate = SOURCE_DATE_FORMAT.parse(value);
-            final Calendar calendar = new GregorianCalendar(sourceDate.getYear(),
-                    sourceDate.getMonth(),
-                    sourceDate.getDay());
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTime(sourceDate);
+            calendar.add(Calendar.DATE, 1);
             nextDayDate = calendar.getTime();
         } catch (Exception e) {
             throw new ApplicationException(e);
