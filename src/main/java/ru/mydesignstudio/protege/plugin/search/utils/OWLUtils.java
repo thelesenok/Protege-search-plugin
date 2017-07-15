@@ -77,13 +77,26 @@ public class OWLUtils {
      * @param second - и этот
      * @return
      */
-    public static final boolean equals(OWLDomainClass first, OWLDomainClass second) {
+    public static final boolean equals(OWLClass first, OWLClass second) {
         /**
          * Как оказалось, OWLClass.equals не работает корректно
          */
         return StringUtils.equalsIgnoreCase(
-                first.getOwlClass().getIRI().getFragment(),
-                second.getOwlClass().getIRI().getFragment()
+                first.getIRI().getFragment(),
+                second.getIRI().getFragment()
+        );
+    }
+
+    /**
+     * Являются ли два класса эквивалентными
+     * @param first - этот
+     * @param second - и этот
+     * @return
+     */
+    public static final boolean equals(OWLDomainClass first, OWLDomainClass second) {
+        return equals(
+                first.getOwlClass(),
+                second.getOwlClass()
         );
     }
 

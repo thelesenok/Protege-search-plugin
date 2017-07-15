@@ -19,7 +19,7 @@ public class EnumerationWherePartConverter implements WherePartConditionConverte
         }
         final StringBuilder builder = new StringBuilder();
         final String stringValue = value.getLiteral().getLiteral();
-        builder.append("FILTER(STR(" + variableName + ") = \"" + stringValue + "\")");
+        builder.append("(STR(" + variableName + ") = \"" + stringValue + "\")");
         return builder.toString();
     }
 }

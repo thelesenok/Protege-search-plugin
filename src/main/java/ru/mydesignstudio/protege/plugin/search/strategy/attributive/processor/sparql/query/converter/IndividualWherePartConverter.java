@@ -17,7 +17,7 @@ public class IndividualWherePartConverter implements WherePartConditionConverter
         }
         final StringBuilder builder = new StringBuilder();
         final String stringValue = value.getNamedIndividual().getIRI().toURI().toString();
-        builder.append("FILTER(STR(" + variableName + ") = \"" + stringValue + "\")");
+        builder.append("(STR(" + variableName + ") = \"" + stringValue + "\")");
         return builder.toString();
     }
 }

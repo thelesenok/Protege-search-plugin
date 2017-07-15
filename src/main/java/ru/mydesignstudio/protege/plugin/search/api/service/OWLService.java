@@ -7,18 +7,29 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.ResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
  * Created by abarmin on 03.01.17.
  */
 public interface OWLService {
+    /**
+     * Онтология, с которой в данной момент работаем
+     * @return - объект онтологии
+     * @throws ApplicationException
+     * @deprecated - онтологий может быть больше одной одновременно
+     */
+    @Deprecated
+    OWLOntology getOntology() throws ApplicationException;
+
     /**
      * Зарегистрированные классы
      *
@@ -90,6 +101,14 @@ public interface OWLService {
     OWLClass getIndividualClass(OWLIndividual individual) throws ApplicationException;
 
     /**
+     * Все классы, к которым принадлежит экземпляр
+     * @param individual - экземпляр
+     * @return - классы экземпляра
+     * @throws ApplicationException
+     */
+    Collection<OWLClass> getIndividualClasses(OWLIndividual individual) throws ApplicationException;
+
+    /**
      * Элемент по идентификатору
      * @param uri - длинный идентификатор объекта
      * @return
@@ -123,10 +142,52 @@ public interface OWLService {
     Object getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException;
 
     /**
+     * Значение свойства
+     * @param individual - объект, у которого пытаемся получить значение свойства
+     * @param propertyName - название свойства
+     * @return - значение свойства
+     * @throws ApplicationException
+     */
+    Object getPropertyValue(OWLIndividual individual, String propertyName) throws ApplicationException;
+
+    /**
+     * Установить значение свойства
+     * @param individual - объект, у которого устанавливаем свойство
+     * @param property - объект свойства
+     * @param value - новое значение
+     * @throws ApplicationException
+     */
+    void setPropertyValue(OWLIndividual individual, OWLProperty property, Object value) throws ApplicationException;
+
+    /**
+     * Создать свойство и привязать его к указанному классу
+     * @param targetClasses - к каким классам привязываем свойство
+     * @param propertyName - название свойства
+     * @param propertyType - тип данных свойства
+     * @return - созданное свойство
+     * @throws ApplicationException
+     */
+    OWLProperty createDataProperty(Collection<OWLClass> targetClasses, String propertyName, Type propertyType) throws ApplicationException;
+
+    /**
      * Элемент перечисления
      * @param value - значение перечисления
      * @return
      * @throws ApplicationException
      */
     OWLLiteral getLiteral(String value) throws ApplicationException;
+
+    /**
+     * Сохранить текущие изменения в онтологии
+     * @throws ApplicationException
+     */
+    void saveOntology() throws ApplicationException;
+
+    /**
+     * Классы, которые указаны эквивалентными у переданного
+     * @param owlClass - от этого класса вычисляем
+     * @return - коллекция эквивалентных классов
+     * @throws ApplicationException
+     */
+    Collection<OWLClass> getEqualClasses(OWLClass owlClass) throws ApplicationException;
 }

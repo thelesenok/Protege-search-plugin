@@ -16,6 +16,12 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeE
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainDataProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainLiteral;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainObjectProperty;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainProperty;
 import ru.mydesignstudio.protege.plugin.search.service.EventBus;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
@@ -31,12 +37,6 @@ import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.FuzzyA
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.FuzzyOntologySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainDataProperty;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainIndividual;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainLiteral;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainObjectProperty;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainProperty;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;

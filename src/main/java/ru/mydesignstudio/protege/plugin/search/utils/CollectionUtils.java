@@ -1,7 +1,12 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
+import ru.mydesignstudio.protege.plugin.search.utils.function.BinaryFunction;
+import ru.mydesignstudio.protege.plugin.search.utils.function.Function;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by abarmin on 04.01.17.
@@ -34,12 +39,49 @@ public class CollectionUtils {
         });
     }
 
+    /**
+     * Прогнать коллекцию через трансформер.
+     * За неимением stream-ов делаем так вот
+     * @param source - исходная коллекция
+     * @param transformer - трансформер
+     * @param <SOURCE> - тип элемента исходной коллекции
+     * @param <DESTINATION> - тип элемента целевой коллекции
+     * @return - трансформированная коллекция
+     */
+    public static final <SOURCE, DESTINATION> Collection<DESTINATION> flatMap(Collection<SOURCE> source, Transformer<SOURCE, Collection<DESTINATION>> transformer) {
+        final Collection<DESTINATION> destinations = new ArrayList<DESTINATION>();
+        for (SOURCE item : source) {
+            destinations.addAll(transformer.transform(item));
+        }
+        return destinations;
+    }
+
+    /**
+     * Прогнать коллекцию через трансформер.
+     * За неимением stream-ов делаем так вот
+     * @param source - исходная коллекция
+     * @param transformer - трансформер
+     * @param <SOURCE> - тип элемента исходной коллекции
+     * @param <DESTINATION> - тип элемента целевой коллекции
+     * @return - трансформированная коллекция
+     */
     public static final <SOURCE, DESTINATION> Collection<DESTINATION> map(Collection<SOURCE> source, Transformer<SOURCE, DESTINATION> transformer) {
         final Collection<DESTINATION> destination = new ArrayList<DESTINATION>();
         for (SOURCE item : source) {
             destination.add(transformer.transform(item));
         }
         return destination;
+    }
+
+    /**
+     * Найти минимальный элемет в коллекции
+     * @param source - коллекция
+     * @param comparator - компаратор
+     * @param <ITEM> - тип элемента в коллекции
+     * @return
+     */
+    public static final <ITEM> ITEM min(Collection<ITEM> source, Comparator<ITEM> comparator) {
+        return Collections.min(source, comparator);
     }
 
     /**
@@ -89,5 +131,24 @@ public class CollectionUtils {
             }
         }
         return target;
+    }
+
+    /**
+     * Редуцировать коллекцию
+     * @param source - исходная коллекция
+     * @param defaultValue - начальное значение, от которого редуцируем
+     * @param getter - функция получения значения из каждого элемента
+     * @param reducer - редуктор
+     * @param <ITEM> - тип элемента в коллекции
+     * @param <VALUE> - тип выходного значения
+     * @return
+     */
+    public static final <ITEM, VALUE> VALUE reduce(Collection<ITEM> source, VALUE defaultValue, Function<ITEM, VALUE> getter, BinaryFunction<VALUE, VALUE, VALUE> reducer) {
+        VALUE value = defaultValue;
+        for (ITEM item : source) {
+            VALUE valueFromItem = getter.run(item);
+            value = reducer.run(value, valueFromItem);
+        }
+        return value;
     }
 }

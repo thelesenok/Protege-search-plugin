@@ -19,7 +19,9 @@ public class InjectionUtils {
      * @param targetClass - класс бина
      * @param <T> - бин
      * @return
+     * @deprecated - так как нарушает DI-подход
      */
+    @Deprecated
     public static final <T> T getInstance(Class<T> targetClass) {
         final Injector injector = Guice.createInjector(new ModuleConfig());
         return injector.getInstance(targetClass);
@@ -28,7 +30,9 @@ public class InjectionUtils {
     /**
      * Внедрить зависимости в указанный класс
      * @param target
+     * @deprecated - так как нарушает DI-подход
      */
+    @Deprecated
     public static final void injectInstances(Object target) {
         for (Field field : ClassUtils.getFields(target.getClass(), Inject.class)) {
             final Class<?> serviceClass = field.getType();
