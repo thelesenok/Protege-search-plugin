@@ -29,18 +29,20 @@ public class WherePartConditionConverterFactory {
     private final DateWherePartConverter dateConverter;
     private final EnumerationWherePartConverter enumerationConverter;
     private final FuzzyWherePartConverter fuzzyConverter;
+    private final BooleanWherePartConverter booleanConverter;
 
     @Inject
     public WherePartConditionConverterFactory(IndividualWherePartConverter individualConverter,
 			NumericWherePartConverter numericConverter, StringWherePartConverter stringConverter,
 			DateWherePartConverter dateConverter, EnumerationWherePartConverter enumerationConverter,
-			FuzzyWherePartConverter fuzzyConverter) {
+			FuzzyWherePartConverter fuzzyConverter, BooleanWherePartConverter booleanConverter) {
 		this.individualConverter = individualConverter;
 		this.numericConverter = numericConverter;
 		this.stringConverter = stringConverter;
 		this.dateConverter = dateConverter;
 		this.enumerationConverter = enumerationConverter;
 		this.fuzzyConverter = fuzzyConverter;
+		this.booleanConverter = booleanConverter;
 	}
 
 	/**
@@ -64,6 +66,8 @@ public class WherePartConditionConverterFactory {
             return dateConverter;
         } else if (LogicalOperationHelper.hasEnumerationExpression(ranges)) {
             return enumerationConverter;
+        } else if (LogicalOperationHelper.hasBooleanExpression(ranges)) {
+        		return booleanConverter;
         } else {
             LOGGER.error("Can't get value converter");
             throw new ApplicationException("Can't get value converter");

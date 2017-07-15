@@ -1,6 +1,19 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component;
 
-import com.google.common.eventbus.Subscribe;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -11,6 +24,9 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.eventbus.Subscribe;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
@@ -40,19 +56,6 @@ import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
-
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by abarmin on 10.01.17.
@@ -290,6 +293,12 @@ public class AttributiveSearchParamsTable extends JTable {
                             }
                         }
                     }
+                } else if (LogicalOperationHelper.hasBooleanExpression(ranges)) {
+                		final JComboBox<Boolean> booleanSelector = new JComboBox<>();
+                		booleanSelector.setRenderer(createComboboxRenderer());
+                		valueEditors.put(editingRow, new DefaultCellEditor(booleanSelector));
+                		booleanSelector.addItem(Boolean.TRUE);
+                		booleanSelector.addItem(Boolean.FALSE);
                 } else if (LogicalOperationHelper.hasEnumerationExpression(ranges)) {
                     final JComboBox<OWLDomainLiteral> literalSelector = new JComboBox<>();
                     literalSelector.setRenderer(createComboboxRenderer());

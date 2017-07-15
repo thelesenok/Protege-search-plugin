@@ -54,6 +54,8 @@ public class ProximityCalculatorEquals extends ProximityCalculatorSupport implem
 						) ?
 								Weight.maxWeight(getPropertyWeight(property, usePropertyWeight)) :
 									Weight.minWeight(getPropertyWeight(property, usePropertyWeight));
+			} else if (targetValue instanceof Boolean) {
+				return Weight.maxWeight(getPropertyWeight(property, usePropertyWeight));
 			} else {
 				throw new ApplicationException(String.format(
 						"Unsupported value type, %s",
