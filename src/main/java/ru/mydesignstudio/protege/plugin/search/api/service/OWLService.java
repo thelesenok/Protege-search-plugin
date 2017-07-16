@@ -1,5 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
+
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -10,12 +13,10 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
-
-import java.lang.reflect.Type;
-import java.util.Collection;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -81,11 +82,14 @@ public interface OWLService {
      * @param child
      * @return
      * @throws ApplicationException
+     * @deprecated there are more than one parent class because of subclassOf axiom
      */
+    @Deprecated
     OWLClass getParentClass(OWLClass child) throws ApplicationException;
 
     /**
      * Дочерние классы для указанного родительского
+     * TODO this method, looks like, return parents not a children
      * @param parent
      * @return
      * @throws ApplicationException
@@ -190,4 +194,11 @@ public interface OWLService {
      * @throws ApplicationException
      */
     Collection<OWLClass> getEqualClasses(OWLClass owlClass) throws ApplicationException;
+    
+    /**
+     * Get Thing class reference
+     * @return Thing class reference
+     * @throws ApplicationException if where is no Thing class
+     */
+    OWLClass getTopClass() throws ApplicationException;
 }

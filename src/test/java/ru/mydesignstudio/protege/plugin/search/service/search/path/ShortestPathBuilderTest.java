@@ -12,7 +12,7 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectPropertyImpl;
@@ -24,7 +24,7 @@ import java.util.Collection;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ShortestPathBuilderTest {
-    private PathBuilder pathBuilder;
+    private PropertyBasedPathBuilder pathBuilder;
     @Mock
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();

@@ -1,6 +1,16 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import javax.inject.Inject;
+
 import org.semanticweb.owlapi.model.OWLClass;
+
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
@@ -9,18 +19,11 @@ import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilder;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import static ru.mydesignstudio.protege.plugin.search.utils.OWLUtils.getClassesInHierarchy;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 /**
  * Created by abarmin on 24.06.17.
@@ -30,12 +33,31 @@ import static ru.mydesignstudio.protege.plugin.search.utils.OWLUtils.getClassesI
 @Component
 public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCreator {
     private final OWLService owlService;
+    private final OwlClassHierarchyBuilder hierarchyBuilder;
 
-    public NearestNeighboursRelatedQueriesCreator() {
-        owlService = InjectionUtils.getInstance(OWLService.class);
+    @Inject
+	public NearestNeighboursRelatedQueriesCreator(OWLService owlService, OwlClassHierarchyBuilder hierarchyBuilder) {
+		this.owlService = owlService;
+		this.hierarchyBuilder = hierarchyBuilder;
+	}
+    
+    /**
+     * Get hierarchy from given class to Thing class and covert result to OWLDomainClass instances
+     * @param domainClass classes to start from
+     * @return collection of domain classes
+     * @throws ApplicationException is hierarchy can no be build
+     */
+    private Collection<OWLDomainClass> getClassesHierarchy(OWLDomainClass domainClass) throws ApplicationException {
+	    	final Collection<OWLClass> classesHierarchy = hierarchyBuilder.build(domainClass.getOwlClass());
+	    	return CollectionUtils.map(classesHierarchy, new Transformer<OWLClass, OWLDomainClass>() {
+	    		@Override
+	    		public OWLDomainClass transform(OWLClass item) {
+	    			return new OWLDomainClass(item);
+	    		}    			
+	    	});
     }
 
-    @Override
+	@Override
     public Collection<SelectQuery> create(SelectQuery initialQuery, SearchProcessorParams searchProcessorParams) throws ApplicationException {
         final TaxonomyProcessorParams processorParams = (TaxonomyProcessorParams) searchProcessorParams;
         final Collection<SelectQuery> relatedQueries = new ArrayList<>();
@@ -47,7 +69,7 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
         /**
          * посмотрим путь до вершины иерархии
          */
-        final Collection<OWLDomainClass> classesInHierarchy = OWLUtils.getClassesInHierarchy(domainClass);
+        final Collection<OWLDomainClass> classesInHierarchy = getClassesHierarchy(domainClass);
         /**
          * получим все классы, которые имеют указанные общие вершины
          */
@@ -106,7 +128,7 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
         //
         for (OWLClass owlClass : allClasses) {
             final OWLDomainClass domainClass = new OWLDomainClass(owlClass);
-            final Collection<OWLDomainClass> currentHierarchy = getClassesInHierarchy(domainClass);
+            final Collection<OWLDomainClass> currentHierarchy = getClassesHierarchy(domainClass);
             if (startsWith(currentHierarchy, targetHierarchy)) {
                 sharedClasses.add(domainClass);
             }
@@ -169,4 +191,8 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
         }
         return true;
     }
+
+	public OWLService getOwlService() {
+		return owlService;
+	}
 }

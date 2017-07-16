@@ -11,7 +11,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import ru.mydesignstudio.protege.plugin.search.api.common.Pair;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.TestPathBuilder;
@@ -27,7 +27,7 @@ public class WherePartSwrlConverterTest {
     @Mock
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
-    private PathBuilder pathBuilder;
+    private PropertyBasedPathBuilder pathBuilder;
 
     @Before
     public void setUp() throws Exception {

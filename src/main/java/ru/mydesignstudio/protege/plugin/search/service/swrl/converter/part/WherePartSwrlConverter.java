@@ -9,7 +9,7 @@ import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationExceptio
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
@@ -27,10 +27,10 @@ import java.util.List;
 @Component
 public class WherePartSwrlConverter implements CollectionItemSwrlConverter<Pair<OWLClass, WherePart>> {
     private final SwrlPrefixResolver prefixResolver;
-    private final PathBuilder pathBuilder;
+    private final PropertyBasedPathBuilder pathBuilder;
 
     @Inject
-    public WherePartSwrlConverter(SwrlPrefixResolver prefixResolver, PathBuilder pathBuilder) {
+    public WherePartSwrlConverter(SwrlPrefixResolver prefixResolver, PropertyBasedPathBuilder pathBuilder) {
         this.prefixResolver = prefixResolver;
         this.pathBuilder = pathBuilder;
     }

@@ -19,7 +19,7 @@ import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.api.service.SwrlService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
@@ -32,6 +32,7 @@ import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.Where
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.WherePartsCollectionSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.rule.engine.SwrlEngineManager;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchParamsTable;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
@@ -47,7 +48,7 @@ public class SwrlServiceImplTest {
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlService swrlService;
-    private PathBuilder pathBuilder;
+    private PropertyBasedPathBuilder pathBuilder;
     private SwrlPrefixResolver prefixResolver;
 
     @Before
@@ -106,7 +107,14 @@ public class SwrlServiceImplTest {
         final Collection<LookupParam> lookupParams = Collections.singleton(
                 new LookupParam(
                         new AttributiveSearchStrategy(
-                        		new AttributiveSearchStrategyParamsComponent(owlService, wrapperService),
+                        		new AttributiveSearchStrategyParamsComponent(
+                        				owlService, 
+                        				wrapperService,
+                        				new AttributiveSearchParamsTable(
+                        						owlService, 
+                        						wrapperService
+                        						)
+                        				),
                         		new AttributiveProcessor()
                         	),
                         new AttributiveProcessorParams(

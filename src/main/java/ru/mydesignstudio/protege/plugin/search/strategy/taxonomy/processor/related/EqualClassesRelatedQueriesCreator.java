@@ -1,16 +1,19 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.semanticweb.owlapi.model.OWLClass;
+
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilder;
 
 /**
  * Created by abarmin on 24.06.17.
@@ -19,13 +22,12 @@ import java.util.Collection;
  */
 @Component
 public class EqualClassesRelatedQueriesCreator extends NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCreator{
-    private final OWLService owlService;
+	@Inject
+	public EqualClassesRelatedQueriesCreator(OWLService owlService, OwlClassHierarchyBuilder hierarchyBuilder) {
+		super(owlService, hierarchyBuilder);
+	}
 
-    public EqualClassesRelatedQueriesCreator() {
-        owlService = InjectionUtils.getInstance(OWLService.class);
-    }
-
-    @Override
+	@Override
     public Collection<SelectQuery> create(SelectQuery initialQuery, SearchProcessorParams searchProcessorParams) throws ApplicationException {
         final Collection<SelectQuery> relatedQueries = new ArrayList<>();
         /**
@@ -35,7 +37,7 @@ public class EqualClassesRelatedQueriesCreator extends NearestNeighboursRelatedQ
         /**
          * найдем все эквивалентные классы
          */
-        final Collection<OWLClass> equalClasses = owlService.getEqualClasses(defaultFromClass);
+        final Collection<OWLClass> equalClasses = getOwlService().getEqualClasses(defaultFromClass);
         for (OWLClass equalClass : equalClasses) {
             /**
              * создадим запрос

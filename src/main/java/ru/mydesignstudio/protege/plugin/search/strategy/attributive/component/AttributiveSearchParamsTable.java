@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
@@ -27,10 +28,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
 import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainDataProperty;
@@ -61,6 +64,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 /**
  * Created by abarmin on 10.01.17.
  */
+@VisualComponent
 public class AttributiveSearchParamsTable extends JTable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AttributiveSearchParamsTable.class);
 
@@ -88,12 +92,14 @@ public class AttributiveSearchParamsTable extends JTable {
      */
     private boolean isFuzzyOntologyLookupEnabled = false;
 
-    public AttributiveSearchParamsTable(SelectQuery selectQuery, OWLService owlService, ExceptionWrapperService wrapperService) {
+    @Inject
+    public AttributiveSearchParamsTable(OWLService owlService, ExceptionWrapperService wrapperService) {
         eventBus.register(this);
-        this.selectQuery = selectQuery;
         this.owlService = owlService;
         this.wrapperService = wrapperService;
         //
+        this.selectQuery = new SelectQuery();
+        this.selectQuery.addWherePart(new WherePart());
         paramsTableModel = new CriteriaTableModel(selectQuery);
         this.setModel(paramsTableModel);
         //
@@ -104,7 +110,11 @@ public class AttributiveSearchParamsTable extends JTable {
         getColumnModel().getColumn(4).setCellRenderer(new ButtonCellRenderer());
     }
 
-    private TableCellRenderer createCellRendererWithIcons() {
+    public SelectQuery getSelectQuery() {
+		return selectQuery;
+	}
+
+	private TableCellRenderer createCellRendererWithIcons() {
         return new CellRendererWithIcon();
     }
 
@@ -401,7 +411,7 @@ public class AttributiveSearchParamsTable extends JTable {
                 component.addItem(new OWLDomainClass(owlClass));
             }
         }
-    }
+    }    
 
     @Subscribe
     public void onRemoveRowEvent(RemoveRowEvent event) {

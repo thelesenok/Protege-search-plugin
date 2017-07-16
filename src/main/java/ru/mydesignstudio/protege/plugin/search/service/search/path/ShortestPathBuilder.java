@@ -10,7 +10,7 @@ import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component
-public class ShortestPathBuilder implements PathBuilder {
+public class ShortestPathBuilder implements PropertyBasedPathBuilder {
 	private final OWLService owlService;
 	private final ExceptionWrapperService wrapperService;
 	

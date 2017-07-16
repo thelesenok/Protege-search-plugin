@@ -1,5 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
@@ -8,13 +13,10 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
-import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.related.FuzzyTaxonomyRelatedQueryCreator;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.related.binding.FuzzyQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.weight.calculator.FuzzyTaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by abarmin on 25.06.17.
@@ -24,9 +26,14 @@ import java.util.Collection;
 @Component
 public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements SearchProcessor<FuzzyTaxonomyProcessorParams> {
     private final Collection<SelectQuery> relatedQueries = new ArrayList<>();
-    private final RelatedQueriesCreator queriesCreator = new FuzzyTaxonomyRelatedQueryCreator();
+    private final RelatedQueriesCreator queriesCreator;
 
-    private SelectQuery initialQuery;
+    @Inject
+    public FuzzyTaxonomyProcessor(@FuzzyQueryCreator RelatedQueriesCreator queriesCreator) {
+		this.queriesCreator = queriesCreator;
+	}
+
+	private SelectQuery initialQuery;
 
     @Override
     public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyTaxonomyProcessorParams strategyParams) throws ApplicationException {

@@ -1,5 +1,14 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy;
 
+import java.io.StringReader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -10,6 +19,8 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLProperty;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
@@ -21,33 +32,33 @@ import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.FuzzySi
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Concept;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Datatype;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.FuzzyOWL2;
+import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilder;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * Created by abarmin on 13.05.17.
  */
+@Component
 public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLService {
     private static final int DEFAULT_PROPERTY_WEIGHT = 1;
 
-    @Inject
-    private FuzzyFunctionFactory functionFactory;
-    @Inject
-    private RelatedClassFactory relatedClassFactory;
-    @Inject
-    private PropertyWeightFactory propertyWeightFactory;
+    private final FuzzyFunctionFactory functionFactory;
+    private final RelatedClassFactory relatedClassFactory;
+    private final PropertyWeightFactory propertyWeightFactory;
 
-    private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity owlEntity) throws ApplicationException {
+    @Inject
+    public FuzzyOWLServiceImpl(OwlClassHierarchyBuilder hierarchyBuilder, FuzzyFunctionFactory functionFactory,
+			RelatedClassFactory relatedClassFactory, PropertyWeightFactory propertyWeightFactory) {
+		super(hierarchyBuilder);
+		this.functionFactory = functionFactory;
+		this.relatedClassFactory = relatedClassFactory;
+		this.propertyWeightFactory = propertyWeightFactory;
+	}
+
+	private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity owlEntity) throws ApplicationException {
         final Set<OWLAnnotationAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.ANNOTATION_ASSERTION);
         final Collection<OWLAnnotationAssertionAxiom> annotationAssertionAxioms = CollectionUtils.filter(axioms, new Specification<OWLAnnotationAssertionAxiom>() {
             @Override
@@ -59,7 +70,7 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
         return annotationAssertionAxioms;
     }
 
-    @Override
+	@Override
     public double getPropertyWeigth(OWLProperty property) throws ApplicationException {
         final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(property);
         final OWLAnnotationAssertionAxiom propertyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.PROPERTY);

@@ -1,6 +1,14 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl;
 
-import com.google.common.base.Optional;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -31,6 +39,9 @@ import org.semanticweb.owlapi.model.OWLPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.RemoveAxiom;
+
+import com.google.common.base.Optional;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
@@ -50,13 +61,6 @@ import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 import uk.ac.manchester.cs.owl.owlapi.concurrent.ConcurrentOWLOntologyImpl;
 
-import javax.inject.Inject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-
 /**
  * Created by abarmin on 03.01.17.
  *
@@ -64,10 +68,16 @@ import java.util.Set;
  * https://github.com/phillord/owl-api/blob/master/contract/src/test/java/org/coode/owlapi/examples/Examples.java
  */
 public class OWLServiceImpl implements OWLService {
+	private static final String THING_CLASS_NAME = "Thing";
+	
+    private final OwlClassHierarchyBuilder hierarchyBuilder;
+    
     @Inject
-    private OwlClassHierarchyBuilder hierarchyBuilder;
+    public OWLServiceImpl(OwlClassHierarchyBuilder hierarchyBuilder) {
+		this.hierarchyBuilder = hierarchyBuilder;
+	}
 
-    @Override
+	@Override
     public OWLOntology getOntology() throws ApplicationException {
         return OntologyConfig.getOntology();
     }
@@ -182,14 +192,15 @@ public class OWLServiceImpl implements OWLService {
     @Override
     public Collection<OWLClass> getChildrenClasses(OWLClass parent) throws ApplicationException {
         final Set<OWLSubClassOfAxiom> axioms = getOntology().getAxioms(AxiomType.SUBCLASS_OF);
+        final Collection<OWLClass> childClasses = new HashSet<>();
         for (OWLSubClassOfAxiom axiom : axioms) {
-            for (OWLClass owlClass : axiom.getSuperClass().getClassesInSignature()) {
+            for (OWLClass owlClass : axiom.getSubClass().getClassesInSignature()) {
                 if (parent.equals(owlClass)) {
-                    return axiom.getSubClass().getClassesInSignature();
+                    childClasses.addAll(axiom.getSuperClass().getClassesInSignature());
                 }
             }
         }
-        return null;
+        return childClasses;
     }
 
     @Override
@@ -622,4 +633,17 @@ public class OWLServiceImpl implements OWLService {
             throw new ApplicationException(e);
         }
     }
+
+	@Override
+	public OWLClass getTopClass() throws ApplicationException {
+		return CollectionUtils.findFirst(getClasses(), new Specification<OWLClass>() {
+			@Override
+			public boolean isSatisfied(OWLClass item) {
+				return StringUtils.equalsIgnoreCase(
+						THING_CLASS_NAME, 
+						item.getIRI().getFragment()
+						);
+			}
+		});
+	}
 }

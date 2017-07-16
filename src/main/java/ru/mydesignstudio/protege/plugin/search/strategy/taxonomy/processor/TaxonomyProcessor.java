@@ -1,5 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
@@ -8,13 +13,10 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedRes
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.EqualClassesRelatedQueriesCreator;
-import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.NearestNeighboursRelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
+import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.EqualClassesQueryCreator;
+import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.NearestNeighboursQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by abarmin on 04.05.17.
@@ -22,13 +24,25 @@ import java.util.Collection;
  * Искалка с учетом таксономии
  */
 public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchProcessor<TaxonomyProcessorParams> {
-    private final RelatedQueriesCreator nearestNeighboursCreator = new NearestNeighboursRelatedQueriesCreator();
-    private final RelatedQueriesCreator equalClassesCreator = new EqualClassesRelatedQueriesCreator();
+    private final RelatedQueriesCreator nearestNeighboursCreator;
+    private final RelatedQueriesCreator equalClassesCreator;
+    private final TaxonomyRowWeightCalculator weightCalculator;
 
     private TaxonomyProcessorParams processorParams;
     private Collection<SelectQuery> relatedQueries = new ArrayList<>();
 
-    @Override
+    @Inject
+	public TaxonomyProcessor(
+			@NearestNeighboursQueryCreator RelatedQueriesCreator nearestNeighboursCreator, 
+			@EqualClassesQueryCreator RelatedQueriesCreator equalClassesCreator,
+			TaxonomyRowWeightCalculator weightCalculator) {
+    	
+		this.nearestNeighboursCreator = nearestNeighboursCreator;
+		this.equalClassesCreator = equalClassesCreator;
+		this.weightCalculator = weightCalculator;
+	}
+
+	@Override
     public SelectQuery prepareQuery(SelectQuery initialQuery, TaxonomyProcessorParams strategyParams) throws ApplicationException {
         /**
          * сохраним параметры процессора
@@ -129,6 +143,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
      * @throws ApplicationException
      */
     public WeighedRowWeightCalculator getRowWeightCalculator() throws ApplicationException {
-        return new TaxonomyRowWeightCalculator(processorParams);
+    		weightCalculator.setProcessorParams(processorParams);
+        return weightCalculator;
     }
 }

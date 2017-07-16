@@ -54,10 +54,9 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     
     private final OWLService owlService;
     private final ExceptionWrapperService wrapperService;
+    private final AttributiveSearchParamsTable criteriaTable;
 
     private EventBus eventBus = EventBus.getInstance();
-
-    private SelectQuery selectQuery;
 
     private final JPanel targetContainer = new JPanel(new GridLayout(1, 5));
     private final JPanel criteriaContainer = new JPanel(new BorderLayout());
@@ -74,16 +73,16 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     private boolean useAttributeWeights = false;
 
     @Inject
-    public AttributiveSearchStrategyParamsComponent(OWLService owlService, ExceptionWrapperService wrapperService) {
+    public AttributiveSearchStrategyParamsComponent(OWLService owlService, 
+    		ExceptionWrapperService wrapperService, AttributiveSearchParamsTable criteriaTable) {
+    	
 	    	this.owlService = owlService;
 	    	this.wrapperService = wrapperService;
+	    	this.criteriaTable = criteriaTable;
 	    	//
 	    	setLayout(new BorderLayout());
 	    	add(targetContainer, BorderLayout.NORTH);
 	    	add(criteriaContainer, BorderLayout.CENTER);
-	    	//
-	    	selectQuery = new SelectQuery();
-	    	selectQuery.addWherePart(new WherePart());
     }
 
     @PostConstruct
@@ -99,12 +98,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     }
 
     private void fillCriteriaTable() {
-        final AttributiveSearchParamsTable criteriaTable = new AttributiveSearchParamsTable(
-                selectQuery,
-                owlService,
-                wrapperService
-        );
-        final JScrollPane scrollPane = new JScrollPane(criteriaTable);
+        final JScrollPane scrollPane = new JScrollPane(this.criteriaTable);
         criteriaTable.setFillsViewportHeight(true);
         //
         criteriaContainer.add(scrollPane, BorderLayout.CENTER);
@@ -135,7 +129,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final OWLDomainClass item = (OWLDomainClass) e.getItem();
-                    selectQuery.setFrom(new FromType(item.getOwlClass()));
+                    criteriaTable.getSelectQuery().setFrom(new FromType(item.getOwlClass()));
                 }
             }
         });
@@ -143,7 +137,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
         addCriteriaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectQuery.addWherePart(new WherePart());
+            		criteriaTable.getSelectQuery().addWherePart(new WherePart());
             }
         });
         // добавим галку "Использовать веса атрибутов"
@@ -163,8 +157,8 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
         cleanAllConditionsControl.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				selectQuery.emptyWhereParts();
-				selectQuery.addWherePart(new WherePart());
+				criteriaTable.getSelectQuery().emptyWhereParts();
+				criteriaTable.getSelectQuery().addWherePart(new WherePart());
 				/** Publishing remove all conditions event to update conditions table immediately */
 				eventBus.publish(new CleanConditionsEvent());
 			}
@@ -205,7 +199,7 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
 
     @Override
     public AttributiveProcessorParams getSearchParams() {
-        final SelectQuery clonedQuery = selectQuery.clone();
+        final SelectQuery clonedQuery = this.criteriaTable.getSelectQuery().clone();
         boolean isFirstWherePart = true;
         for (WherePart wherePart : clonedQuery.getWhereParts()) {
             if (!isFirstWherePart) {
@@ -231,12 +225,12 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
         /**
          * удалим старые условия поиска
          */
-        selectQuery.emptyWhereParts();
+        this.criteriaTable.getSelectQuery().emptyWhereParts();
         /**
          * добавим новые условия
          */
         for (WherePart wherePart : loadedQuery.getWhereParts()) {
-            selectQuery.addWherePart(wherePart);
+        		this.criteriaTable.getSelectQuery().addWherePart(wherePart);
         }
     }
 

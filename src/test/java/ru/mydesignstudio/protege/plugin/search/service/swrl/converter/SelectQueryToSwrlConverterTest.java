@@ -12,7 +12,7 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.api.service.PathBuilder;
+import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.TestPathBuilder;
@@ -34,7 +34,7 @@ public class SelectQueryToSwrlConverterTest {
     private SelectQueryToSwrlConverter converter;
     @Mock
     private OWLService owlService;
-    private PathBuilder pathBuilder;
+    private PropertyBasedPathBuilder pathBuilder;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlPrefixResolver prefixResolver;
 
