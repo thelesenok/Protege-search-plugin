@@ -5,8 +5,17 @@ import javax.inject.Inject;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorEndsWith;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorFuzzyLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLessOrEqulas;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLessThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorMoreOrEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorMoreThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorNotEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorStartsWith;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 
 /**
  * Created by abarmin on 08.05.17.
@@ -15,11 +24,40 @@ import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
  */
 @Component
 public class ProximityCalculatorFactory {
-	private final OWLService owlService;
-		
+	private final ProximityCalculator equalsCalculator;
+	private final ProximityCalculator fuzzyLikeCalculator;
+	private final ProximityCalculator startsWithCalculator;
+	private final ProximityCalculator endsWithCalculator;
+	private final ProximityCalculator likeCalculator;
+	private final ProximityCalculator notEqualsCalculator;
+	private final ProximityCalculator moreThanCalculator;
+	private final ProximityCalculator moreOrEqualsCalculator;
+	private final ProximityCalculator lessThanCalculator;
+	private final ProximityCalculator lessOrEqualsCalculator;
+	
 	@Inject
-    public ProximityCalculatorFactory(OWLService owlService) {
-		this.owlService = owlService;
+	public ProximityCalculatorFactory(
+			@CalculatorEquals ProximityCalculator equalsCalculator,
+			@CalculatorFuzzyLike ProximityCalculator fuzzyLikeCalculator, 
+			@CalculatorStartsWith ProximityCalculator startsWithCalculator,
+			@CalculatorEndsWith ProximityCalculator endsWithCalculator, 
+			@CalculatorLike ProximityCalculator likeCalculator,
+			@CalculatorNotEquals ProximityCalculator notEqualsCalculator, 
+			@CalculatorMoreThan ProximityCalculator moreThanCalculator,
+			@CalculatorMoreOrEquals ProximityCalculator moreOrEqualsCalculator, 
+			@CalculatorLessThan ProximityCalculator lessThanCalculator,
+			@CalculatorLessOrEqulas ProximityCalculator lessOrEqualsCalculator) {
+		
+		this.equalsCalculator = equalsCalculator;
+		this.fuzzyLikeCalculator = fuzzyLikeCalculator;
+		this.startsWithCalculator = startsWithCalculator;
+		this.endsWithCalculator = endsWithCalculator;
+		this.likeCalculator = likeCalculator;
+		this.notEqualsCalculator = notEqualsCalculator;
+		this.moreThanCalculator = moreThanCalculator;
+		this.moreOrEqualsCalculator = moreOrEqualsCalculator;
+		this.lessThanCalculator = lessThanCalculator;
+		this.lessOrEqualsCalculator = lessOrEqualsCalculator;
 	}
 
 	/**
@@ -31,34 +69,34 @@ public class ProximityCalculatorFactory {
      */
     public ProximityCalculator getCalculator(LogicalOperation operation, SearchProcessorParams params) throws ApplicationException {
         if (LogicalOperation.EQUALS.equals(operation)) {
-            return new ProximityCalculatorEquals(owlService);
+            return equalsCalculator;
         }
         if (LogicalOperation.FUZZY_LIKE.equals(operation)) {
-            return new ProximityCalculatorFuzzyLike();
+            return fuzzyLikeCalculator;
         }
         if (LogicalOperation.STARTS_WITH.equals(operation)) {
-            return new ProximityCalculatorStartsWith();
+            return startsWithCalculator;
         }
         if (LogicalOperation.ENDS_WITH.equals(operation)) {
-            return new ProximityCalculatorEndsWith();
+            return endsWithCalculator;
         }
         if (LogicalOperation.LIKE.equals(operation)) {
-            return new ProximityCalculatorLike();
+            return likeCalculator;
         }
         if (LogicalOperation.EQUALS_NOT.equals(operation)) {
-            return new ProximityCalculatorNotEquals();
+            return notEqualsCalculator;
         }
         if (LogicalOperation.MORE_THAN.equals(operation)) {
-            return new ProximityCalculatorMoreThan();
+            return moreThanCalculator;
         }
         if (LogicalOperation.MORE_OR_EQUALS.equals(operation)) {
-            return new ProximityCalculatorMoreThanOrEquals();
+            return moreOrEqualsCalculator;
         }
         if (LogicalOperation.LESS_THAN.equals(operation)) {
-            return new ProximityCalculatorLessThan();
+            return lessThanCalculator;
         }
         if (LogicalOperation.LESS_OR_EQUALS.equals(operation)) {
-            return new ProximityCalculatorLessThanOrEquals();
+            return lessOrEqualsCalculator;
         }
         throw new ApplicationException(String.format(
                 "Can't find calculator for %s operation",

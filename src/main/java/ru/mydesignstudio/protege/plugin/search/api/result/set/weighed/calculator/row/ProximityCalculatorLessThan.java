@@ -2,6 +2,8 @@ package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculato
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 
@@ -10,9 +12,12 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
  *
  * Калькулятор "Меньше"
  */
+@Component
 public class ProximityCalculatorLessThan implements ProximityCalculator {
     @Override
-    public Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
+    public Weight calculate(Object targetValue, OWLIndividual individual, 
+    		@SuppressWarnings("rawtypes") OWLProperty property, 
+    		boolean usePropertyWeight) throws ApplicationException {
         return Weight.maxWeight();
     }
 }

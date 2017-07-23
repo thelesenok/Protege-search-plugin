@@ -1,9 +1,15 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
+import javax.inject.Inject;
+
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
+
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 /**
@@ -11,9 +17,15 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  *
  * Калькулятор близости по признаку "похоже нечетко"
  */
+@Component
 public class ProximityCalculatorFuzzyLike extends ProximityCalculatorSupport implements ProximityCalculator {
-    @Override
-    public Weight calculate(Object targetObjectValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
+	@Inject
+    public ProximityCalculatorFuzzyLike(OWLService owlService, FuzzyOWLService fuzzyOWLService) {
+		super(owlService, fuzzyOWLService);
+	}
+
+	@Override
+    public Weight calculate(Object targetObjectValue, OWLIndividual individual, @SuppressWarnings("rawtypes") OWLProperty property, boolean usePropertyWeight) throws ApplicationException {
         final String propertyValue = getPropertyAsString(individual, property);
         final String targetValue = (String) targetObjectValue;
         //

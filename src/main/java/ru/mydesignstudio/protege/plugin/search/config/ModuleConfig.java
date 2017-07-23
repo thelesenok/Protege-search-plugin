@@ -17,6 +17,27 @@ import com.google.inject.spi.TypeListener;
 
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculatorDefault;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorEndsWith;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorFuzzyLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorLessThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorLessThanOrEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorMoreThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorMoreThanOrEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorNotEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculatorStartsWith;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorEndsWith;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorFuzzyLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLessOrEqulas;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLessThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorLike;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorMoreOrEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorMoreThan;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorNotEquals;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.binding.CalculatorStartsWith;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
@@ -80,6 +101,37 @@ public class ModuleConfig extends AbstractModule {
         bind(RelatedQueriesCreator.class)
         		.annotatedWith(FuzzyQueryCreator.class)
         		.to(FuzzyTaxonomyRelatedQueryCreator.class);
+        /** Proximity calculators */
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorEndsWith.class)
+        		.to(ProximityCalculatorEndsWith.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorEquals.class)
+        		.to(ProximityCalculatorEquals.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorFuzzyLike.class)
+        		.to(ProximityCalculatorFuzzyLike.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorLessOrEqulas.class)
+        		.to(ProximityCalculatorLessThanOrEquals.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorLessThan.class)
+        		.to(ProximityCalculatorLessThan.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorLike.class)
+        		.to(ProximityCalculatorLike.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorMoreOrEquals.class)
+        		.to(ProximityCalculatorMoreThanOrEquals.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorMoreThan.class)
+        		.to(ProximityCalculatorMoreThan.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorNotEquals.class)
+        		.to(ProximityCalculatorNotEquals.class);
+        bind(ProximityCalculator.class)
+        		.annotatedWith(CalculatorStartsWith.class)
+        		.to(ProximityCalculatorStartsWith.class);
         //
         bind(SearchStrategySerializationService.class).to(SearchStrategySerializationServiceImpl.class);
         bindListener(Matchers.any(), new TypeListener() {

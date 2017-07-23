@@ -1,10 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed;
 
-import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 
 /**
  * Created by abarmin on 22.06.17.
@@ -97,4 +97,43 @@ public class Weight {
     public Collection<Weight> getChildren() {
         return Collections.unmodifiableCollection(children);
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((children == null) ? 0 : children.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(multiplicator);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(weight);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Weight other = (Weight) obj;
+		if (children == null) {
+			if (other.children != null)
+				return false;
+		} else if (!children.equals(other.children))
+			return false;
+		if (Double.doubleToLongBits(multiplicator) != Double.doubleToLongBits(other.multiplicator))
+			return false;
+		if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Weight [weight=" + weight + ", multiplicator=" + multiplicator + ", children=" + children + "]";
+	}
 }

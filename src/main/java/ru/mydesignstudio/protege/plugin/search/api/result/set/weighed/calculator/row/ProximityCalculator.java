@@ -2,6 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculato
 
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
+
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.Weight;
 
@@ -20,5 +21,6 @@ public interface ProximityCalculator {
      * @return
      * @throws ApplicationException
      */
-    Weight calculate(Object targetValue, OWLIndividual individual, OWLProperty property, boolean usePropertyWeight) throws ApplicationException;
+    Weight calculate(Object targetValue, OWLIndividual individual, 
+    		@SuppressWarnings("rawtypes") OWLProperty property, boolean usePropertyWeight) throws ApplicationException;
 }

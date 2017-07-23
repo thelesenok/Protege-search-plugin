@@ -97,6 +97,19 @@ public class StringUtils {
         }
         return new String();
     }
+    
+    /**
+     * Convert collection of characters to string
+     * @param source collection of characters
+     * @return string representation
+     */
+    public static final String toString(Collection<Character> source) {
+    		final StringBuilder builder = new StringBuilder();
+    		for (Character character : source) {
+			builder.append(character);
+    		}
+    		return builder.toString();
+    }
 
     /**
      * Конвертировать строку в коллекцию символов
