@@ -1,15 +1,14 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row;
 
-import javax.inject.Inject;
-
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
-
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
+
+import javax.inject.Inject;
 
 /**
  * Created by abarmin on 28.05.17.
@@ -38,7 +37,7 @@ public abstract class ProximityCalculatorSupport implements ProximityCalculator 
         if (!usePropertyWeight) {
             return 1;
         }
-        return fuzzyOWLService.getPropertyWeigth(property);
+        return fuzzyOWLService.getPropertyWeight(property);
     }
 
     /**

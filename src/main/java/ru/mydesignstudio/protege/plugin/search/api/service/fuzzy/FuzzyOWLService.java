@@ -24,7 +24,7 @@ public interface FuzzyOWLService extends OWLService {
      * @return - вес атрибута
      * @throws ApplicationException
      */
-    double getPropertyWeigth(OWLProperty property) throws ApplicationException;
+    double getPropertyWeight(OWLProperty property) throws ApplicationException;
     /**
      * Классы, которые в аннотации указаны как сходные с определенной степенью
      * @param owlClass - класс, для которого ищем связанные

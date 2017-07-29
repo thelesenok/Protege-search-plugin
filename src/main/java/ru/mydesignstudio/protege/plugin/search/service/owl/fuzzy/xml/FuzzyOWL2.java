@@ -26,6 +26,19 @@ public class FuzzyOWL2 {
      */
     @XmlElement(name = "Concept", required = false)
     private Concept concept;
+    /**
+     * Degree for object properties
+     */
+    @XmlElement(name = "Degree", required = false)
+    private Degree degree;
+
+    public Degree getDegree() {
+        return degree;
+    }
+
+    public void setDegree(Degree degree) {
+        this.degree = degree;
+    }
 
     public Concept getConcept() {
         return concept;

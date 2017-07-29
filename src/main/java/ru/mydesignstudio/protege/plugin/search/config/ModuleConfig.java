@@ -1,12 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.config;
 
-import java.lang.reflect.Method;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
@@ -14,7 +7,8 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.WeightCalculatorDefault;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.ProximityCalculator;
@@ -48,6 +42,11 @@ import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.related.RelatedClassFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.FuzzyOWLServiceImpl;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.DataPropertyWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.ObjectPropertyWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.PropertyWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.binding.DataWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.binding.ObjectWeightFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.RelatedClassFactoryImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.owl.hierarchy.OwlClassHierarchyBuilderImpl;
@@ -68,6 +67,9 @@ import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.relat
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.EqualClassesQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.NearestNeighboursQueryCreator;
+
+import javax.annotation.PostConstruct;
+import java.lang.reflect.Method;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -101,6 +103,13 @@ public class ModuleConfig extends AbstractModule {
         bind(RelatedQueriesCreator.class)
         		.annotatedWith(FuzzyQueryCreator.class)
         		.to(FuzzyTaxonomyRelatedQueryCreator.class);
+        /** Property weight factory */
+        bind(PropertyWeightFactory.class)
+                .annotatedWith(DataWeightFactory.class)
+                .to(DataPropertyWeightFactory.class);
+        bind(PropertyWeightFactory.class)
+                .annotatedWith(ObjectWeightFactory.class)
+                .to(ObjectPropertyWeightFactory.class);
         /** Proximity calculators */
         bind(ProximityCalculator.class)
         		.annotatedWith(CalculatorEndsWith.class)

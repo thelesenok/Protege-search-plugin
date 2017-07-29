@@ -1,7 +1,9 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.weight.calculator;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculator.RowWeightCalculatorSupport;
 
@@ -13,5 +15,11 @@ import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculato
 public class AttributiveRowWeightCalculator extends RowWeightCalculatorSupport implements WeighedRowWeightCalculator {
     public AttributiveRowWeightCalculator(SelectQuery selectQuery, AttributiveProcessorParams params) {
         super(selectQuery, params);
+    }
+
+    @Override
+    public boolean usePropertyWeights(SearchProcessorParams processorParams) throws ApplicationException {
+        final AttributiveProcessorParams params = (AttributiveProcessorParams) processorParams;
+        return params.isUseAttributeWeights();
     }
 }

@@ -14,7 +14,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.ReflectionUtils;
  * Created by abarmin on 13.05.17.
  */
 public class FuzzyOWLServiceImplTest {
-    private FuzzyOWLServiceImpl service = new FuzzyOWLServiceImpl(null, null, null, null);
+    private FuzzyOWLServiceImpl service = new FuzzyOWLServiceImpl(null, null, null, null, null);
     private FuzzyFunctionFactory functionFactory = new FuzzyFunctionFactory();
 
     @Before

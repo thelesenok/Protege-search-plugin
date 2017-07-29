@@ -77,4 +77,9 @@ public class FuzzyOntologyRowWeightCalculator extends RowWeightCalculatorSupport
         final OWLIndividual record = owlService.getIndividual(iri);
         return fuzzyOWLService.getPropertyDatatype(record, property);
     }
+
+    @Override
+    public boolean usePropertyWeights(SearchProcessorParams processorParams) throws ApplicationException {
+        return false;
+    }
 }

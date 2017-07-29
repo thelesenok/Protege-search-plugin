@@ -11,7 +11,6 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 
 /**
@@ -43,9 +42,7 @@ public abstract class RowWeightCalculatorSupport implements WeighedRowWeightCalc
         final Weight totalWeight = Weight.noneWeight();
         //
         final OWLIndividual ontologyObject = owlService.getIndividual(row.getObjectIRI());
-        final boolean useAttributeWeights = (processorParams instanceof AttributiveProcessorParams) ?
-                ((AttributiveProcessorParams) processorParams).isUseAttributeWeights() :
-                false;
+        final boolean useAttributeWeights = usePropertyWeights(processorParams);
         //
         for (WherePart wherePart : selectQuery.getWhereParts()) {
             final ProximityCalculator calculator = calculatorFactory.getCalculator(wherePart.getLogicalOperation(), processorParams);
@@ -60,4 +57,12 @@ public abstract class RowWeightCalculatorSupport implements WeighedRowWeightCalc
         //
         return totalWeight;
     }
+
+    /**
+     * Use property weights in weight calculation for, for example, fuzzy attributes
+     * @param processorParams - search processor params
+     * @return - use or not
+     * @throws ApplicationException
+     */
+    public abstract boolean usePropertyWeights(SearchProcessorParams processorParams) throws ApplicationException;
 }

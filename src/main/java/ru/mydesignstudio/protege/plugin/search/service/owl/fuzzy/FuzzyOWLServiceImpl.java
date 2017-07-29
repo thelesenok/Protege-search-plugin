@@ -5,11 +5,13 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
@@ -20,6 +22,8 @@ import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.related.Related
 import ru.mydesignstudio.protege.plugin.search.service.owl.OWLServiceImpl;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.function.FuzzyFunctionFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.PropertyWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.binding.DataWeightFactory;
+import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.property.binding.ObjectWeightFactory;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.FuzzySimilarClass;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Concept;
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.xml.Datatype;
@@ -47,15 +51,20 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
 
     private final FuzzyFunctionFactory functionFactory;
     private final RelatedClassFactory relatedClassFactory;
-    private final PropertyWeightFactory propertyWeightFactory;
+    private final PropertyWeightFactory dataPropertyWeightFactory;
+    private final PropertyWeightFactory objectPropertyWeightFactory;
 
     @Inject
-    public FuzzyOWLServiceImpl(OwlClassHierarchyBuilder hierarchyBuilder, FuzzyFunctionFactory functionFactory,
-			RelatedClassFactory relatedClassFactory, PropertyWeightFactory propertyWeightFactory) {
+    public FuzzyOWLServiceImpl(OwlClassHierarchyBuilder hierarchyBuilder,
+                               FuzzyFunctionFactory functionFactory,
+                               RelatedClassFactory relatedClassFactory,
+                               @DataWeightFactory PropertyWeightFactory dataPropertyWeightFactory,
+                               @ObjectWeightFactory PropertyWeightFactory objectPropertyWeightFactory) {
 		super(hierarchyBuilder);
 		this.functionFactory = functionFactory;
 		this.relatedClassFactory = relatedClassFactory;
-		this.propertyWeightFactory = propertyWeightFactory;
+		this.dataPropertyWeightFactory = dataPropertyWeightFactory;
+		this.objectPropertyWeightFactory = objectPropertyWeightFactory;
 	}
 
 	private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity owlEntity) throws ApplicationException {
@@ -69,10 +78,14 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
         });
     }
 
-	@Override
-    public double getPropertyWeigth(OWLProperty property) throws ApplicationException {
-        final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(property);
-        final OWLAnnotationAssertionAxiom propertyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.PROPERTY);
+    /**
+     * Get property weight from annotation
+     * @param propertyAxiom - annotation to extract weight
+     * @param factory - factory that convert xml and extract weight
+     * @return - weight, if annotation object is not present, default weight will be returned
+     * @throws ApplicationException
+     */
+    private double getPropertyWeight(OWLAnnotationAssertionAxiom propertyAxiom, PropertyWeightFactory factory) throws ApplicationException {
         if (propertyAxiom == null) {
             /**
              * Нет информации о весе свойства, используем вес по умолчанию
@@ -83,7 +96,41 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
          * Получим xml и пропустим его через фабрику
          */
         final String xmlString = ((OWLLiteral) propertyAxiom.getValue()).getLiteral();
-        return propertyWeightFactory.build(xmlString);
+        return dataPropertyWeightFactory.build(xmlString);
+    }
+
+    /**
+     * Get weight of data property
+     * @param property - property to check
+     * @param factory - factory that convert xml and extract weight
+     * @return weight, if there is no weight annotation, default weight will be returned
+     * @throws ApplicationException
+     */
+    private double getDataPropertyWeight(OWLDataProperty property, PropertyWeightFactory factory) throws ApplicationException {
+        final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(property);
+        final OWLAnnotationAssertionAxiom propertyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.PROPERTY);
+        return getPropertyWeight(propertyAxiom, factory);
+    }
+
+    /**
+     * Get weight of object property
+     * @param property - property to check
+     * @param factory - factory that convert xml and extract weight
+     * @return - weight, if there is no weight annotation, default weight will be returned
+     * @throws ApplicationException
+     */
+    private double getObjectPropertyWeight(OWLObjectProperty property, PropertyWeightFactory factory) throws ApplicationException {
+        final Collection<OWLAnnotationAssertionAxiom> annotations = getAnnotations(property);
+        final OWLAnnotationAssertionAxiom propertyAxiom = getFuzzyAxiom(annotations, FuzzyAnnotationType.CLASS_OR_DATATYPE);
+        return getPropertyWeight(propertyAxiom, factory);
+    }
+
+	@Override
+    public double getPropertyWeight(OWLProperty property) throws ApplicationException {
+        if (property instanceof OWLDataProperty) {
+            return getDataPropertyWeight((OWLDataProperty) property, dataPropertyWeightFactory);
+        }
+        return getObjectPropertyWeight((OWLObjectProperty) property, objectPropertyWeightFactory);
     }
 
     private OWLAnnotationAssertionAxiom getFuzzyAxiom(Collection<OWLAnnotationAssertionAxiom> axioms, FuzzyAnnotationType annotationType) throws ApplicationException {

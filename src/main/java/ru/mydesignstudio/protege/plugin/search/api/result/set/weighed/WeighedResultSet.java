@@ -20,10 +20,13 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  * Created by abarmin on 06.05.17.
  *
  * Взвешенные результаты
+ * @deprecated this class should be overwritten because of logic in addResultSet method. This logic should be
+ * moved to separated class and this class should only store data
  */
 public class WeighedResultSet extends SparqlResultSet implements ResultSet {
     private final WeighedRowWeightCalculator weightCalculator;
 
+    @Deprecated
     public WeighedResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) {
         this.weightCalculator = weightCalculator;
         final ExceptionWrapperService wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
@@ -116,6 +119,11 @@ public class WeighedResultSet extends SparqlResultSet implements ResultSet {
                 final WeighedRow rowToAdd;
                 if (sourceRow instanceof WeighedRow) {
                     rowToAdd = (WeighedRow) sourceRow;
+                    /**
+                     * Calculate weight of row with current calculator and add it
+                     */
+                    final Weight calculatedWeight = weightCalculator.calculate(rowToAdd);
+                    rowToAdd.addWeight(calculatedWeight);
                 } else {
                     final Weight calculatedWeight = weightCalculator.calculate(sourceRow);
                     rowToAdd = new WeighedRowDefaultImpl(sourceRow, calculatedWeight);
