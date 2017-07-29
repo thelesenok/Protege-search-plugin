@@ -3,6 +3,7 @@ package ru.mydesignstudio.protege.plugin.search.ui.component.search.results;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
@@ -29,20 +30,21 @@ import java.util.Collection;
 /**
  * Created by abarmin on 07.01.17.
  */
+@VisualComponent
 public class SearchResultsViewComponent extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResultsViewComponent.class);
     private final EventBus eventBus = EventBus.getInstance();
+    private final OWLService owlService;
+
     @Inject
-    private OWLService owlService;
-
-    private JTable resultsTable = new JTable();
-    private JScrollPane scrollPane = new JScrollPane(resultsTable);
-
-    public SearchResultsViewComponent() {
+    public SearchResultsViewComponent(OWLService owlService) {
+        this.owlService = owlService;
         setLayout(new BorderLayout());
         resultsTable.setFillsViewportHeight(true);
-        add(scrollPane, BorderLayout.CENTER);
+        add(new JScrollPane(resultsTable), BorderLayout.CENTER);
     }
+
+    private JTable resultsTable = new JTable();
 
     @PostConstruct
     public void init() {

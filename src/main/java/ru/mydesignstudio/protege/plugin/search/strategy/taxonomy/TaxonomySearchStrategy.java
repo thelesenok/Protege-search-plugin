@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessor;
@@ -13,11 +14,16 @@ import java.awt.Component;
  *
  * Стратегия поиска с учетом таксономической близости
  */
+@VisualComponent
 public class TaxonomySearchStrategy implements SearchStrategy {
+    private final TaxonomySearchParamsComponent paramsComponent;
+    private final TaxonomyProcessor taxonomyProcessor;
+
     @Inject
-    private TaxonomySearchParamsComponent paramsComponent;
-    @Inject
-    private TaxonomyProcessor taxonomyProcessor;
+    public TaxonomySearchStrategy(TaxonomySearchParamsComponent paramsComponent, TaxonomyProcessor taxonomyProcessor) {
+        this.paramsComponent = paramsComponent;
+        this.taxonomyProcessor = taxonomyProcessor;
+    }
 
     @Override
     public String getTitle() {
@@ -30,8 +36,13 @@ public class TaxonomySearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
+    public boolean enabledByDefault() {
         return false;
+    }
+
+    @Override
+    public boolean canBeDisabled() {
+        return true;
     }
 
     @Override

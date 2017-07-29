@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.common.Triplet;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by abarmin on 07.01.17.
  */
+@Component
 public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, WherePartVisitor, ConcatOperationVisitor {
     private static final String DEFAULTS =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
@@ -40,10 +42,14 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
     private static final String NEW_LINE = "\n";
     private final Map<String, String> prefixes = new HashMap<String, String>();
 
+    private final OWLService owlService;
+    private final WherePartConditionConverterFactory conditionConverterFactory;
+
     @Inject
-    private OWLService owlService;
-    @Inject
-    private WherePartConditionConverterFactory conditionConverterFactory;
+    public SparqlQueryVisitor(OWLService owlService, WherePartConditionConverterFactory conditionConverterFactory) {
+        this.owlService = owlService;
+        this.conditionConverterFactory = conditionConverterFactory;
+    }
 
     private String getNextVariableName() {
         return "?variable" + variableIndex.incrementAndGet();

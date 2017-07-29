@@ -1,8 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.service.swrl;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +11,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
-
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
@@ -36,8 +32,21 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.At
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryVisitor;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.BooleanWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.DateWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.EnumerationWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.FuzzyWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.IndividualWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.NumericWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.StringWherePartConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.converter.WherePartConditionConverterFactory;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLNamedIndividualImpl;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by abarmin on 27.06.17.
@@ -48,13 +57,11 @@ public class SwrlServiceImplTest {
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlService swrlService;
-    private PropertyBasedPathBuilder pathBuilder;
-    private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
-        prefixResolver = new SwrlPrefixResolver();
-        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
+        SwrlPrefixResolver prefixResolver = new SwrlPrefixResolver();
+        PropertyBasedPathBuilder pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         swrlService = new SwrlServiceImpl(
                 new SelectQueryToSwrlConverter(
                         new FromTypeSwrlConverter(prefixResolver),
@@ -108,14 +115,30 @@ public class SwrlServiceImplTest {
                 new LookupParam(
                         new AttributiveSearchStrategy(
                         		new AttributiveSearchStrategyParamsComponent(
-                        				owlService, 
-                        				wrapperService,
+                        				owlService,
                         				new AttributiveSearchParamsTable(
                         						owlService, 
                         						wrapperService
                         						)
                         				),
-                        		new AttributiveProcessor()
+                        		new AttributiveProcessor(
+                        		        owlService,
+                                        wrapperService,
+                                        new SparqlQueryConverter(
+                                                new SparqlQueryVisitor(
+                                                        owlService,
+                                                        new WherePartConditionConverterFactory(
+                                                                new IndividualWherePartConverter(),
+                                                                new NumericWherePartConverter(),
+                                                                new StringWherePartConverter(),
+                                                                new DateWherePartConverter(),
+                                                                new EnumerationWherePartConverter(),
+                                                                new FuzzyWherePartConverter(),
+                                                                new BooleanWherePartConverter()
+                                                        )
+                                                )
+                                        )
+                                )
                         	),
                         new AttributiveProcessorParams(
                                 query, false

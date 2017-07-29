@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.relational;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
@@ -13,9 +14,14 @@ import java.awt.Component;
  *
  * Стратегия поиска "С учетом отношений"
  */
+@VisualComponent
 public class RelationalSearchStrategy implements SearchStrategy {
+    private final RelationalProcessor relationalProcessor;
+
     @Inject
-    private RelationalProcessor relationalProcessor;
+    public RelationalSearchStrategy(RelationalProcessor relationalProcessor) {
+        this.relationalProcessor = relationalProcessor;
+    }
 
     @Override
     public String getTitle() {
@@ -28,8 +34,13 @@ public class RelationalSearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
+    public boolean enabledByDefault() {
         return false;
+    }
+
+    @Override
+    public boolean canBeDisabled() {
+        return true;
     }
 
     @Override

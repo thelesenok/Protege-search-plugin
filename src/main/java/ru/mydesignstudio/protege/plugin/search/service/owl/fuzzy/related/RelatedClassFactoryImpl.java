@@ -22,8 +22,12 @@ import java.util.Collections;
  */
 @Component
 public class RelatedClassFactoryImpl implements RelatedClassFactory {
+    private final OWLService owlService;
+
     @Inject
-    private OWLService owlService;
+    public RelatedClassFactoryImpl(OWLService owlService) {
+        this.owlService = owlService;
+    }
 
     @Override
     public Collection<FuzzySimilarClass> build(FuzzyOWL2 fuzzyData) throws ApplicationException {

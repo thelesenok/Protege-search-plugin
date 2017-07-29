@@ -3,11 +3,17 @@ package ru.mydesignstudio.protege.plugin.search.service.search.path;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.utils.*;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectPropertyExpressionImpl;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.SetUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectPropertyImpl;
 
 import java.util.ArrayList;
@@ -22,10 +28,8 @@ import java.util.Set;
  */
 public class TestPathBuilder {
     private final Collection<VertexPath> vertexPaths = new ArrayList<>();
-    private final OWLService owlService;
 
     protected TestPathBuilder(OWLService owlService) throws ApplicationException {
-        this.owlService = owlService;
         /**
          * Получение свойств класса
          */

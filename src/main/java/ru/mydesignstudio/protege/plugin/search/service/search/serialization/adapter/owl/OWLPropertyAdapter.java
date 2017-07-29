@@ -39,8 +39,7 @@ public class OWLPropertyAdapter implements JsonSerializer<OWLProperty>, JsonDese
         final OWLService owlService = InjectionUtils.getInstance(OWLService.class);
         final IRI iri = IRI.create(jsonPrimitive.getAsString());
         try {
-            final OWLProperty property = owlService.getProperty(iri);
-            return property;
+            return owlService.getProperty(iri);
         } catch (ApplicationException e) {
             LOGGER.error("Can't deserialize OWLProperty", e);
             throw new ApplicationRuntimeException(e);

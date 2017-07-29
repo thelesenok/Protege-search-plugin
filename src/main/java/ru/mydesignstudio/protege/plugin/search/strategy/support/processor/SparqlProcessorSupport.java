@@ -6,9 +6,9 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
@@ -33,13 +33,19 @@ import java.util.Collections;
  * Абстрактный процессор с поддержкой поиска по sparql запросу
  */
 public abstract class SparqlProcessorSupport {
-    @Inject
-    private OWLService owlService;
-    @Inject
-    private ExceptionWrapperService wrapperService;
-    @Inject
-    private SparqlQueryConverter queryConverter;
+    private final OWLService owlService;
+    private final ExceptionWrapperService wrapperService;
+    private final SparqlQueryConverter queryConverter;
     private SparqlReasoner reasonerHolder;
+
+    @Inject
+    public SparqlProcessorSupport(OWLService owlService,
+                                  ExceptionWrapperService wrapperService,
+                                  SparqlQueryConverter queryConverter) {
+        this.owlService = owlService;
+        this.wrapperService = wrapperService;
+        this.queryConverter = queryConverter;
+    }
 
     public SparqlReasoner getReasoner() throws ApplicationException {
         if (reasonerHolder == null) {

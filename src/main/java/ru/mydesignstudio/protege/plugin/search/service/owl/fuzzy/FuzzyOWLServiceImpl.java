@@ -1,16 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy;
 
-import java.io.StringReader;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
@@ -18,8 +10,8 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
-
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
@@ -37,6 +29,14 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Created by abarmin on 13.05.17.
@@ -60,14 +60,13 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
 
 	private Collection<OWLAnnotationAssertionAxiom> getAnnotations(OWLEntity owlEntity) throws ApplicationException {
         final Set<OWLAnnotationAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.ANNOTATION_ASSERTION);
-        final Collection<OWLAnnotationAssertionAxiom> annotationAssertionAxioms = CollectionUtils.filter(axioms, new Specification<OWLAnnotationAssertionAxiom>() {
+        return CollectionUtils.filter(axioms, new Specification<OWLAnnotationAssertionAxiom>() {
             @Override
             public boolean isSatisfied(OWLAnnotationAssertionAxiom axiom) {
                 final IRI subject = (IRI) axiom.getSubject();
                 return OWLUtils.equals(subject, owlEntity.getIRI());
             }
         });
-        return annotationAssertionAxioms;
     }
 
 	@Override
@@ -168,5 +167,20 @@ public class FuzzyOWLServiceImpl extends OWLServiceImpl implements FuzzyOWLServi
             return null;
         }
         return propertyAxiom.getObject().getDatatype();
+    }
+
+    @Override
+    public boolean isFuzzyOntology(OWLOntology ontology) throws ApplicationException {
+        final Set<OWLAnnotation> annotations = ontology.getAnnotations();
+        final OWLAnnotation labelAnnotation = CollectionUtils.findFirst(annotations, new Specification<OWLAnnotation>() {
+            @Override
+            public boolean isSatisfied(OWLAnnotation owlAnnotation) {
+                return StringUtils.equalsIgnoreCase(
+                        owlAnnotation.getProperty().getIRI().getFragment(),
+                        "fuzzyLabel"
+                );
+            }
+        });
+        return labelAnnotation != null;
     }
 }

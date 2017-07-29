@@ -39,8 +39,7 @@ public class OWLClassAdapter implements JsonSerializer<OWLClass>, JsonDeserializ
         final OWLService owlService = InjectionUtils.getInstance(OWLService.class);
         final IRI iri = IRI.create(jsonPrimitive.getAsString());
         try {
-            final OWLClass owlClass = owlService.getOWLClass(iri);
-            return owlClass;
+            return owlService.getOWLClass(iri);
         } catch (ApplicationException e) {
             LOGGER.error("Can't deserialize OWLCLass", e);
             throw new ApplicationRuntimeException(e);

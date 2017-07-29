@@ -3,6 +3,7 @@ package ru.mydesignstudio.protege.plugin.search.api.service.fuzzy;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
@@ -55,4 +56,12 @@ public interface FuzzyOWLService extends OWLService {
      * @throws ApplicationException
      */
     OWLDatatype getPropertyDatatype(OWLIndividual individual, OWLProperty property) throws ApplicationException;
+
+    /**
+     * Does ontology support fuzzy properties
+     * @param ontology - ontology to check
+     * @return
+     * @throws ApplicationException
+     */
+    boolean isFuzzyOntology(OWLOntology ontology) throws ApplicationException;
 }

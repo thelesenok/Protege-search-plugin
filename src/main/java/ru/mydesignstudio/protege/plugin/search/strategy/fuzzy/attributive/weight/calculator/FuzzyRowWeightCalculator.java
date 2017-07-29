@@ -11,12 +11,7 @@ import ru.mydesignstudio.protege.plugin.search.strategy.support.weight.calculato
  * Вычисляет вес строки с учетом нечетког поиска
  */
 public class FuzzyRowWeightCalculator extends RowWeightCalculatorSupport implements WeighedRowWeightCalculator {
-    private final SelectQuery fuzzyQuery;
-    private final FuzzyAttributiveProcessorParams processorParams;
-
     public FuzzyRowWeightCalculator(SelectQuery selectQuery, FuzzyAttributiveProcessorParams processorParams) {
         super(selectQuery, processorParams);
-        this.fuzzyQuery = selectQuery;
-        this.processorParams = processorParams;
     }
 }

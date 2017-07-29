@@ -27,11 +27,10 @@ public class WherePartSwrlConverterTest {
     @Mock
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
-    private PropertyBasedPathBuilder pathBuilder;
 
     @Before
     public void setUp() throws Exception {
-        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
+        PropertyBasedPathBuilder pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         wherePartConverter = new WherePartSwrlConverter(new SwrlPrefixResolver(), pathBuilder);
         /**
          * Обучим OWLService связям в графе классов

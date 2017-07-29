@@ -1,29 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.ui.component.search.params;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.TreeSet;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import com.google.common.eventbus.Subscribe;
-
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
@@ -41,9 +19,31 @@ import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.TreeSet;
+
 /**
  * Created by abarmin on 03.01.17.
  */
+@VisualComponent
 @SuppressWarnings("serial")
 public class SearchParamsPane extends JPanel {
     private final JPanel strategiesContainer = new JPanel(new FlowLayout());
@@ -76,10 +76,16 @@ public class SearchParamsPane extends JPanel {
     public void init() {
         eventBus.register(this);
 
-        fillStrategies();
-        fillSearchButton();
-        selectRequiredStrategies();
+        wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
+            @Override
+            public Void run() throws ApplicationException {
+                fillStrategies();
+                selectRequiredStrategies();
+                return null;
+            }
+        });
 
+        fillSearchButton();
         this.revalidate();
     }
 
@@ -296,7 +302,7 @@ public class SearchParamsPane extends JPanel {
      * Включить стратегию
      * @param strategy - какую именно
      */
-    private void enableStrategy(SearchStrategy strategy) {
+    private void enableStrategy(SearchStrategy strategy) throws ApplicationException {
         /**
          * не включаем стратегию, если она уже включена
          */
@@ -324,8 +330,8 @@ public class SearchParamsPane extends JPanel {
      * Выключить стратегию
      * @param strategy - какую именно
      */
-    private void disableStrategy(SearchStrategy strategy) {
-        if (strategy.isRequired()) {
+    private void disableStrategy(SearchStrategy strategy) throws ApplicationException {
+        if (!strategy.canBeDisabled()) {
             /**
              * обязательные стратегии выключить нельзя
              */
@@ -365,21 +371,27 @@ public class SearchParamsPane extends JPanel {
     public void onStrategyChangeEventListener(StrategyChangeEvent event) {
         final SearchStrategy selectedStrategy = event.getStrategy();
         // если это включение стратегии, то добавляем ее в список
-        if (event.isSelected()) {
-            enableStrategy(selectedStrategy);
-        } else {
-            disableStrategy(selectedStrategy);
-        }
+        wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
+            @Override
+            public Void run() throws ApplicationException {
+                if (event.isSelected()) {
+                    enableStrategy(selectedStrategy);
+                } else {
+                    disableStrategy(selectedStrategy);
+                }
+                return null;
+            }
+        });
     }
 
     /**
      * Отметить обязательные стратегии галочками -
      * опубликовать события
      */
-    private void selectRequiredStrategies() {
+    private void selectRequiredStrategies() throws ApplicationException {
         final Collection<SearchStrategy> strategies = strategyService.getStrategies();
         for (SearchStrategy strategy : strategies) {
-            if (strategy.isRequired()) {
+            if (!strategy.canBeDisabled()) {
                 eventBus.publish(new StrategyChangeEvent(strategy, true));
             }
         }
@@ -388,11 +400,11 @@ public class SearchParamsPane extends JPanel {
     /**
      * Заполнить список доступных стратегий
      */
-    private void fillStrategies() {
+    private void fillStrategies() throws ApplicationException {
         final Collection<SearchStrategy> strategies = strategyService.getStrategies();
         for (final SearchStrategy strategy : strategies) {
-            final JCheckBox strategySelectFlag = new JCheckBox(strategy.getTitle(), strategy.isRequired());
-            strategySelectFlag.setEnabled(!strategy.isRequired());
+            final JCheckBox strategySelectFlag = new JCheckBox(strategy.getTitle(), strategy.enabledByDefault());
+            strategySelectFlag.setEnabled(strategy.canBeDisabled());
             strategiesContainer.add(strategySelectFlag);
             strategySelectors.add(strategySelectFlag);
             //

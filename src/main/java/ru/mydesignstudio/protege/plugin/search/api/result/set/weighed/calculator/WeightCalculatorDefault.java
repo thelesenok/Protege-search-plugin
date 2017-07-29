@@ -15,8 +15,7 @@ public class WeightCalculatorDefault implements WeightCalculator {
         if (totalCount == 0) {
             return 0;
         }
-        final double value = getTotalWeight(weight) / totalCount;
-        return value;
+        return getTotalWeight(weight) / totalCount;
     }
 
     /**

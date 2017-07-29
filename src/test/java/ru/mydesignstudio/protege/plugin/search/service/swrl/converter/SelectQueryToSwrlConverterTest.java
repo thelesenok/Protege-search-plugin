@@ -15,8 +15,6 @@ import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.PropertyBasedPathBuilder;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.service.search.path.ShortestPathBuilder;
-import ru.mydesignstudio.protege.plugin.search.service.search.path.TestPathBuilder;
-import ru.mydesignstudio.protege.plugin.search.service.search.path.VertexPath;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.FromTypeSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.IndividualToSwrlConverter;
 import ru.mydesignstudio.protege.plugin.search.service.swrl.converter.part.SwrlPrefixResolver;
@@ -34,14 +32,12 @@ public class SelectQueryToSwrlConverterTest {
     private SelectQueryToSwrlConverter converter;
     @Mock
     private OWLService owlService;
-    private PropertyBasedPathBuilder pathBuilder;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
-    private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
-        prefixResolver = new SwrlPrefixResolver();
-        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
+        SwrlPrefixResolver prefixResolver = new SwrlPrefixResolver();
+        PropertyBasedPathBuilder pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         converter = new SelectQueryToSwrlConverter(
                 new FromTypeSwrlConverter(prefixResolver),
                 new IndividualToSwrlConverter(owlService, prefixResolver),
