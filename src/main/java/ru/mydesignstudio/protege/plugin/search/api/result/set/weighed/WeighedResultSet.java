@@ -23,11 +23,10 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  */
 public class WeighedResultSet extends SparqlResultSet implements ResultSet {
     private final WeighedRowWeightCalculator weightCalculator;
-    private final ExceptionWrapperService wrapperService;
 
     public WeighedResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) {
         this.weightCalculator = weightCalculator;
-        wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
+        final ExceptionWrapperService wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
         /**
          * если нет столбца с весом, добавим его
          */

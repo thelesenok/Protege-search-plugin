@@ -1,8 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.service.swrl;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +11,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
-
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
@@ -39,6 +35,9 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.At
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLNamedIndividualImpl;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Created by abarmin on 27.06.17.
  */
@@ -48,13 +47,11 @@ public class SwrlServiceImplTest {
     private OWLService owlService;
     private ExceptionWrapperService wrapperService = new ExceptionWrapperService();
     private SwrlService swrlService;
-    private PropertyBasedPathBuilder pathBuilder;
-    private SwrlPrefixResolver prefixResolver;
 
     @Before
     public void setUp() throws Exception {
-        prefixResolver = new SwrlPrefixResolver();
-        pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
+        SwrlPrefixResolver prefixResolver = new SwrlPrefixResolver();
+        PropertyBasedPathBuilder pathBuilder = new ShortestPathBuilder(owlService, wrapperService);
         swrlService = new SwrlServiceImpl(
                 new SelectQueryToSwrlConverter(
                         new FromTypeSwrlConverter(prefixResolver),
@@ -108,8 +105,7 @@ public class SwrlServiceImplTest {
                 new LookupParam(
                         new AttributiveSearchStrategy(
                         		new AttributiveSearchStrategyParamsComponent(
-                        				owlService, 
-                        				wrapperService,
+                        				owlService,
                         				new AttributiveSearchParamsTable(
                         						owlService, 
                         						wrapperService

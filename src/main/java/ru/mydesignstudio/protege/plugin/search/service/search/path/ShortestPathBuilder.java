@@ -1,9 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.service.search.path;
 
-import javax.inject.Inject;
-
 import org.semanticweb.owlapi.model.OWLClass;
-
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
@@ -18,6 +15,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -110,13 +108,12 @@ public class ShortestPathBuilder implements PropertyBasedPathBuilder {
 					destinationClass
 			));
 		}
-		final List<OWLClass> targetPath = CollectionUtils.min(suitablePaths, new Comparator<List<OWLClass>>() {
+		return CollectionUtils.min(suitablePaths, new Comparator<List<OWLClass>>() {
 			@Override
 			public int compare(List<OWLClass> first, List<OWLClass> second) {
 				return Integer.compare(first.size(), second.size());
 			}
 		});
-		return targetPath;
 	}
 
 	private void buildVertexPath(OWLClass currentClass, OWLClass destinationClass,

@@ -1,19 +1,18 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Created by abarmin on 05.01.17.
@@ -178,7 +177,7 @@ public class LogicalOperationHelper {
         });
     }
 
-    private static final boolean isFuzzyDatatype(OWLDatatype datatype) {
+    private static boolean isFuzzyDatatype(OWLDatatype datatype) {
         final FuzzyOWLService owlService = InjectionUtils.getInstance(FuzzyOWLService.class);
         try {
             return owlService.isFuzzyDatatype(datatype);

@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.search;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 
@@ -26,11 +27,18 @@ public interface SearchStrategy {
     <T extends Component & SearchStrategyComponent> T getSearchParamsPane();
 
     /**
-     * Обязательная, не может быть выключена
-     *
+     * Can be disabled
+     * @throws ApplicationException
      * @return
      */
-    boolean isRequired();
+    boolean canBeDisabled() throws ApplicationException;
+
+    /**
+     * Is strategy enabled by default
+     * @throws ApplicationException
+     * @return
+     */
+    boolean enabledByDefault() throws ApplicationException;
 
     /**
      * Порядок сортировки

@@ -24,10 +24,6 @@ import java.util.Map;
  */
 public class FuzzyTaxonomyRowWeightCalculator implements WeighedRowWeightCalculator {
     /**
-     * Класс, по которому в самом начале выполнялся запрос
-     */
-    private final OWLClass initialFromClass;
-    /**
      * Множители весов - класс на множитель. Значения получаем из аннотации
      */
     private Map<OWLClass, Double> weightMultipliers = new HashMap<>();
@@ -36,8 +32,6 @@ public class FuzzyTaxonomyRowWeightCalculator implements WeighedRowWeightCalcula
     private final ExceptionWrapperService wrapperService;
 
     public FuzzyTaxonomyRowWeightCalculator(OWLClass initialFromClass) {
-        this.initialFromClass = initialFromClass;
-        //
         fuzzyOWLService = InjectionUtils.getInstance(FuzzyOWLService.class);
         wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
         //

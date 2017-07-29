@@ -1,10 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
@@ -13,10 +8,17 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.related.binding.FuzzyQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.weight.calculator.FuzzyTaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by abarmin on 25.06.17.
@@ -29,7 +31,11 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
     private final RelatedQueriesCreator queriesCreator;
 
     @Inject
-    public FuzzyTaxonomyProcessor(@FuzzyQueryCreator RelatedQueriesCreator queriesCreator) {
+    public FuzzyTaxonomyProcessor(@FuzzyQueryCreator RelatedQueriesCreator queriesCreator,
+                                  final OWLService owlService,
+                                  final ExceptionWrapperService wrapperService,
+                                  final SparqlQueryConverter sparqlQueryConverter) {
+        super(owlService, wrapperService, sparqlQueryConverter);
 		this.queriesCreator = queriesCreator;
 	}
 

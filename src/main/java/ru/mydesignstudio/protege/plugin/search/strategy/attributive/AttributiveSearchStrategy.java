@@ -1,14 +1,13 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive;
 
-import java.awt.Component;
-
-import javax.inject.Inject;
-
 import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
+
+import javax.inject.Inject;
+import java.awt.Component;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -36,8 +35,8 @@ public class AttributiveSearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
-        return true;
+    public boolean canBeDisabled() {
+        return false;
     }
 
     @Override
@@ -48,5 +47,10 @@ public class AttributiveSearchStrategy implements SearchStrategy {
     @Override
     public SearchProcessor getSearchProcessor() {
         return attributiveProcessor;
+    }
+
+    @Override
+    public boolean enabledByDefault() {
+        return true;
     }
 }

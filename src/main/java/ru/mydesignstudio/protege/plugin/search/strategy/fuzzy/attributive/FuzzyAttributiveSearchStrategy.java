@@ -1,7 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.component.FuzzyAttributiveParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor.FuzzyAttributiveProcessor;
 
@@ -13,11 +16,20 @@ import java.awt.Component;
  *
  * Нечеткий поиск. Поиск по неполному совпадению текста
  */
+@VisualComponent
 public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
+    private final FuzzyAttributiveParamsComponent paramsComponent;
+    private final FuzzyAttributiveProcessor fuzzyAttributiveProcessor;
+    private final FuzzyOWLService fuzzyOWLService;
+
     @Inject
-    private FuzzyAttributiveParamsComponent paramsComponent;
-    @Inject
-    private FuzzyAttributiveProcessor fuzzyAttributiveProcessor;
+    public FuzzyAttributiveSearchStrategy(FuzzyAttributiveParamsComponent paramsComponent,
+                                          FuzzyAttributiveProcessor fuzzyAttributiveProcessor,
+                                          FuzzyOWLService fuzzyOWLService) {
+        this.paramsComponent = paramsComponent;
+        this.fuzzyAttributiveProcessor = fuzzyAttributiveProcessor;
+        this.fuzzyOWLService = fuzzyOWLService;
+    }
 
     @Override
     public String getTitle() {
@@ -30,8 +42,13 @@ public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
+    public boolean enabledByDefault() {
         return false;
+    }
+
+    @Override
+    public boolean canBeDisabled() throws ApplicationException {
+        return fuzzyOWLService.isFuzzyOntology(fuzzyOWLService.getOntology());
     }
 
     @Override

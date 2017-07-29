@@ -1,8 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy;
 
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.FuzzyTaxonomyProcessor;
 
 import javax.inject.Inject;
@@ -16,8 +18,15 @@ import java.awt.Component;
  * <fuzzyOwl2 fuzzyType="concept">
  */
 public class FuzzyTaxonomySearchStrategy implements SearchStrategy {
+    private final FuzzyTaxonomyProcessor taxonomyProcessor;
+    private final FuzzyOWLService fuzzyOWLService;
+
     @Inject
-    private FuzzyTaxonomyProcessor taxonomyProcessor;
+    public FuzzyTaxonomySearchStrategy(FuzzyTaxonomyProcessor taxonomyProcessor,
+                                       FuzzyOWLService fuzzyOWLService) {
+        this.taxonomyProcessor = taxonomyProcessor;
+        this.fuzzyOWLService = fuzzyOWLService;
+    }
 
     @Override
     public String getTitle() {
@@ -30,8 +39,13 @@ public class FuzzyTaxonomySearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
+    public boolean enabledByDefault() {
         return false;
+    }
+
+    @Override
+    public boolean canBeDisabled() throws ApplicationException {
+        return fuzzyOWLService.isFuzzyOntology(fuzzyOWLService.getOntology());
     }
 
     @Override

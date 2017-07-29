@@ -6,8 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.IOUtils;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
@@ -41,12 +39,13 @@ import java.util.Collection;
  */
 @Component
 public class SearchStrategySerializationServiceImpl implements SearchStrategySerializationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchStrategySerializationServiceImpl.class);
-
     private Gson serializer;
+    private final SearchStrategyService strategyService;
 
     @Inject
-    private SearchStrategyService strategyService;
+    public SearchStrategySerializationServiceImpl(SearchStrategyService strategyService) {
+        this.strategyService = strategyService;
+    }
 
     @PostConstruct
     public void init() {

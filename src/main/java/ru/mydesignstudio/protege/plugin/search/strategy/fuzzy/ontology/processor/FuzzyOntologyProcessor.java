@@ -7,6 +7,7 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
@@ -39,17 +40,23 @@ import java.util.Map;
  *
  * Процессор для поиска с учетом лингвистических переменных
  */
+@Component
 public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProcessorParams> {
-    @Inject
-    private OWLService owlService;
-    @Inject
-    private FuzzyOWLService fuzzyOWLService;
-    @Inject
-    private DatatypeCalculator datatypeCalculator;
-    @Inject
-    private ExceptionWrapperService wrapperService;
+    private final OWLService owlService;
+    private final FuzzyOWLService fuzzyOWLService;
+    private final DatatypeCalculator datatypeCalculator;
+    private final ExceptionWrapperService wrapperService;
 
     private Collection<WherePart> fuzzyConditions = new ArrayList<>();
+
+    @Inject
+    public FuzzyOntologyProcessor(OWLService owlService, FuzzyOWLService fuzzyOWLService,
+                                  DatatypeCalculator datatypeCalculator, ExceptionWrapperService wrapperService) {
+        this.owlService = owlService;
+        this.fuzzyOWLService = fuzzyOWLService;
+        this.datatypeCalculator = datatypeCalculator;
+        this.wrapperService = wrapperService;
+    }
 
     @Override
     public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyOntologyProcessorParams strategyParams) throws ApplicationException {

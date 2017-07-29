@@ -38,7 +38,7 @@ public class Validation {
      * Выбросить исключение с указанным сообщением
      * @param message - сообщение исключения
      */
-    private static final void fail(String message) {
+    private static void fail(String message) {
         throw new IllegalArgumentException(message);
     }
 }

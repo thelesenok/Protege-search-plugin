@@ -1,8 +1,11 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.FuzzyOntologyProcessor;
 
 import javax.inject.Inject;
@@ -11,9 +14,17 @@ import java.awt.Component;
 /**
  * Created by abarmin on 13.05.17.
  */
+@VisualComponent
 public class FuzzyOntologySearchStrategy implements SearchStrategy {
+    private final FuzzyOntologyProcessor fuzzyProcessor;
+    private final FuzzyOWLService fuzzyOWLService;
+
     @Inject
-    private FuzzyOntologyProcessor fuzzyProcessor;
+    public FuzzyOntologySearchStrategy(FuzzyOntologyProcessor fuzzyProcessor,
+                                       FuzzyOWLService fuzzyOWLService) {
+        this.fuzzyProcessor = fuzzyProcessor;
+        this.fuzzyOWLService = fuzzyOWLService;
+    }
 
     @Override
     public String getTitle() {
@@ -26,8 +37,13 @@ public class FuzzyOntologySearchStrategy implements SearchStrategy {
     }
 
     @Override
-    public boolean isRequired() {
+    public boolean enabledByDefault() {
         return false;
+    }
+
+    @Override
+    public boolean canBeDisabled() throws ApplicationException {
+        return fuzzyOWLService.isFuzzyOntology(fuzzyOWLService.getOntology());
     }
 
     @Override

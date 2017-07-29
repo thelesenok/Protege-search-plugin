@@ -1,12 +1,26 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import com.google.common.eventbus.Subscribe;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
+import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
+import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
+import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
+import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
+import ru.mydesignstudio.protege.plugin.search.service.EventBus;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.CleanConditionsEvent;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.ui.event.concat.ConcatOperationChangeEvent;
+import ru.mydesignstudio.protege.plugin.search.utils.Action;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -19,31 +33,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.semanticweb.owlapi.model.OWLClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.eventbus.Subscribe;
-
-import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
-import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
-import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
-import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
-import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
-import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
-import ru.mydesignstudio.protege.plugin.search.domain.OWLDomainClass;
-import ru.mydesignstudio.protege.plugin.search.service.EventBus;
-import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.event.CleanConditionsEvent;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.renderer.JComboboxIconRenderer;
-import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
-import ru.mydesignstudio.protege.plugin.search.ui.event.concat.ConcatOperationChangeEvent;
-import ru.mydesignstudio.protege.plugin.search.utils.Action;
-import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -53,7 +49,6 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttributiveSearchStrategyParamsComponent.class);
     
     private final OWLService owlService;
-    private final ExceptionWrapperService wrapperService;
     private final AttributiveSearchParamsTable criteriaTable;
 
     private EventBus eventBus = EventBus.getInstance();
@@ -73,11 +68,8 @@ public class AttributiveSearchStrategyParamsComponent extends JPanel implements 
     private boolean useAttributeWeights = false;
 
     @Inject
-    public AttributiveSearchStrategyParamsComponent(OWLService owlService, 
-    		ExceptionWrapperService wrapperService, AttributiveSearchParamsTable criteriaTable) {
-    	
+    public AttributiveSearchStrategyParamsComponent(OWLService owlService, AttributiveSearchParamsTable criteriaTable) {
 	    	this.owlService = owlService;
-	    	this.wrapperService = wrapperService;
 	    	this.criteriaTable = criteriaTable;
 	    	//
 	    	setLayout(new BorderLayout());

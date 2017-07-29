@@ -1,10 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
@@ -12,11 +7,18 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.EqualClassesQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.NearestNeighboursQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by abarmin on 04.05.17.
@@ -33,10 +35,13 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
 
     @Inject
 	public TaxonomyProcessor(
+	        OWLService owlService,
+            ExceptionWrapperService wrapperService,
+            SparqlQueryConverter sparqlQueryConverter,
 			@NearestNeighboursQueryCreator RelatedQueriesCreator nearestNeighboursCreator, 
 			@EqualClassesQueryCreator RelatedQueriesCreator equalClassesCreator,
 			TaxonomyRowWeightCalculator weightCalculator) {
-    	
+    	super(owlService, wrapperService, sparqlQueryConverter);
 		this.nearestNeighboursCreator = nearestNeighboursCreator;
 		this.equalClassesCreator = equalClassesCreator;
 		this.weightCalculator = weightCalculator;

@@ -15,14 +15,13 @@ import java.awt.Label;
  * Компонент с настройками нечеткого поиска
  */
 public class FuzzyAttributiveParamsComponent extends JPanel implements SearchStrategyComponent<FuzzyAttributiveProcessorParams> {
-    private final FuzzyAttributiveProcessorParams processorParams = new FuzzyAttributiveProcessorParams();
     private JTextField fuzzyMaskSize;
 
     public FuzzyAttributiveParamsComponent() {
         setLayout(new FlowLayout());
         add(new Label("Fuzzy mask size"));
         add(createMaskSizeComponent());
-        setSearchParams(processorParams);
+        setSearchParams(new FuzzyAttributiveProcessorParams());
     }
 
     private Component createMaskSizeComponent() {

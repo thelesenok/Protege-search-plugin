@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.service.search.strategy;
 
+import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.service.SearchStrategyRegistry;
@@ -21,21 +22,32 @@ import java.util.List;
 /**
  * Created by abarmin on 03.01.17.
  */
+@Component
 public class SearchStrategyServiceImpl implements SearchStrategyService {
+    private final SearchStrategyRegistry registry;
+    private final AttributiveSearchStrategy attributiveSearchStrategy;
+    private final RelationalSearchStrategy relationalSearchStrategy;
+    private final TaxonomySearchStrategy taxonomySearchStrategy;
+    private final FuzzyAttributiveSearchStrategy fuzzyAttributiveSearchStrategy;
+    private final FuzzyOntologySearchStrategy fuzzyOntologySearchStrategy;
+    private final FuzzyTaxonomySearchStrategy fuzzyTaxonomySearchStrategy;
+
     @Inject
-    private SearchStrategyRegistry registry;
-    @Inject
-    private AttributiveSearchStrategy attributiveSearchStrategy;
-    @Inject
-    private RelationalSearchStrategy relationalSearchStrategy;
-    @Inject
-    private TaxonomySearchStrategy taxonomySearchStrategy;
-    @Inject
-    private FuzzyAttributiveSearchStrategy fuzzyAttributiveSearchStrategy;
-    @Inject
-    private FuzzyOntologySearchStrategy fuzzyOntologySearchStrategy;
-    @Inject
-    private FuzzyTaxonomySearchStrategy fuzzyTaxonomySearchStrategy;
+    public SearchStrategyServiceImpl(SearchStrategyRegistry registry,
+                                     AttributiveSearchStrategy attributiveSearchStrategy,
+                                     RelationalSearchStrategy relationalSearchStrategy,
+                                     TaxonomySearchStrategy taxonomySearchStrategy,
+                                     FuzzyAttributiveSearchStrategy fuzzyAttributiveSearchStrategy,
+                                     FuzzyOntologySearchStrategy fuzzyOntologySearchStrategy,
+                                     FuzzyTaxonomySearchStrategy fuzzyTaxonomySearchStrategy) {
+        this.registry = registry;
+        this.attributiveSearchStrategy = attributiveSearchStrategy;
+        this.relationalSearchStrategy = relationalSearchStrategy;
+        this.taxonomySearchStrategy = taxonomySearchStrategy;
+        this.fuzzyAttributiveSearchStrategy = fuzzyAttributiveSearchStrategy;
+        this.fuzzyOntologySearchStrategy = fuzzyOntologySearchStrategy;
+        this.fuzzyTaxonomySearchStrategy = fuzzyTaxonomySearchStrategy;
+    }
 
     @PostConstruct
     public void init() {
