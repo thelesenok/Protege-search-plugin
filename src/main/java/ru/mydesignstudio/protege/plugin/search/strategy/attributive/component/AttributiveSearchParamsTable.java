@@ -1,20 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.attributive.component;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-
+import com.google.common.eventbus.Subscribe;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataOneOf;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -25,12 +11,10 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.eventbus.Subscribe;
-
 import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
+import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
@@ -56,10 +40,23 @@ import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.re
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.FuzzyAttributiveSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.FuzzyOntologySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.RelationalSearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.TaxonomySearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.ui.event.StrategyChangeEvent;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+
+import javax.inject.Inject;
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by abarmin on 10.01.17.
@@ -84,6 +81,10 @@ public class AttributiveSearchParamsTable extends JTable {
      */
     private boolean isRelationalLookupEnabled = false;
     /**
+     * Is taxonomy lookup enabled mark
+     */
+    private boolean isTaxonomyLookupEnabled = false;
+    /**
      * Признак включенности нечеткого поиска по атрибутам
      */
     private boolean isFuzzyAttributiveLookupEnabled = false;
@@ -99,6 +100,10 @@ public class AttributiveSearchParamsTable extends JTable {
         this.wrapperService = wrapperService;
         //
         this.selectQuery = new SelectQuery();
+        if (CollectionUtils.isNotEmpty(getAvailableClassesForLookup())) {
+            final OWLClass firstClass = getAvailableClassesForLookup().iterator().next();
+            selectQuery.setFrom(new FromType(firstClass));
+        }
         this.selectQuery.addWherePart(new WherePart());
         paramsTableModel = new CriteriaTableModel(selectQuery);
         this.setModel(paramsTableModel);
@@ -135,13 +140,18 @@ public class AttributiveSearchParamsTable extends JTable {
     private Collection<OWLClass> getAvailableClassesForLookup() {
         try {
             final Collection<OWLClass> classes = owlService.getClasses();
-            if (isRelationalLookupEnabled) {
+            if (isRelationalLookupEnabled || isTaxonomyLookupEnabled) {
                 return classes;
             }
             return CollectionUtils.filter(classes, new Specification<OWLClass>() {
                 @Override
                 public boolean isSatisfied(OWLClass owlClass) {
-                    return owlClass == selectQuery.getFrom().getOwlClass();
+                    return selectQuery.getFrom() == null ?
+                            true :
+                            OWLUtils.equals(
+                                    owlClass,
+                                    selectQuery.getFrom().getOwlClass()
+                            );
                 }
             });
         } catch (ApplicationException e) {
@@ -334,7 +344,13 @@ public class AttributiveSearchParamsTable extends JTable {
     @Subscribe
     public void onStrategyToggleEvent(StrategyChangeEvent event) {
         try {
-            if (RelationalSearchStrategy.class.equals(event.getStrategy().getClass())) {
+            if (TaxonomySearchStrategy.class.equals(event.getStrategy().getClass())) {
+                isTaxonomyLookupEnabled = event.isSelected();
+                /**
+                 * Update class selectors
+                 */
+                updateClassEditors();
+            }else if (RelationalSearchStrategy.class.equals(event.getStrategy().getClass())) {
                 isRelationalLookupEnabled = event.isSelected();
                 // надо обновить все выбиралки классов, чтобы
                 // там на выбор был только текущий класс
