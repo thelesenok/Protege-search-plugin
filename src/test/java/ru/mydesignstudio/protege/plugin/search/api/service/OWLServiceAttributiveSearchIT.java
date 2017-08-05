@@ -4,9 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLProperty;
-import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
@@ -20,10 +17,8 @@ import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.AttributiveSearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.test.GuiceJUnit4Runner;
-import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.test.TestUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
-import ru.mydesignstudio.protege.plugin.search.utils.Specification;
-import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -51,38 +46,14 @@ public class OWLServiceAttributiveSearchIT {
         attributiveStrategy = InjectionUtils.getInstance(AttributiveSearchStrategy.class);
     }
 
-    private OWLClass getOwlClass(String className) throws ApplicationException {
-        return CollectionUtils.findFirst(owlService.getClasses(), new Specification<OWLClass>() {
-            @Override
-            public boolean isSatisfied(OWLClass owlClass) {
-                return StringUtils.equalsIgnoreCase(
-                        owlClass.getIRI().getFragment(),
-                        className
-                );
-            }
-        });
-    }
-
-    private OWLProperty getOwlProperty(OWLClass owlClass, String propertyName) throws ApplicationException {
-        return CollectionUtils.findFirst(owlService.getDataProperties(owlClass), new Specification<OWLDataProperty>() {
-            @Override
-            public boolean isSatisfied(OWLDataProperty owlDataProperty) {
-                return StringUtils.equalsIgnoreCase(
-                        owlDataProperty.getIRI().getFragment(),
-                        propertyName
-                );
-            }
-        });
-    }
-
     @Test
     public void testFindFelixCatByAttributeWithEqualsCondition() throws Exception {
         final SelectQuery selectQuery = new SelectQuery();
-        final OWLClass classToSelect = getOwlClass("Cat");
+        final OWLClass classToSelect = TestUtils.getOwlClass(owlService,"Cat");
         selectQuery.setFrom(new FromType(classToSelect));
         selectQuery.addWherePart(new WherePart(
                 classToSelect,
-                getOwlProperty(classToSelect, "says"),
+                TestUtils.getOwlProperty(owlService, classToSelect, "says"),
                 LogicalOperation.EQUALS,
                 "meow"
         ));
@@ -103,11 +74,11 @@ public class OWLServiceAttributiveSearchIT {
     @Test
     public void testFindFelixCatByAttributeWithLikeCondition() throws Exception {
         final SelectQuery selectQuery = new SelectQuery();
-        final OWLClass classToSelect = getOwlClass("Cat");
+        final OWLClass classToSelect = TestUtils.getOwlClass(owlService, "Cat");
         selectQuery.setFrom(new FromType(classToSelect));
         selectQuery.addWherePart(new WherePart(
                 classToSelect,
-                getOwlProperty(classToSelect, "says"),
+                TestUtils.getOwlProperty(owlService, classToSelect, "says"),
                 LogicalOperation.LIKE,
                 "me"
         ));

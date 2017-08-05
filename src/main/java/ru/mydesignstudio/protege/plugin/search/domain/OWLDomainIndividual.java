@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 /**
  * Created by abarmin on 05.01.17.
  */
+@Deprecated
 public class OWLDomainIndividual implements OWLDomainObject {
     private final OWLNamedIndividual namedIndividual;
 

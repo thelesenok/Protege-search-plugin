@@ -21,15 +21,8 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Component;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -193,7 +186,7 @@ public class SearchParamsPane extends JPanel {
     }
 
     /**
-     * Параметры поиска, доступные в указанных стратегиях
+     * Параметры поиска, доступные в¶ указанных стратегиях
      * @param strategies - сортированные стратегии
      * @return
      */

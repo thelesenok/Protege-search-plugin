@@ -2,6 +2,7 @@ package ru.mydesignstudio.protege.plugin.search.api.query;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLProperty;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 
 /**
  * Created by abarmin on 04.01.17.
@@ -24,6 +25,19 @@ public class WherePart extends SelectField implements QueryObject {
     private Object value;
 
     public WherePart() {
+    }
+
+    public WherePart(LogicalOperation concatOperation, OWLClass owlClass, OWLProperty property, LogicalOperation logicalOperation, Object value) {
+        super(owlClass, property);
+        //
+        Validation.assertTrue(String.format(
+                "%s is not a concat operation",
+                concatOperation
+        ), LogicalOperation.getConcatOperations().contains(concatOperation));
+        //
+        this.concatOperation = concatOperation;
+        this.logicalOperation = logicalOperation;
+        this.value = value;
     }
 
     public WherePart(OWLClass owlClass, OWLProperty property, LogicalOperation logicalOperation, Object value) {

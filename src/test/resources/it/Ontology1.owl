@@ -13,13 +13,25 @@
     <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
     <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
     <Declaration>
+        <Class IRI="#Gender"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#gender"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MaleGender"/>
+    </Declaration>
+    <Declaration>
         <NamedIndividual IRI="#NyakoCat"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#Felix"/>
+        <NamedIndividual IRI="#FemaleGender"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#says"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Felix"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Cat"/>
@@ -33,9 +45,27 @@
         <NamedIndividual IRI="#Felix"/>
     </ClassAssertion>
     <ClassAssertion>
+        <Class IRI="#Gender"/>
+        <NamedIndividual IRI="#FemaleGender"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Gender"/>
+        <NamedIndividual IRI="#MaleGender"/>
+    </ClassAssertion>
+    <ClassAssertion>
         <Class IRI="#Cat"/>
         <NamedIndividual IRI="#NyakoCat"/>
     </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#gender"/>
+        <NamedIndividual IRI="#Felix"/>
+        <NamedIndividual IRI="#MaleGender"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#gender"/>
+        <NamedIndividual IRI="#NyakoCat"/>
+        <NamedIndividual IRI="#FemaleGender"/>
+    </ObjectPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#says"/>
         <NamedIndividual IRI="#Felix"/>
@@ -46,6 +76,14 @@
         <NamedIndividual IRI="#NyakoCat"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">nya</Literal>
     </DataPropertyAssertion>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#gender"/>
+        <Class IRI="#Cat"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#gender"/>
+        <Class IRI="#Gender"/>
+    </ObjectPropertyRange>
     <DataPropertyDomain>
         <DataProperty IRI="#says"/>
         <Class IRI="#Cat"/>
