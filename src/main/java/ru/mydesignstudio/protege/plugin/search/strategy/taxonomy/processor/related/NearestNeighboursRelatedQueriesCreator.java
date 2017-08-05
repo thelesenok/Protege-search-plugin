@@ -1,16 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import javax.inject.Inject;
-
 import org.semanticweb.owlapi.model.OWLClass;
-
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.FromType;
@@ -24,6 +14,13 @@ import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.Taxon
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Created by abarmin on 24.06.17.
@@ -48,13 +45,14 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
      * @throws ApplicationException is hierarchy can no be build
      */
     private Collection<OWLDomainClass> getClassesHierarchy(OWLDomainClass domainClass) throws ApplicationException {
-	    	final Collection<OWLClass> classesHierarchy = hierarchyBuilder.build(domainClass.getOwlClass());
-	    	return CollectionUtils.map(classesHierarchy, new Transformer<OWLClass, OWLDomainClass>() {
-	    		@Override
-	    		public OWLDomainClass transform(OWLClass item) {
-	    			return new OWLDomainClass(item);
-	    		}    			
-	    	});
+        final Collection<OWLClass> classesHierarchy = CollectionUtils.reverse(
+                hierarchyBuilder.build(domainClass.getOwlClass()));
+        return CollectionUtils.map(classesHierarchy, new Transformer<OWLClass, OWLDomainClass>() {
+            @Override
+            public OWLDomainClass transform(OWLClass item) {
+                return new OWLDomainClass(item);
+            }
+        });
     }
 
 	@Override
@@ -112,13 +110,8 @@ public class NearestNeighboursRelatedQueriesCreator implements RelatedQueriesCre
         /**
          * отрежем остальные общие вершины
          */
-        final Collection<OWLDomainClass> targetHierarchy = new LinkedList<>();
-        int index = 0;
-        for (OWLDomainClass domainClass : classesInHierarchy) {
-            if (index < proximity) {
-                targetHierarchy.add(domainClass);
-            }
-        }
+        final Collection<OWLDomainClass> targetHierarchy = CollectionUtils.subcollection(
+                classesInHierarchy, 0, proximity);
         /**
          * пойдем самым тупым путем - будем собирать общие классы
          * путем получения пути для всех имеющихся классов

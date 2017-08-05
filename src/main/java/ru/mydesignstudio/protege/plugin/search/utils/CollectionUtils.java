@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.utils.function.BinaryFunction;
 import ru.mydesignstudio.protege.plugin.search.utils.function.Function;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by abarmin on 04.01.17.
@@ -131,6 +133,50 @@ public class CollectionUtils {
             }
         }
         return target;
+    }
+
+    /**
+     * Create collection of source collection from start to end indexes
+     * @param source - source collection
+     * @param start - start index (inclusive)
+     * @param end - end index (exclusive)
+     * @param <ITEM> - collection type
+     * @return - copy of collection part
+     */
+    public static final <ITEM> Collection<ITEM> subcollection(Collection<ITEM> source, int start, int end) {
+        Validation.assertTrue("Start should be less than end", start <= end);
+        Validation.assertTrue("Start should be more or equals to zero", start >= 0);
+        Validation.assertTrue("End should be more or equals to zero", end >= 0);
+        if (start > source.size() - 1) {
+            return Collections.emptyList();
+        }
+        if (end > source.size() - 1) {
+            end = source.size();
+        }
+        final Collection<ITEM> result = new ArrayList<>(end - start);
+        int index = 0;
+        for (ITEM item : source) {
+            if (index >= start && index < end) {
+                result.add(item);
+            }
+            index++;
+            if (index >= end) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Reverse collection
+     * @param source - source collection
+     * @param <ITEM> - collection type
+     * @return - reversed collection
+     */
+    public final static <ITEM> Collection<ITEM> reverse(Collection<ITEM> source) {
+        final List<ITEM> result = new ArrayList<>(source);
+        Collections.reverse(result);
+        return result;
     }
 
     /**

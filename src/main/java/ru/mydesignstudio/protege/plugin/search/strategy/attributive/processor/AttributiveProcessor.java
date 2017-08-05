@@ -45,7 +45,7 @@ public class AttributiveProcessor extends SparqlProcessorSupport implements Sear
         /**
          * добавляем предыдущие данные
          */
-        resultSet.addResultSet(initialResultSet);
+        resultSet.addResultSet(initialResultSet, getWeightCalculator(selectQuery, strategyParams));
         /**
          * на выход
          */

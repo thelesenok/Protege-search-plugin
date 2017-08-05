@@ -100,7 +100,7 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
     private ResultSet mergeResultSets(ResultSet sourceData, Collection<ResultSet> relatedData) throws ApplicationException {
         final WeighedResultSet targetResultSet = new WeighedResultSet(sourceData, getWeightCalculator(initialQuery));
         for (ResultSet resultSet : relatedData) {
-            targetResultSet.addResultSet(resultSet);
+            targetResultSet.addResultSet(resultSet, getWeightCalculator(initialQuery));
         }
         return targetResultSet;
     }

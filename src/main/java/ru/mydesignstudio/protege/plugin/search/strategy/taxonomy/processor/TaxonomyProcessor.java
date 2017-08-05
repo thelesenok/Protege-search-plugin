@@ -1,5 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor;
 
+import org.semanticweb.owlapi.model.OWLClass;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
@@ -33,6 +35,8 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
     private TaxonomyProcessorParams processorParams;
     private Collection<SelectQuery> relatedQueries = new ArrayList<>();
 
+    private OWLClass targetClass;
+
     @Inject
 	public TaxonomyProcessor(
 	        OWLService owlService,
@@ -49,6 +53,10 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
 
 	@Override
     public SelectQuery prepareQuery(SelectQuery initialQuery, TaxonomyProcessorParams strategyParams) throws ApplicationException {
+        /**
+         * Save target class
+         */
+        this.targetClass = initialQuery.getFrom().getOwlClass();
         /**
          * сохраним параметры процессора
          */
@@ -135,11 +143,16 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
      * @return - результирующий набор данных
      */
     private ResultSet mergeResultSets(ResultSet sourceData, Collection<ResultSet> relatedData) throws ApplicationException {
-        final WeighedResultSet resultSet = new WeighedResultSet(sourceData, getRowWeightCalculator());
+        /**
+         * In accordance with application architecture, sourceData is weighted result set. If we will
+         * weight source data with current weight calculator, we will have an inconsistent value
+         */
+        Validation.assertTrue("Source data is not weighted", sourceData instanceof WeighedResultSet);
+        final WeighedResultSet weightedSourceData = (WeighedResultSet) sourceData;
         for (ResultSet relatedDatum : relatedData) {
-            resultSet.addResultSet(relatedDatum);
+            weightedSourceData.addResultSet(relatedDatum, getRowWeightCalculator());
         }
-        return resultSet;
+        return weightedSourceData;
     }
 
     /**
@@ -148,7 +161,8 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
      * @throws ApplicationException
      */
     public WeighedRowWeightCalculator getRowWeightCalculator() throws ApplicationException {
-    		weightCalculator.setProcessorParams(processorParams);
+        weightCalculator.setProcessorParams(processorParams);
+        weightCalculator.setTargetClass(targetClass);
         return weightCalculator;
     }
 }

@@ -24,11 +24,8 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  * moved to separated class and this class should only store data
  */
 public class WeighedResultSet extends SparqlResultSet implements ResultSet {
-    private final WeighedRowWeightCalculator weightCalculator;
-
     @Deprecated
     public WeighedResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) {
-        this.weightCalculator = weightCalculator;
         final ExceptionWrapperService wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
         /**
          * если нет столбца с весом, добавим его
@@ -51,7 +48,7 @@ public class WeighedResultSet extends SparqlResultSet implements ResultSet {
         wrapperService.invokeWrapped(new ExceptionWrappedCallback<Void>() {
             @Override
             public Void run() throws ApplicationException {
-                addResultSet(resultSet);
+                addResultSet(resultSet, weightCalculator);
                 return null;
             }
         });
@@ -82,9 +79,10 @@ public class WeighedResultSet extends SparqlResultSet implements ResultSet {
     /**
      * Добавить набор данных к взвешенному результату
      * @param resultSet - что добавляем
+     * @param weightCalculator - row weight calculator
      * @throws ApplicationException - в случае невозможности взвешивать строки
      */
-    public void addResultSet(ResultSet resultSet) throws ApplicationException {
+    public void addResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) throws ApplicationException {
         for (ResultSetRow sourceRow : resultSet.getRows()) {
             if (containsRow(sourceRow)) {
                 /**

@@ -1,6 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 import ru.mydesignstudio.protege.plugin.search.utils.function.BinaryFunction;
 import ru.mydesignstudio.protege.plugin.search.utils.function.Function;
@@ -9,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -61,5 +61,28 @@ public class CollectionUtilsTest {
                 return integer != null;
             }
         }));
+    }
+
+    @Test
+    public void testSubcollection() throws Exception {
+        final Collection<Integer> source = Arrays.asList(1, 2, 3, 4, 5);
+        // create empty collection
+        final Collection<Integer> subcollection = CollectionUtils.subcollection(source, 0, 0);
+        assertEquals("Collection is not empty", 0, subcollection.size());
+        // create collection with one element
+        final Collection<Integer> singleElementCollection = CollectionUtils.subcollection(source, 0, 1);
+        assertEquals("Collection contains more than one element", 1, singleElementCollection.size());
+        // create collection with end behind collection size
+        final Collection<Integer> oversizedCollection = CollectionUtils.subcollection(source, 2, 10);
+        assertEquals("Collection contains more elements than expected", 3, oversizedCollection.size());
+    }
+
+    @Test
+    public void testReverse() throws Exception {
+        final Collection<Integer> source = Arrays.asList(1, 2, 3);
+        final Collection<Integer> targetCollection = Arrays.asList(3, 2, 1);
+        //
+        final Collection<Integer> reversed = CollectionUtils.reverse(source);
+        assertEquals("Collections are not equal", targetCollection, reversed);
     }
 }
