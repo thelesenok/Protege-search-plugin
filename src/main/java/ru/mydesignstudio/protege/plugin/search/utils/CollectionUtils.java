@@ -31,10 +31,10 @@ public class CollectionUtils {
         if (source.size() == 0) {
             return false;
         }
-        return some(source, new Specification<ITEM>() {
+        return CollectionUtils.some(source, new Specification<ITEM>() {
             @Override
             public boolean isSatisfied(ITEM item) {
-                return (item != null);
+                return item != null;
             }
         });
     }
@@ -116,7 +116,7 @@ public class CollectionUtils {
     }
 
     public static final <ITEM> boolean every(Collection<ITEM> source, Specification<ITEM> specification) {
-        boolean result = true;
+        boolean result = CollectionUtils.isNotEmpty(source);
         for (ITEM item : source) {
             result = result && specification.isSatisfied(item);
         }

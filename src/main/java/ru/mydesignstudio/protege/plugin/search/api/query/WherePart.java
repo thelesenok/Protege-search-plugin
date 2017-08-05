@@ -1,5 +1,8 @@
 package ru.mydesignstudio.protege.plugin.search.api.query;
 
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLProperty;
+
 /**
  * Created by abarmin on 04.01.17.
  *
@@ -19,6 +22,15 @@ public class WherePart extends SelectField implements QueryObject {
      * С чем сравниваем
      */
     private Object value;
+
+    public WherePart() {
+    }
+
+    public WherePart(OWLClass owlClass, OWLProperty property, LogicalOperation logicalOperation, Object value) {
+        super(owlClass, property);
+        this.logicalOperation = logicalOperation;
+        this.value = value;
+    }
 
     public LogicalOperation getConcatOperation() {
         return concatOperation;

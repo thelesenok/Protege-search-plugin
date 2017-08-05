@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.OWLModelManagerImpl;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
@@ -33,7 +36,9 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
@@ -646,4 +651,17 @@ public class OWLServiceImpl implements OWLService {
 			}
 		});
 	}
+
+    @Override
+    public OWLOntology loadOntology(File ontologyFile) throws ApplicationException {
+        final OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+        try {
+            final OWLOntology ontology = ontologyManager.loadOntologyFromOntologyDocument(ontologyFile);
+            OntologyConfig.setOntology(ontology);
+            OntologyConfig.setOntologyManager(ontologyManager);
+            return ontology;
+        } catch (OWLOntologyCreationException e) {
+            throw new ApplicationException(e);
+        }
+    }
 }

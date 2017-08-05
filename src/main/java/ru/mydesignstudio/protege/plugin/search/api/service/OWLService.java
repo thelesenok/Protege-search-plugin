@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
@@ -22,6 +23,13 @@ import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
  * Created by abarmin on 03.01.17.
  */
 public interface OWLService {
+    /**
+     * Load ontology from file
+     * @param ontologyFile - file that stores ontology
+     * @return - loaded ontology object
+     * @throws ApplicationException - if ontology can not be loaded
+     */
+    OWLOntology loadOntology(File ontologyFile) throws ApplicationException;
     /**
      * Онтология, с которой в данной момент работаем
      * @return - объект онтологии

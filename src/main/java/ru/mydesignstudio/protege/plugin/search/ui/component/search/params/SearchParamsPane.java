@@ -391,7 +391,7 @@ public class SearchParamsPane extends JPanel {
     private void selectRequiredStrategies() throws ApplicationException {
         final Collection<SearchStrategy> strategies = strategyService.getStrategies();
         for (SearchStrategy strategy : strategies) {
-            if (!strategy.canBeDisabled()) {
+            if (strategy.enabledByDefault()) {
                 eventBus.publish(new StrategyChangeEvent(strategy, true));
             }
         }

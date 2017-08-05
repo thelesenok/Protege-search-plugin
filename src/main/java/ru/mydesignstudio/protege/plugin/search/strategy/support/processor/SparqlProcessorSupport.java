@@ -50,7 +50,7 @@ public abstract class SparqlProcessorSupport {
     public SparqlReasoner getReasoner() throws ApplicationException {
         if (reasonerHolder == null) {
             final SparqlInferenceFactory factory = new BasicSparqlReasonerFactory();
-            reasonerHolder = factory.createReasoner(OntologyConfig.getModelManager().getOWLOntologyManager());
+            reasonerHolder = factory.createReasoner(OntologyConfig.getOntologyManager());
             try {
                 reasonerHolder.precalculate();
             } catch (SparqlReasonerException e) {

@@ -30,7 +30,7 @@ public class SwrlPrefixResolver {
             field.setAccessible(true);
             prefixedString = (String) field.get(iri);
         } catch (Exception e) {
-            prefixedString = iri.getStart();
+            throw new ApplicationException(e);
         }
         return extractPrefix(prefixedString);
     }

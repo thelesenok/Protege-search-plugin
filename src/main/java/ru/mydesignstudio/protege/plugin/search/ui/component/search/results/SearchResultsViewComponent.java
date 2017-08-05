@@ -56,7 +56,7 @@ public class SearchResultsViewComponent extends JPanel {
         try {
             final ResultSet resultSet = owlService.search(event.getLookupParams());
             createResultsTable(resultSet, event.getLookupParams());
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             LOGGER.error("Can't execute lookup request", e);
             throw new ApplicationRuntimeException(e);
         }
