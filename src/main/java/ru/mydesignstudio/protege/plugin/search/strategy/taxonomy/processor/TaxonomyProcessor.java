@@ -64,6 +64,10 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
         Validation.assertNotNull("Initial query not provided", initialQuery);
         Validation.assertNotNull("Strategy params not provided", strategyParams);
         Validation.assertNotNull("All other strategies params not provided", allParameters);
+        Validation.assertFalse("Nearest neighbours and equal classes methods can not be enabled simultaneously",
+                strategyParams.isNearestNeighboursMethodEnabled() &&
+                        strategyParams.isEqualsClassesMethodEnabled()
+        );
 
         /**
          * Get attributive processor params for future weight calculations
@@ -137,6 +141,10 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
         Validation.assertNotNull("Initial result set not provided", initialResultSet);
         Validation.assertNotNull("Select query not provided", selectQuery);
         Validation.assertNotNull("Strategy params not provided", strategyParams);
+        Validation.assertFalse("Nearest neighbours and equal classes methods can not be enabled simultaneously",
+                strategyParams.isNearestNeighboursMethodEnabled() &&
+                        strategyParams.isEqualsClassesMethodEnabled()
+        );
 
         /**
          * Execute queries using related queries. If result sets are not weighted, weight them

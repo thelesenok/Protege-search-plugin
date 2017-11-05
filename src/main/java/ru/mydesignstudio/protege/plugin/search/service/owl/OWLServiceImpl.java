@@ -52,6 +52,7 @@ import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 import uk.ac.manchester.cs.owl.owlapi.concurrent.ConcurrentOWLOntologyImpl;
 
@@ -620,7 +621,7 @@ public class OWLServiceImpl implements OWLService {
                         }
                     }
             );
-            final Collection<OWLClass> foundClasses = CollectionUtils.map(
+            equalClasses.addAll(CollectionUtils.map(
                     CollectionUtils.flatMap(unions, new Transformer<OWLObjectUnionOf, Collection<OWLClassExpression>>() {
                         @Override
                         public Collection<OWLClassExpression> transform(OWLObjectUnionOf item) {
@@ -633,8 +634,35 @@ public class OWLServiceImpl implements OWLService {
                             return (OWLClass) item;
                         }
                     }
-            );
-            equalClasses.addAll(foundClasses);
+            ));
+            /**
+             * Axioms like (Project equals to Product)
+             */
+            equalClasses.addAll(
+                    CollectionUtils.filter(
+                            CollectionUtils.map(
+                                    CollectionUtils.filter(axiom.getClassExpressions(), new Specification<OWLClassExpression>() {
+                                        @Override
+                                        public boolean isSatisfied(OWLClassExpression expression) {
+                                            return expression instanceof OWLClassImpl;
+                                        }
+                                    }),
+                                    new Transformer<OWLClassExpression, OWLClass>() {
+                                        @Override
+                                        public OWLClass transform(OWLClassExpression item) {
+                                            return (OWLClass) item;
+                                        }
+                                    }
+                            ), new Specification<OWLClass>() {
+                                @Override
+                                public boolean isSatisfied(OWLClass foundClass) {
+                                    return !OWLUtils.equals(
+                                            foundClass,
+                                            owlClass
+                                    );
+                                }
+                            }
+                    ));
         }
         return equalClasses;
     }

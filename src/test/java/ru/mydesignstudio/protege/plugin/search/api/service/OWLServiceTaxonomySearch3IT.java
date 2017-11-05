@@ -57,7 +57,6 @@ public class OWLServiceTaxonomySearch3IT {
 
     @Test
     public void testFindHeroesByLegsCount() throws Exception {
-        final OWLClass duckClass = TestUtils.getOwlClass(owlService, "Duck");
         final OWLClass dogClass = TestUtils.getOwlClass(owlService, "Dog");
         //
         final SelectQuery selectQuery = new SelectQuery();
@@ -71,6 +70,7 @@ public class OWLServiceTaxonomySearch3IT {
         //
         final TaxonomyProcessorParams taxonomyProcessorParams = new TaxonomyProcessorParams();
         taxonomyProcessorParams.setEqualsClassesMethodEnabled(false);
+        taxonomyProcessorParams.setNearestNeighboursMethodEnabled(true);
         taxonomyProcessorParams.setProximity(2);
         final Collection<LookupParam> lookupParams = Arrays.asList(
                 new LookupParam(attributiveStrategy, new AttributiveProcessorParams(selectQuery, false)),

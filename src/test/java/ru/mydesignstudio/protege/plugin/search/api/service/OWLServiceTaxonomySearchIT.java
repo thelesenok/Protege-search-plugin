@@ -114,7 +114,8 @@ public class OWLServiceTaxonomySearchIT {
                 "Sharik"
         ));
         final TaxonomyProcessorParams taxonomyProcessorParams = new TaxonomyProcessorParams();
-        taxonomyProcessorParams.setEqualsClassesMethodEnabled(true);
+        taxonomyProcessorParams.setEqualsClassesMethodEnabled(false);
+        taxonomyProcessorParams.setNearestNeighboursMethodEnabled(true);
         taxonomyProcessorParams.setProximity(2);
         final Collection<LookupParam> lookupParams = new ArrayList<>();
         lookupParams.add(new LookupParam(attributiveStrategy,
