@@ -1,13 +1,15 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor;
 
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
-import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.weight.calculator.FuzzyRowWeightCalculator;
 
 import java.util.ArrayList;
@@ -21,8 +23,18 @@ import java.util.Collection;
 public class FuzzyAttributiveProcessor implements SearchProcessor<FuzzyAttributiveProcessorParams> {
     private FuzzyAttributiveProcessorParams processorParams;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyAttributiveProcessorParams strategyParams) throws ApplicationException {
+    public SelectQuery prepareQuery(SelectQuery initialQuery,
+                                    FuzzyAttributiveProcessorParams strategyParams,
+                                    Collection<? extends SearchProcessorParams> allParameters) throws ApplicationException {
+
+        Validation.assertNotNull("Initial query not provided", initialQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+        Validation.assertNotNull("Other strategies parameters not provided", allParameters);
+
         processorParams = strategyParams;
         /**
          * отберем все параметры, которые содержат fuzzy условия,

@@ -5,11 +5,14 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLProperty;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.config.OntologyConfig;
 import ru.mydesignstudio.protege.plugin.search.reasoner.sparql.BasicSparqlReasonerFactory;
@@ -129,5 +132,24 @@ public abstract class SparqlProcessorSupport {
                 });
             }
         });
+    }
+
+    /**
+     * Convert non-weighted result set to weighted. If provided result set is already weighted, it will
+     * be returned as is.
+     * @param dataResultSet result set to weight
+     * @param weightCalculator row weight calculator
+     * @return weighted result set
+     */
+    protected WeighedResultSet toWeightedResultSet(ResultSet dataResultSet,
+                                                   WeighedRowWeightCalculator weightCalculator) {
+
+        Validation.assertNotNull("Result set not provided", dataResultSet);
+        Validation.assertNotNull("Row weight calculator not provided", weightCalculator);
+
+        if (dataResultSet instanceof WeighedResultSet) {
+            return (WeighedResultSet) dataResultSet;
+        }
+        return new WeighedResultSet(dataResultSet, weightCalculator);
     }
 }

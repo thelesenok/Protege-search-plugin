@@ -1,9 +1,11 @@
 package ru.mydesignstudio.protege.plugin.search.api.search.processor;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
+import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
+
+import java.util.Collection;
 
 /**
  * Created by abarmin on 12.03.17.
@@ -14,14 +16,16 @@ import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProces
  */
 public interface SearchProcessor<PARAMS extends SearchProcessorParams> {
     /**
-     * Подготовить запрос для поиска на основе предыдущего запроса
+     * Prepare query based on parameters of previous strategies.
      *
-     * @param initialQuery
-     * @param strategyParams
+     * @param initialQuery initial query that user wrote
+     * @param strategyParams current strategy parameter
+     * @param allParameters parameters for all strategies
      * @return
      * @throws ApplicationException
      */
-    SelectQuery prepareQuery(SelectQuery initialQuery, PARAMS strategyParams) throws ApplicationException;
+    SelectQuery prepareQuery(SelectQuery initialQuery, PARAMS strategyParams,
+                             Collection<? extends SearchProcessorParams> allParameters) throws ApplicationException;
 
     /**
      * Отобрать данные из онтологии на основе предыдущих данных
