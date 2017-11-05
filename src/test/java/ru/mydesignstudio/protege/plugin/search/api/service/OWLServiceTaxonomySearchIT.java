@@ -54,6 +54,11 @@ public class OWLServiceTaxonomySearchIT {
         taxonomyStrategy = InjectionUtils.getInstance(TaxonomySearchStrategy.class);
     }
 
+    /**
+     * We are looking for Matroskin can by cat's name. Name is equals to "Matroskin", we are
+     * checking if cat found and has necessary name. Also we are checking if weight of found row is 1.
+     * @throws Exception
+     */
     @Test
     public void testFindMatroskinCatWithEnabledTaxonomySearch() throws Exception {
         final SelectQuery selectQuery = new SelectQuery();
@@ -86,6 +91,16 @@ public class OWLServiceTaxonomySearchIT {
                 weightCalculator.calculate(weighedRow.getWeight()), 0.0);
     }
 
+    /**
+     * We are looking for Sharik by cat's name. In this test we are checking if dog found, dog's name
+     * is Sharkik, dog's class is Dog. Weight of dog should be equals to 5/6 because property "name" is common for
+     * both classes and we found Dog by this attribute (for attribute search weight is 1). Also we used
+     * taxonomy search which gives us 2/3 (2 of 3 nodes in hierarchy are common). Total weight is (1 + 2/3)/2 = 5/6
+     *
+     * Olesya approved and said "We will not change this logic anymore".
+     *
+     * @throws Exception
+     */
     @Test
     public void testFindSharikDogByCatParamsWithTaxonomyStrategy() throws Exception {
         final SelectQuery selectQuery = new SelectQuery();
@@ -113,14 +128,15 @@ public class OWLServiceTaxonomySearchIT {
         final IRI foundDogRow = (IRI) row.getValue(FieldConstants.OBJECT_IRI);
         assertEquals("Incorrect record found", "Sharik", foundDogRow.getFragment());
         final OWLIndividual sharikIndividual = owlService.getIndividual(foundDogRow);
-        assertEquals("Individula class incorrect", dogClass, owlService.getIndividualClass(sharikIndividual));
+        assertEquals("Individual class incorrect", dogClass, owlService.getIndividualClass(sharikIndividual));
         /**
-         * Check if row weight is correct. Row weight should be equals to 2/3 because we have two common
-         * classes of three in hierarchy between dog and thing
+         * Check if row weight is correct. Row weight should be equals to 5/6 because we have two common
+         * classes of three in hierarchy between dog and thing. Also we found this record by attribute search
+         * that gave us weight 1.
          */
         assertTrue("Row is not weighted", row instanceof WeighedRow);
         final WeighedRow weighedRow = (WeighedRow) row;
-        assertEquals("Row weight incorrect", (double) 2/3,
+        assertEquals("Row weight incorrect", (double) 5/6,
                 weightCalculator.calculate(weighedRow.getWeight()), 0.0001);
     }
 }

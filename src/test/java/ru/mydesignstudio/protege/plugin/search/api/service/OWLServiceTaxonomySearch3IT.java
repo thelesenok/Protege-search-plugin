@@ -81,7 +81,9 @@ public class OWLServiceTaxonomySearch3IT {
         /**
          * We should have two records because both Pluto and DarkWingDuck has more or equals to two legs.
          * But they have different weight - Pluto is dog and has more than two legs, weight should be max,
-         * DarkWingDuck is not a dog, he was found by taxonomy lookup and has two legs
+         * DarkWingDuck is not a dog, he was found by taxonomy lookup and has two legs.
+         *
+         * Olesya approved it.
          */
         assertEquals("Incorrect results count", 2, resultSet.getRowCount());
         /**
@@ -120,7 +122,7 @@ public class OWLServiceTaxonomySearch3IT {
          */
         assertEquals("Pluto's row has incorrect weight", 1,
                 weightCalculator.calculate(((WeighedRow) plutoRow).getWeight()), 0.0);
-        assertEquals("DarkWingDuck'r row has incorrect weight", (double) 2/3,
+        assertEquals("DarkWingDuck'r row has incorrect weight", (double) 5/6,
                 weightCalculator.calculate(((WeighedRow) darkWingDuckRow).getWeight()), 0.0);
     }
 }

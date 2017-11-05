@@ -102,8 +102,10 @@ public class OWLServiceTaxonomySearch2IT {
          * Check weight.
          * Sharik the dog has 1 weight because it was found by attributes - we were looking for dog by cat'a
          * name attribute, target and Sharik's classes are equal.
-         * CloneCat has weight 2/3 because we weren't found it by attributes - we were looking for dog but
-         * CloneCat is a cat, and in accordance with taxonomy strategy we found it.
+         * CloneCat has weight 5/6 because we found it by attributes (1 for attribute weight) and this type of cat
+         * has different class - we were looking for dog, taxonomy weight is 2/3. Total weight is (1 + 2/3) / 2 = 5/6.
+         *
+         * Olesya approved it.
          */
         assertTrue("Dog's row is not weighted", sharikRow instanceof WeighedRow);
         assertTrue("CloneCat's row is not weighted", fakeCatRow instanceof WeighedRow);
@@ -113,7 +115,7 @@ public class OWLServiceTaxonomySearch2IT {
         // Actually checking weight
         assertEquals("Dog's weight incorrect", 1,
                 weightCalculator.calculate(weightedSharikRow.getWeight()), 0.0);
-        assertEquals("CloneCat's weight incorrect", (double) 2/3,
+        assertEquals("CloneCat's weight incorrect", (double) 5/6,
                 weightCalculator.calculate(weightedFakeCatRow.getWeight()), 0.0001);
     }
 }

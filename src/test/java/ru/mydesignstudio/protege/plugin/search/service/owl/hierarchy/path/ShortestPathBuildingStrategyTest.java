@@ -61,7 +61,7 @@ public class ShortestPathBuildingStrategyTest {
 	@Test
 	public void testLongPath() throws Exception {
 		final Collection<OWLClass> path = strategy.build(createClass("A"), createClass("D"));
-		assertEquals("Path lenght check fialed", 3, path.size());
+		assertEquals("Path length check failed", 3, path.size());
 		assertEquals("Path check failed", Arrays.asList(
 				createClass("A"),
 				createClass("C"),
