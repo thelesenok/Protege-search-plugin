@@ -1,17 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.service.owl;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import com.google.common.base.Optional;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.OWLModelManagerImpl;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -44,14 +34,13 @@ import org.semanticweb.owlapi.model.OWLPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-
-import com.google.common.base.Optional;
-
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.empty.EmptyResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
@@ -65,6 +54,15 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 import uk.ac.manchester.cs.owl.owlapi.concurrent.ConcurrentOWLOntologyImpl;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -154,16 +152,28 @@ public class OWLServiceImpl implements OWLService {
         });
     }
 
+    private Collection<? extends SearchProcessorParams> getAllProcessorsParameters(Collection<LookupParam> lookupParams) {
+        final Collection<SearchProcessorParams> processorParams = new ArrayList<>();
+        for (LookupParam lookupParam : lookupParams) {
+            final SearchProcessorParams strategyParams = lookupParam.getStrategyParams();
+            processorParams.add(strategyParams);
+        }
+        return processorParams;
+    }
+
     @Override
     public ResultSet search(Collection<LookupParam> params) throws ApplicationException {
+        Validation.assertNotNull("Lookup params not provided", params);
+
         /**
          * Получим запрос по которому будем искать
          */
         SelectQuery selectQuery = null;
+        final Collection<? extends SearchProcessorParams> allProcessorsParameters = getAllProcessorsParameters(params);
         for (LookupParam param : params) {
             final SearchStrategy strategy = param.getStrategy();
             final SearchProcessor processor = strategy.getSearchProcessor();
-            selectQuery = processor.prepareQuery(selectQuery, param.getStrategyParams());
+            selectQuery = processor.prepareQuery(selectQuery, param.getStrategyParams(), allProcessorsParameters);
         }
         /**
          * Реализуем последовательный поиск разными стратегиями

@@ -8,10 +8,13 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.weight.calculator.AttributiveRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.EqualClassesQueryCreator;
@@ -32,7 +35,8 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
     private final RelatedQueriesCreator equalClassesCreator;
     private final TaxonomyRowWeightCalculator weightCalculator;
 
-    private TaxonomyProcessorParams processorParams;
+    private TaxonomyProcessorParams taxonomyProcessorParams;
+    private AttributiveProcessorParams attributiveProcessorParams;
     private Collection<SelectQuery> relatedQueries = new ArrayList<>();
 
     private OWLClass targetClass;
@@ -45,6 +49,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
 			@NearestNeighboursQueryCreator RelatedQueriesCreator nearestNeighboursCreator, 
 			@EqualClassesQueryCreator RelatedQueriesCreator equalClassesCreator,
 			TaxonomyRowWeightCalculator weightCalculator) {
+
     	super(owlService, wrapperService, sparqlQueryConverter);
 		this.nearestNeighboursCreator = nearestNeighboursCreator;
 		this.equalClassesCreator = equalClassesCreator;
@@ -52,7 +57,23 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
 	}
 
 	@Override
-    public SelectQuery prepareQuery(SelectQuery initialQuery, TaxonomyProcessorParams strategyParams) throws ApplicationException {
+    public SelectQuery prepareQuery(SelectQuery initialQuery,
+                                    TaxonomyProcessorParams strategyParams,
+                                    Collection<? extends SearchProcessorParams> allParameters) throws ApplicationException {
+
+        Validation.assertNotNull("Initial query not provided", initialQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+        Validation.assertNotNull("All other strategies params not provided", allParameters);
+
+        /**
+         * Get attributive processor params for future weight calculations
+         */
+        for (SearchProcessorParams parameter : allParameters) {
+            if (parameter instanceof AttributiveProcessorParams) {
+                attributiveProcessorParams = (AttributiveProcessorParams) parameter;
+            }
+        }
+        Validation.assertNotNull("Attributive processor params not provided", attributiveProcessorParams);
         /**
          * Save target class
          */
@@ -60,7 +81,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
         /**
          * сохраним параметры процессора
          */
-        processorParams = strategyParams;
+        taxonomyProcessorParams = strategyParams;
         /**
          * на случай, если несколько раз ищем
          */
@@ -109,13 +130,25 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
     }
 
     @Override
-    public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, TaxonomyProcessorParams strategyParams) throws ApplicationException {
+    public ResultSet collect(ResultSet initialResultSet,
+                             SelectQuery selectQuery,
+                             TaxonomyProcessorParams strategyParams) throws ApplicationException {
+
+        Validation.assertNotNull("Initial result set not provided", initialResultSet);
+        Validation.assertNotNull("Select query not provided", selectQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+
         /**
-         * выполним поиск по каждому из заготовленных запросов
+         * Execute queries using related queries. If result sets are not weighted, weight them
+         * using attributive params.
          */
         final Collection<ResultSet> relatedData = new ArrayList<>();
         for (SelectQuery relatedQuery : relatedQueries) {
-            final ResultSet relatedResultSet = collect(relatedQuery);
+            final ResultSet relatedResultSet =
+                    toWeightedResultSet(
+                            collect(relatedQuery),
+                            getAttributiveRowWeightCalculator(relatedQuery, attributiveProcessorParams)
+                    );
             relatedData.add(relatedResultSet);
         }
         /**
@@ -150,9 +183,25 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
         Validation.assertTrue("Source data is not weighted", sourceData instanceof WeighedResultSet);
         final WeighedResultSet weightedSourceData = (WeighedResultSet) sourceData;
         for (ResultSet relatedDatum : relatedData) {
-            weightedSourceData.addResultSet(relatedDatum, getRowWeightCalculator());
+            weightedSourceData.addResultSet(relatedDatum, getTaxonomyRowWeightCalculator());
         }
         return weightedSourceData;
+    }
+
+    /**
+     * Get attributive row weight calculator. It is necessary to weight rows that found using related queries.
+     * @param selectQuery related select query
+     * @param attributiveProcessorParams attributive processor params
+     * @return attributive row weight calculator
+     * @throws ApplicationException if can't create calculator
+     */
+    private WeighedRowWeightCalculator getAttributiveRowWeightCalculator(SelectQuery selectQuery,
+                                                                         AttributiveProcessorParams attributiveProcessorParams) throws ApplicationException {
+
+        Validation.assertNotNull("Select query not provided", selectQuery);
+        Validation.assertNotNull("Attributive processor params not provided", attributiveProcessorParams);
+
+        return new AttributiveRowWeightCalculator(selectQuery, attributiveProcessorParams);
     }
 
     /**
@@ -160,8 +209,8 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
      * @return - объект калькулятора
      * @throws ApplicationException
      */
-    public WeighedRowWeightCalculator getRowWeightCalculator() throws ApplicationException {
-        weightCalculator.setProcessorParams(processorParams);
+    private WeighedRowWeightCalculator getTaxonomyRowWeightCalculator() throws ApplicationException {
+        weightCalculator.setProcessorParams(taxonomyProcessorParams);
         weightCalculator.setTargetClass(targetClass);
         return weightCalculator;
     }

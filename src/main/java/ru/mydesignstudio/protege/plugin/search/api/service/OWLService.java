@@ -1,9 +1,5 @@
 package ru.mydesignstudio.protege.plugin.search.api.service;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.util.Collection;
-
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -14,10 +10,13 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
-
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.search.params.LookupParam;
+
+import java.io.File;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -81,8 +80,10 @@ public interface OWLService {
     /**
      * Искать экземпляры по набору указанных параметров
      * @param params
+     * @deprecated this method should be extracted into separated class
      * @return
      */
+    @Deprecated
     ResultSet search(Collection<LookupParam> params) throws ApplicationException;
 
     /**

@@ -123,6 +123,6 @@ public class OWLServiceTaxonomySearch3IT {
         assertEquals("Pluto's row has incorrect weight", 1,
                 weightCalculator.calculate(((WeighedRow) plutoRow).getWeight()), 0.0);
         assertEquals("DarkWingDuck'r row has incorrect weight", (double) 5/6,
-                weightCalculator.calculate(((WeighedRow) darkWingDuckRow).getWeight()), 0.0);
+                weightCalculator.calculate(((WeighedRow) darkWingDuckRow).getWeight()), 0.0001);
     }
 }

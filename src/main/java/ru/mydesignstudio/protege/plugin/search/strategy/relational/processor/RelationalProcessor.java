@@ -1,12 +1,16 @@
 package ru.mydesignstudio.protege.plugin.search.strategy.relational.processor;
 
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.weight.calculator.RelationalRowWeightCalculator;
+
+import java.util.Collection;
 
 /**
  * Created by abarmin on 04.05.17.
@@ -15,7 +19,14 @@ import ru.mydesignstudio.protege.plugin.search.strategy.relational.weight.calcul
  */
 public class RelationalProcessor implements SearchProcessor<RelationalProcessorParams> {
     @Override
-    public SelectQuery prepareQuery(SelectQuery initialQuery, RelationalProcessorParams strategyParams) throws ApplicationException {
+    public SelectQuery prepareQuery(SelectQuery initialQuery,
+                                    RelationalProcessorParams strategyParams,
+                                    Collection<? extends SearchProcessorParams> allParameters) throws ApplicationException {
+
+        Validation.assertNotNull("Initial query not provided", initialQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+        Validation.assertNotNull("Other strategies parameters not provided", allParameters);
+
         return initialQuery;
     }
 

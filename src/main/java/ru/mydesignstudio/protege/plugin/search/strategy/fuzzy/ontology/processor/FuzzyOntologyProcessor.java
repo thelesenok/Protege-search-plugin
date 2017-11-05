@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectField;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
@@ -17,6 +18,7 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
@@ -59,7 +61,14 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
     }
 
     @Override
-    public SelectQuery prepareQuery(SelectQuery initialQuery, FuzzyOntologyProcessorParams strategyParams) throws ApplicationException {
+    public SelectQuery prepareQuery(SelectQuery initialQuery,
+                                    FuzzyOntologyProcessorParams strategyParams,
+                                    Collection<? extends SearchProcessorParams> allParameters) throws ApplicationException {
+
+        Validation.assertNotNull("Initial query not provided", initialQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+        Validation.assertNotNull("Other strategies parameters not provided", allParameters);
+
         /**
          * Оставим только обычные условия, fuzzy соберем в отдельную коллекцию
          * и будем проверять уже после основного поиска
