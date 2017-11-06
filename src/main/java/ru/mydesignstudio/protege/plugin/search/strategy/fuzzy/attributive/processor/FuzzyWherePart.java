@@ -68,6 +68,16 @@ public class FuzzyWherePart extends WherePart {
         return new FuzzyWherePart(maskSize, originalWherePart.clone());
     }
 
+    @Override
+    public LogicalOperation getConcatOperation() {
+        return originalWherePart.getConcatOperation();
+    }
+
+    @Override
+    public void setConcatOperation(LogicalOperation concatOperation) {
+        originalWherePart.setConcatOperation(concatOperation);
+    }
+
     /**
      * Сколько символов в маске для поиска
      * @return

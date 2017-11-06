@@ -6,12 +6,16 @@ import ru.mydesignstudio.protege.plugin.search.api.query.LogicalOperation;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.weight.calculator.FuzzyRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -20,8 +24,16 @@ import java.util.Collection;
  *
  * Процессор для нечеткого поиска
  */
-public class FuzzyAttributiveProcessor implements SearchProcessor<FuzzyAttributiveProcessorParams> {
+public class FuzzyAttributiveProcessor extends SparqlProcessorSupport implements SearchProcessor<FuzzyAttributiveProcessorParams> {
     private FuzzyAttributiveProcessorParams processorParams;
+
+    @Inject
+    public FuzzyAttributiveProcessor(OWLService owlService,
+                                     ExceptionWrapperService wrapperService,
+                                     SparqlQueryConverter queryConverter) {
+
+        super(owlService, wrapperService, queryConverter);
+    }
 
     /**
      * {@inheritDoc}
@@ -78,7 +90,7 @@ public class FuzzyAttributiveProcessor implements SearchProcessor<FuzzyAttributi
         /**
          * Результирующий набор данных будет с учетом схожести результатов
          */
-        return new WeighedResultSet(initialResultSet, getWeightCalculator(selectQuery));
+        return toWeightedResultSet(initialResultSet, getWeightCalculator(selectQuery));
     }
 
     /**

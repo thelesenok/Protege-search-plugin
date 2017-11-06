@@ -5,6 +5,8 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
@@ -36,6 +38,8 @@ import java.util.Collections;
  * Абстрактный процессор с поддержкой поиска по sparql запросу
  */
 public abstract class SparqlProcessorSupport {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlProcessorSupport.class);
+
     private final OWLService owlService;
     private final ExceptionWrapperService wrapperService;
     private final SparqlQueryConverter queryConverter;
@@ -70,11 +74,14 @@ public abstract class SparqlProcessorSupport {
      * @throws ApplicationException
      */
     public ResultSet collect(SelectQuery selectQuery) throws ApplicationException {
+        Validation.assertNotNull("Select Query was not provided", selectQuery);
+
         final String sparqlQuery = queryConverter.convert(selectQuery);
         try {
             final SparqlReasoner reasoner = getReasoner();
             return reasoner.executeQuery(sparqlQuery);
         } catch (SparqlReasonerException e) {
+            LOGGER.error("Invalid SPARQL Query {}", sparqlQuery);
             throw new ApplicationException(e);
         }
     }
