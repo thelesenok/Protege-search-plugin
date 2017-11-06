@@ -16,7 +16,6 @@ import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.query.WherePart;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
@@ -25,8 +24,10 @@ import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.function.FuzzyFunction;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.calculator.DatatypeCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.weight.calculator.FuzzyOntologyRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.LogicalOperationHelper;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
@@ -43,7 +44,7 @@ import java.util.Map;
  * Процессор для поиска с учетом лингвистических переменных
  */
 @Component
-public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProcessorParams> {
+public class FuzzyOntologyProcessor extends SparqlProcessorSupport implements SearchProcessor<FuzzyOntologyProcessorParams> {
     private final OWLService owlService;
     private final FuzzyOWLService fuzzyOWLService;
     private final DatatypeCalculator datatypeCalculator;
@@ -52,8 +53,13 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
     private Collection<WherePart> fuzzyConditions = new ArrayList<>();
 
     @Inject
-    public FuzzyOntologyProcessor(OWLService owlService, FuzzyOWLService fuzzyOWLService,
-                                  DatatypeCalculator datatypeCalculator, ExceptionWrapperService wrapperService) {
+    public FuzzyOntologyProcessor(OWLService owlService,
+                                  ExceptionWrapperService wrapperService,
+                                  SparqlQueryConverter queryConverter,
+                                  FuzzyOWLService fuzzyOWLService,
+                                  DatatypeCalculator datatypeCalculator) {
+
+        super(owlService, wrapperService, queryConverter);
         this.owlService = owlService;
         this.fuzzyOWLService = fuzzyOWLService;
         this.datatypeCalculator = datatypeCalculator;
@@ -100,7 +106,14 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
     }
 
     @Override
-    public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, FuzzyOntologyProcessorParams strategyParams) throws ApplicationException {
+    public ResultSet collect(ResultSet initialResultSet,
+                             SelectQuery selectQuery,
+                             FuzzyOntologyProcessorParams strategyParams) throws ApplicationException {
+
+        Validation.assertNotNull("Initial result set not provided", initialResultSet);
+        Validation.assertNotNull("Select query not provided", selectQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+
         /**
          * если нечетких свойств нет, возвращаем все как есть
          */
@@ -122,15 +135,22 @@ public class FuzzyOntologyProcessor implements SearchProcessor<FuzzyOntologyProc
          * пройдем по всем записям из initialResultSet и уберем оттуда все, которые не подходят по условиям
          * нечеткого поиска
          */
-        for (ResultSetRow sourceRow : initialResultSet.getRows()) {
-            if (!isValidFuzzyRow(sourceRow, selectQuery, values)) {
-                initialResultSet.removeRow(sourceRow);
+        initialResultSet = initialResultSet.filter(new Specification<ResultSetRow>() {
+            @Override
+            public boolean isSatisfied(ResultSetRow resultSetRow) {
+                return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Boolean>() {
+                    @Override
+                    public Boolean run() throws ApplicationException {
+                        return isValidFuzzyRow(resultSetRow, selectQuery, values);
+                    }
+                });
             }
-        }
+        });
         /**
          * а теперь делаем из этого обычный взвешенный набор данных
          */
-        return new WeighedResultSet(initialResultSet, getWeightCalculator(selectQuery, strategyParams, fuzzyConditions));
+        return toWeightedResultSet(initialResultSet,
+                getWeightCalculator(selectQuery, strategyParams, fuzzyConditions), true);
     }
 
     protected boolean isValidFuzzyRow(ResultSetRow row, SelectQuery fuzzyQuery, Map<OWLProperty, OWLDatatype> fuzzyValues) throws ApplicationException {

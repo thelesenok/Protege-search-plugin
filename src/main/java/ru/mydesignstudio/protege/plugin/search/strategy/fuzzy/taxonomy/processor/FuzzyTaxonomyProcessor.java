@@ -11,12 +11,16 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.related.binding.FuzzyQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.weight.calculator.FuzzyTaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.RelatedQueriesCreator;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ import java.util.Collection;
 public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements SearchProcessor<FuzzyTaxonomyProcessorParams> {
     private final Collection<SelectQuery> relatedQueries = new ArrayList<>();
     private final RelatedQueriesCreator queriesCreator;
+    private final ExceptionWrapperService wrapperService;
 
     @Inject
     public FuzzyTaxonomyProcessor(@FuzzyQueryCreator RelatedQueriesCreator queriesCreator,
@@ -39,6 +44,7 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
                                   final SparqlQueryConverter sparqlQueryConverter) {
         super(owlService, wrapperService, sparqlQueryConverter);
 		this.queriesCreator = queriesCreator;
+		this.wrapperService = wrapperService;
 	}
 
 	private SelectQuery initialQuery;
@@ -71,28 +77,40 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
     }
 
     @Override
-    public ResultSet collect(ResultSet initialResultSet, SelectQuery selectQuery, FuzzyTaxonomyProcessorParams strategyParams) throws ApplicationException {
+    public ResultSet collect(ResultSet initialResultSet,
+                             SelectQuery selectQuery,
+                             FuzzyTaxonomyProcessorParams strategyParams) throws ApplicationException {
+
+        Validation.assertNotNull("Initial result set not provided", initialResultSet);
+        Validation.assertNotNull("Select query not provided", selectQuery);
+        Validation.assertNotNull("Strategy params not provided", strategyParams);
+
         /**
          * выполним поиск по каждому из заготовленных запросов
          */
-        final Collection<ResultSet> relatedData = new ArrayList<>();
+        Collection<ResultSet> relatedData = new ArrayList<>();
         for (SelectQuery query : relatedQueries) {
             relatedData.add(collect(query));
         }
         /**
          * проверим, что полученные результаты хоть как-то подходят под параметры поиска
          */
-        for (ResultSet resultSet : relatedData) {
-            final Collection<ResultSetRow> toRemove = new ArrayList<>();
-            for (ResultSetRow resultSetRow : resultSet.getRows()) {
-                if (!containsSelectQueryConditionFields(resultSetRow, selectQuery)) {
-                    toRemove.add(resultSetRow);
-                }
+        relatedData = CollectionUtils.map(relatedData, new Transformer<ResultSet, ResultSet>() {
+            @Override
+            public ResultSet transform(ResultSet resultSet) {
+                return resultSet.filter(new Specification<ResultSetRow>() {
+                    @Override
+                    public boolean isSatisfied(ResultSetRow resultSetRow) {
+                        return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Boolean>() {
+                            @Override
+                            public Boolean run() throws ApplicationException {
+                                return containsSelectQueryConditionFields(resultSetRow, selectQuery);
+                            }
+                        });
+                    }
+                });
             }
-            for (ResultSetRow resultSetRow : toRemove) {
-                resultSet.removeRow(resultSetRow);
-            }
-        }
+        });
         /**
          * объединяем все в один большой ResultSet
          */

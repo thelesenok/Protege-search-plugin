@@ -1,5 +1,7 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set;
 
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+
 import java.util.Collection;
 
 /**
@@ -64,8 +66,9 @@ public interface ResultSet {
     ResultSetRow getRow(int rowIndex);
 
     /**
-     * Удалить строку из результатов
-     * @param row - строка для удаления
+     * Create new result set that contains only records that satisfies specification.
+     * @param specification specification to check
+     * @return new result set
      */
-    void removeRow(ResultSetRow row);
+    ResultSet filter(Specification<ResultSetRow> specification);
 }

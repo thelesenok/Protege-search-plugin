@@ -16,6 +16,8 @@ import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
+import java.util.Collection;
+
 /**
  * Created by abarmin on 06.05.17.
  *
@@ -24,6 +26,13 @@ import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
  * moved to separated class and this class should only store data
  */
 public class WeighedResultSet extends SparqlResultSet implements ResultSet {
+    private WeighedResultSet(Collection<String> columnNames) {
+        int index = 0;
+        for (String columnName : columnNames) {
+            addColumnName(index++, columnName);
+        }
+    }
+
     @Deprecated
     public WeighedResultSet(ResultSet resultSet, WeighedRowWeightCalculator weightCalculator) {
         final ExceptionWrapperService wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
@@ -132,5 +141,17 @@ public class WeighedResultSet extends SparqlResultSet implements ResultSet {
                 addRow(rowToAdd);
             }
         }
+    }
+
+    @Override
+    public ResultSet filter(Specification<ResultSetRow> specification) {
+        Validation.assertNotNull("Specification not provided", specification);
+        final WeighedResultSet weighedResultSet = new WeighedResultSet(getColumnNames());
+        for (ResultSetRow resultSetRow : getRows()) {
+            if (specification.isSatisfied(resultSetRow)) {
+                weighedResultSet.addRow(resultSetRow);
+            }
+        }
+        return weighedResultSet;
     }
 }

@@ -142,6 +142,27 @@ public abstract class SparqlProcessorSupport {
     }
 
     /**
+     * Convert result set no weighted. If provided result set is already weighted and <code>forceWeight</code>
+     * equals to false, it will returned as is. On other hand it will be forced weighted.
+     * @param resultSet result set to weight
+     * @param weightCalculator weight calculator
+     * @param forceWeight force mark
+     * @return weighted result set
+     */
+    protected WeighedResultSet toWeightedResultSet(ResultSet resultSet,
+                                                   WeighedRowWeightCalculator weightCalculator,
+                                                   boolean forceWeight) {
+
+        Validation.assertNotNull("Result set not provided", resultSet);
+        Validation.assertNotNull("Row weight calculator not provided", weightCalculator);
+
+        if ((resultSet instanceof WeighedResultSet) && !forceWeight) {
+            return (WeighedResultSet) resultSet;
+        }
+        return new WeighedResultSet(resultSet, weightCalculator);
+    }
+
+    /**
      * Convert non-weighted result set to weighted. If provided result set is already weighted, it will
      * be returned as is.
      * @param dataResultSet result set to weight

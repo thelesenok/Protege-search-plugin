@@ -1,8 +1,10 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.empty;
 
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,10 +54,9 @@ public class EmptyResultSet implements ResultSet {
     }
 
     @Override
-    public void removeRow(ResultSetRow row) {
-        /**
-         * ничего не делаем, так как в этом наборе нет никаких данных
-         */
+    public ResultSet filter(Specification<ResultSetRow> specification) {
+        Validation.assertNotNull("Specification not provided", specification);
+        return new EmptyResultSet();
     }
 
     @Override

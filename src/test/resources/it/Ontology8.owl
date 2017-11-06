@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5">
+    <Prefix name="" IRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Annotation>
+        <AnnotationProperty IRI="#fuzzyLabel"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">&lt;fuzzyOwl2 fuzzyType=&quot;ontology&quot;&gt;
+&lt;FuzzyLogic logic=&quot;zadeh&quot; /&gt;
+&lt;/fuzzyOwl2&gt;</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#Executor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Project"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasExecutor"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#executorAge"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#executorName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#projectName"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Analyst"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#AutoTester"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Developer"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MS_Office"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MS_Project"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Tester"/>
+    </Declaration>
+    <Declaration>
+        <Datatype IRI="#baby"/>
+    </Declaration>
+    <Declaration>
+        <Datatype IRI="#man"/>
+    </Declaration>
+    <Declaration>
+        <Datatype IRI="#old"/>
+    </Declaration>
+    <Declaration>
+        <Datatype IRI="#young"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Executor"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Analyst"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#AutoTester"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Project"/>
+        <NamedIndividual IRI="#MS_Office"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Project"/>
+        <NamedIndividual IRI="#MS_Project"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Tester"/>
+    </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Office"/>
+        <NamedIndividual IRI="#Analyst"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Project"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ObjectPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorAge"/>
+        <NamedIndividual IRI="#Analyst"/>
+        <Literal datatypeIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5#man"></Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Analyst"/>
+        <Literal datatypeIRI="&xsd;string">Kate</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorAge"/>
+        <NamedIndividual IRI="#AutoTester"/>
+        <Literal datatypeIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5#old"></Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#AutoTester"/>
+        <Literal datatypeIRI="&xsd;string">Anne</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorAge"/>
+        <NamedIndividual IRI="#Developer"/>
+        <Literal datatypeIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5#young"></Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Developer"/>
+        <Literal datatypeIRI="&xsd;string">Sam</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#projectName"/>
+        <NamedIndividual IRI="#MS_Office"/>
+        <Literal datatypeIRI="&xsd;string">MS Office</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#projectName"/>
+        <NamedIndividual IRI="#MS_Project"/>
+        <Literal datatypeIRI="&xsd;string">MS Project</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorAge"/>
+        <NamedIndividual IRI="#Tester"/>
+        <Literal datatypeIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5#baby"></Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Tester"/>
+        <Literal datatypeIRI="&xsd;string">Anna</Literal>
+    </DataPropertyAssertion>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasExecutor"/>
+    </FunctionalObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <Class IRI="#Project"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <Class IRI="#Executor"/>
+    </ObjectPropertyRange>
+    <DataPropertyDomain>
+        <DataProperty IRI="#executorAge"/>
+        <Class IRI="#Executor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#executorName"/>
+        <Class IRI="#Executor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#projectName"/>
+        <Class IRI="#Project"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorAge"/>
+        <Datatype IRI="#baby"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorAge"/>
+        <Datatype IRI="#man"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorAge"/>
+        <Datatype IRI="#old"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorAge"/>
+        <Datatype IRI="#young"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#projectName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="#fuzzyLabel"/>
+        <IRI>#baby</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">&lt;fuzzyOwl2 fuzzyType=&quot;datatype&quot;&gt;
+&lt;Datatype type=&quot;leftshoulder&quot; a=&quot;5&quot; b=&quot;10&quot; /&gt;
+&lt;/fuzzyOwl2&gt;</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="#fuzzyLabel"/>
+        <IRI>#man</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">&lt;fuzzyOwl2 fuzzyType=&quot;datatype&quot;&gt;
+&lt;Datatype type=&quot;trapezoidal&quot; a=&quot;15.0&quot; b=&quot;18.0&quot; c=&quot;25.0&quot; d=&quot;40.0&quot; /&gt;
+&lt;/fuzzyOwl2&gt;</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="#fuzzyLabel"/>
+        <IRI>#old</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">&lt;fuzzyOwl2 fuzzyType=&quot;datatype&quot;&gt;
+&lt;Datatype type=&quot;rightshoulder&quot; a=&quot;45.0&quot; b=&quot;60.0&quot; /&gt;
+&lt;/fuzzyOwl2&gt;</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="#fuzzyLabel"/>
+        <IRI>#young</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">&lt;fuzzyOwl2 fuzzyType=&quot;datatype&quot;&gt;
+&lt;Datatype type=&quot;triangular&quot; a=&quot;8.0&quot; b=&quot;14.0&quot; c=&quot;18.0&quot; /&gt;
+&lt;/fuzzyOwl2&gt;</Literal>
+    </AnnotationAssertion>
+    <DatatypeDefinition>
+        <Datatype IRI="#baby"/>
+        <DataIntersectionOf>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;minInclusive">
+                    <Literal datatypeIRI="&xsd;double">5.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;maxInclusive">
+                    <Literal datatypeIRI="&xsd;double">10.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+        </DataIntersectionOf>
+    </DatatypeDefinition>
+    <DatatypeDefinition>
+        <Datatype IRI="#man"/>
+        <DataIntersectionOf>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;minInclusive">
+                    <Literal datatypeIRI="&xsd;double">15.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;maxInclusive">
+                    <Literal datatypeIRI="&xsd;double">40.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+        </DataIntersectionOf>
+    </DatatypeDefinition>
+    <DatatypeDefinition>
+        <Datatype IRI="#old"/>
+        <DataIntersectionOf>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;minInclusive">
+                    <Literal datatypeIRI="&xsd;double">45.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;maxInclusive">
+                    <Literal datatypeIRI="&xsd;double">60.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+        </DataIntersectionOf>
+    </DatatypeDefinition>
+    <DatatypeDefinition>
+        <Datatype IRI="#young"/>
+        <DataIntersectionOf>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;minInclusive">
+                    <Literal datatypeIRI="&xsd;double">8.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+            <DatatypeRestriction>
+                <Datatype abbreviatedIRI="xsd:double"/>
+                <FacetRestriction facet="&xsd;maxInclusive">
+                    <Literal datatypeIRI="&xsd;double">18.0</Literal>
+                </FacetRestriction>
+            </DatatypeRestriction>
+        </DataIntersectionOf>
+    </DatatypeDefinition>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

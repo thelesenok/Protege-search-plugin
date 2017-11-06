@@ -11,6 +11,7 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
@@ -20,6 +21,9 @@ import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.relat
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.EqualClassesQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.related.binding.NearestNeighboursQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.weight.calculator.TaxonomyRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -34,6 +38,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
     private final RelatedQueriesCreator nearestNeighboursCreator;
     private final RelatedQueriesCreator equalClassesCreator;
     private final TaxonomyRowWeightCalculator weightCalculator;
+    private final ExceptionWrapperService wrapperService;
 
     private TaxonomyProcessorParams taxonomyProcessorParams;
     private AttributiveProcessorParams attributiveProcessorParams;
@@ -54,6 +59,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
 		this.nearestNeighboursCreator = nearestNeighboursCreator;
 		this.equalClassesCreator = equalClassesCreator;
 		this.weightCalculator = weightCalculator;
+		this.wrapperService = wrapperService;
 	}
 
 	@Override
@@ -150,7 +156,7 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
          * Execute queries using related queries. If result sets are not weighted, weight them
          * using attributive params.
          */
-        final Collection<ResultSet> relatedData = new ArrayList<>();
+        Collection<ResultSet> relatedData = new ArrayList<>();
         for (SelectQuery relatedQuery : relatedQueries) {
             final ResultSet relatedResultSet =
                     toWeightedResultSet(
@@ -163,13 +169,22 @@ public class TaxonomyProcessor extends SparqlProcessorSupport implements SearchP
          * так как кретерии поиска из "похожих" запросов могут быть убраны, то нужно проверить результаты,
          * содержат ли они необходимые поля и соответствуют ли их значения параметрам из исходного запроса
          */
-        for (ResultSet relatedSet : relatedData) {
-            for (ResultSetRow row : relatedSet.getRows()) {
-                if (!containsSelectQueryConditionFields(row, selectQuery)) {
-                    relatedSet.removeRow(row);
-                }
+        relatedData = CollectionUtils.map(relatedData, new Transformer<ResultSet, ResultSet>() {
+            @Override
+            public ResultSet transform(ResultSet relatedSet) {
+                return relatedSet.filter(new Specification<ResultSetRow>() {
+                    @Override
+                    public boolean isSatisfied(ResultSetRow resultSetRow) {
+                        return wrapperService.invokeWrapped(new ExceptionWrappedCallback<Boolean>() {
+                            @Override
+                            public Boolean run() throws ApplicationException {
+                                return containsSelectQueryConditionFields(resultSetRow, selectQuery);
+                            }
+                        });
+                    }
+                });
             }
-        }
+        });
         /**
          * объединим результаты и вычислим близость
          */

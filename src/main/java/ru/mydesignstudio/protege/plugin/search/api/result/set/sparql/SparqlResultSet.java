@@ -1,5 +1,6 @@
 package ru.mydesignstudio.protege.plugin.search.api.result.set.sparql;
 
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationRuntimeException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
@@ -24,10 +25,15 @@ public class SparqlResultSet implements ResultSet {
     public SparqlResultSet() {
     }
 
-    public SparqlResultSet(List<String> columnNames) {
-        for (int index = 0; index < columnNames.size(); index++) {
-            this.columnNames.put(index, columnNames.get(index));
+    public SparqlResultSet(Collection<String> columnNames) {
+        int index = 0;
+        for (String columnName : columnNames) {
+            addColumnName(index++, columnName);
         }
+    }
+
+    protected void addColumnName(int index, String columnName) {
+        columnNames.put(index, columnName);
     }
 
     @Override
@@ -125,20 +131,16 @@ public class SparqlResultSet implements ResultSet {
     }
 
     @Override
-    public void removeRow(ResultSetRow row) {
-        /**
-         * определим порядковый номер удаляемой записи
-         */
-        Integer rowIndex = null;
-        for (Map.Entry<Integer, ResultSetRow> entry : rows.entrySet()) {
-            if (OWLUtils.equals(entry.getValue().getObjectIRI(), row.getObjectIRI())) {
-                rowIndex = entry.getKey();
+    public ResultSet filter(Specification<ResultSetRow> specification) {
+        Validation.assertNotNull("Specification not provided", specification);
+        //
+        final SparqlResultSet resultSet = new SparqlResultSet(getColumnNames());
+        for (ResultSetRow row : rows.values()) {
+            if (specification.isSatisfied(row)) {
+                resultSet.addRow(row);
             }
         }
-        if (rowIndex == null) {
-            return;
-        }
-        rows.remove(rowIndex);
+        return resultSet;
     }
 
     @Override
