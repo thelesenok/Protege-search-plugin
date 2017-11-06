@@ -3,14 +3,10 @@ package ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.component;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.taxonomy.processor.TaxonomyProcessorParams;
 
-import javax.swing.Box;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.GridLayout;
-import java.awt.Label;
+import java.awt.*;
 
 /**
  * Created by abarmin on 04.05.17.
@@ -20,17 +16,18 @@ import java.awt.Label;
 public class TaxonomySearchParamsComponent extends JPanel implements SearchStrategyComponent<TaxonomyProcessorParams> {
     private TaxonomyProcessorParams params = new TaxonomyProcessorParams();
     private JTextField proximityValueField;
+    private final ButtonGroup taxonomyStrategiesGroup = new ButtonGroup();
 
     public TaxonomySearchParamsComponent() {
         setLayout(new GridLayout(4, 2));
         /**
-         * Добавим метод ближайших соседей
-         */
-        addNearestNeighboursMethod(this);
-        /**
          * Добавим метод эквивалентных классов
          */
         addEqualClassesMethod(this);
+        /**
+         * Добавим метод ближайших соседей
+         */
+        addNearestNeighboursMethod(this);
         /**
          * Заполнитель
          */
@@ -50,17 +47,18 @@ public class TaxonomySearchParamsComponent extends JPanel implements SearchStrat
         component.add(createEqualClassesEnabler(params));
     }
 
-    private JCheckBox createEqualClassesEnabler(TaxonomyProcessorParams params) {
-        final JCheckBox checkBox = new JCheckBox();
-        checkBox.setSelected(params.isEqualsClassesMethodEnabled());
-        checkBox.addChangeListener(new ChangeListener() {
+    private JRadioButton createEqualClassesEnabler(TaxonomyProcessorParams params) {
+        final JRadioButton radioButton = new JRadioButton();
+        radioButton.setSelected(params.isEqualsClassesMethodEnabled());
+        radioButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                final JCheckBox source = (JCheckBox) e.getSource();
+                final JRadioButton source = (JRadioButton) e.getSource();
                 params.setEqualsClassesMethodEnabled(source.isSelected());
             }
         });
-        return checkBox;
+        taxonomyStrategiesGroup.add(radioButton);
+        return radioButton;
     }
 
     /**
@@ -85,18 +83,19 @@ public class TaxonomySearchParamsComponent extends JPanel implements SearchStrat
      * @param params - поле с галкой
      * @return
      */
-    private JCheckBox createNearestNeighboursEnabler(TaxonomyProcessorParams params) {
-        final JCheckBox checkBox = new JCheckBox();
-        checkBox.setSelected(params.isNearestNeighboursMethodEnabled());
-        checkBox.addChangeListener(new ChangeListener() {
+    private JRadioButton createNearestNeighboursEnabler(TaxonomyProcessorParams params) {
+        final JRadioButton radioButton = new JRadioButton();
+        radioButton.setSelected(params.isNearestNeighboursMethodEnabled());
+        radioButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                final JCheckBox source = (JCheckBox) e.getSource();
+                final JRadioButton source = (JRadioButton) e.getSource();
                 proximityValueField.setEnabled(source.isSelected());
                 params.setNearestNeighboursMethodEnabled(source.isSelected());
             }
         });
-        return checkBox;
+        taxonomyStrategiesGroup.add(radioButton);
+        return radioButton;
     }
 
     /**
