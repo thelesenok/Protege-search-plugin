@@ -2,12 +2,14 @@ package ru.mydesignstudio.protege.plugin.search.strategy.relational;
 
 import ru.mydesignstudio.protege.plugin.search.api.annotation.VisualComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
-import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.processor.RelationalProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.relational.processor.RelationalProcessorParams;
 
 import javax.inject.Inject;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 04.05.17.
@@ -26,6 +28,11 @@ public class RelationalSearchStrategy implements SearchStrategy {
     @Override
     public String getTitle() {
         return "Relational lookup";
+    }
+
+    @Override
+    public SearchProcessorParams getSearchStrategyParams() {
+        return new RelationalProcessorParams();
     }
 
     @Override

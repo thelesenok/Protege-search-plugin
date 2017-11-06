@@ -5,9 +5,10 @@ import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.component.AttributiveSearchStrategyParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 
 import javax.inject.Inject;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -27,6 +28,11 @@ public class AttributiveSearchStrategy implements SearchStrategy {
 	@Override
     public String getTitle() {
         return "Attributive lookup";
+    }
+
+    @Override
+    public AttributiveProcessorParams getSearchStrategyParams() {
+        return paramsComponent.getSearchParams();
     }
 
     @Override

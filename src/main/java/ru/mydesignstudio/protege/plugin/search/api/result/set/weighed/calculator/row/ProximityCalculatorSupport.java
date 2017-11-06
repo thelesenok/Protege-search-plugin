@@ -6,9 +6,14 @@ import org.semanticweb.owlapi.model.OWLProperty;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Specification;
+import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.Transformer;
 import uk.ac.manchester.cs.owl.owlapi.OWLLiteralImplString;
 
 import javax.inject.Inject;
+import java.util.Collection;
 
 /**
  * Created by abarmin on 28.05.17.
@@ -47,8 +52,8 @@ public abstract class ProximityCalculatorSupport implements ProximityCalculator 
      * @return - значение свойства
      * @throws ApplicationException
      */
-    public Object getPropertyValue(OWLIndividual individual, 
-    		@SuppressWarnings("rawtypes") OWLProperty property) throws ApplicationException {
+    public Collection<?> getPropertyValues(OWLIndividual individual,
+                                          @SuppressWarnings("rawtypes") OWLProperty property) throws ApplicationException {
         return owlService.getPropertyValue(individual, property);
     }
 
@@ -64,11 +69,13 @@ public abstract class ProximityCalculatorSupport implements ProximityCalculator 
         if (!(property instanceof OWLDataProperty)) {
             return false;
         }
-        final Object propertyValue = getPropertyValue(individual, property);
-        if (!(propertyValue instanceof OWLLiteralImplString)) {
-            return false;
-        }
-        return true;
+        final Collection<?> propertyValues = getPropertyValues(individual, property);
+        return CollectionUtils.every(propertyValues, new Specification() {
+            @Override
+            public boolean isSatisfied(Object o) {
+                return o instanceof OWLLiteralImplString;
+            }
+        });
     }
 
     /**
@@ -86,8 +93,17 @@ public abstract class ProximityCalculatorSupport implements ProximityCalculator 
                     property.getIRI().getFragment()
             ));
         }
-        final Object propertyValue = getPropertyValue(individual, property);
-        return ((OWLLiteralImplString) propertyValue).getLiteral();
+        final Collection<OWLLiteralImplString> propertyValues =
+                (Collection<OWLLiteralImplString>) getPropertyValues(individual, property);
+        return StringUtils.join(
+                CollectionUtils.map(propertyValues, new Transformer<OWLLiteralImplString, String>() {
+                    @Override
+                    public String transform(OWLLiteralImplString item) {
+                        return item.getLiteral();
+                    }
+                }),
+                ", "
+        );
     }
 
     /**

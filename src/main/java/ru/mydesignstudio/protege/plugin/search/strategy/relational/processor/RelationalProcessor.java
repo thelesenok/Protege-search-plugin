@@ -4,12 +4,16 @@ import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.query.SelectQuery;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
-import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.WeighedResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator.row.WeighedRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
+import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
 import ru.mydesignstudio.protege.plugin.search.strategy.relational.weight.calculator.RelationalRowWeightCalculator;
+import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 /**
@@ -17,7 +21,20 @@ import java.util.Collection;
  *
  * "Искатель" с учетом связей
  */
-public class RelationalProcessor implements SearchProcessor<RelationalProcessorParams> {
+public class RelationalProcessor extends SparqlProcessorSupport implements SearchProcessor<RelationalProcessorParams> {
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    public RelationalProcessor(OWLService owlService,
+                               ExceptionWrapperService wrapperService,
+                               SparqlQueryConverter queryConverter) {
+        super(owlService, wrapperService, queryConverter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SelectQuery prepareQuery(SelectQuery initialQuery,
                                     RelationalProcessorParams strategyParams,
@@ -35,7 +52,7 @@ public class RelationalProcessor implements SearchProcessor<RelationalProcessorP
         /**
          * Wrapping source resultSet with new WeighedResultSet
          */
-        return new WeighedResultSet(initialResultSet, getWeightCalculator(selectQuery, strategyParams));
+        return toWeightedResultSet(initialResultSet, getWeightCalculator(selectQuery, strategyParams));
     }
 
     private WeighedRowWeightCalculator getWeightCalculator(SelectQuery selectQuery, RelationalProcessorParams strategyParams) {

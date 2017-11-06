@@ -3,6 +3,7 @@ package ru.mydesignstudio.protege.plugin.search.ui.model.table;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import ru.mydesignstudio.protege.plugin.search.api.common.FieldConstants;
+import ru.mydesignstudio.protege.plugin.search.api.common.Validation;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSet;
 import ru.mydesignstudio.protege.plugin.search.api.result.set.ResultSetRow;
@@ -11,10 +12,12 @@ import ru.mydesignstudio.protege.plugin.search.api.result.set.weighed.calculator
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.StringUtils;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +71,12 @@ public class ResultSetModel extends AbstractTableModel {
                 public Object run() throws ApplicationException {
                     final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(FieldConstants.OBJECT_IRI));
                     final OWLIndividual individual = owlService.getIndividual(individualIRI);
-                    return owlService.getPropertyValue(individual, FieldConstants.USAGES_COUNT);
+                    final Collection<?> propertyValues = owlService.getPropertyValue(individual, FieldConstants.USAGES_COUNT);
+                    Validation.assertTrue("Invalid count of usages instances", propertyValues.size() < 2);
+                    if (propertyValues.size() == 0) {
+                        return 0;
+                    }
+                    return CollectionUtils.findFirst(propertyValues);
                 }
             });
         }
@@ -78,7 +86,12 @@ public class ResultSetModel extends AbstractTableModel {
                 public Object run() throws ApplicationException {
                     final IRI individualIRI = (IRI) resultSet.getResult(rowIndex, resultSet.getColumnIndex(FieldConstants.OBJECT_IRI));
                     final OWLIndividual individual = owlService.getIndividual(individualIRI);
-                    return owlService.getPropertyValue(individual, FieldConstants.DECLINES_COUNT);
+                    final Collection<?> propertyValues = owlService.getPropertyValue(individual, FieldConstants.DECLINES_COUNT);
+                    Validation.assertTrue("Invalid count of declines instances", propertyValues.size() < 2);
+                    if (propertyValues.size() == 0) {
+                        return 0;
+                    }
+                    return CollectionUtils.findFirst(propertyValues);
                 }
             });
         }

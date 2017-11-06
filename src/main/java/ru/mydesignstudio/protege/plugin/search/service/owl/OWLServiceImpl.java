@@ -62,6 +62,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -269,8 +270,8 @@ public class OWLServiceImpl implements OWLService {
      * @return - аксиома "значение свйойства"
      * @throws ApplicationException
      */
-    private OWLPropertyAssertionAxiom getPropertyAssertionAxiom(OWLIndividual individual, OWLProperty property) throws ApplicationException {
-        // @TODO поправить эту копипасту. чет у меня не получилось прикастовать ровно
+    private Collection<OWLPropertyAssertionAxiom<?, ?>> getPropertyAssertionAxiom(OWLIndividual individual, OWLProperty property) throws ApplicationException {
+        final Collection<OWLPropertyAssertionAxiom<?, ?>> foundAxioms = new ArrayList<>();
         if (property instanceof OWLObjectProperty) {
             final Set<OWLObjectPropertyAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.OBJECT_PROPERTY_ASSERTION);
             final Collection<OWLObjectPropertyAssertionAxiom> subjectAxioms = CollectionUtils.filter(axioms, new Specification<OWLObjectPropertyAssertionAxiom>() {
@@ -279,9 +280,7 @@ public class OWLServiceImpl implements OWLService {
                     return axiom.getSubject().equals(individual) && axiom.getProperty().equals(property);
                 }
             });
-            if (CollectionUtils.isNotEmpty(subjectAxioms)) {
-                return subjectAxioms.iterator().next();
-            }
+            foundAxioms.addAll(subjectAxioms);
         } else if (property instanceof OWLDataProperty) {
             final Set<OWLDataPropertyAssertionAxiom> axioms = getOntology().getAxioms(AxiomType.DATA_PROPERTY_ASSERTION);
             final Collection<OWLDataPropertyAssertionAxiom> subjectAxioms = CollectionUtils.filter(axioms, new Specification<OWLDataPropertyAssertionAxiom>() {
@@ -290,15 +289,13 @@ public class OWLServiceImpl implements OWLService {
                     return axiom.getSubject().equals(individual) && axiom.getProperty().equals(property);
                 }
             });
-            if (CollectionUtils.isNotEmpty(subjectAxioms)) {
-                return subjectAxioms.iterator().next();
-            }
+            foundAxioms.addAll(subjectAxioms);
         }
-        return null;
+        return foundAxioms;
     }
 
     @Override
-    public Object getPropertyValue(OWLIndividual individual, String propertyName) throws ApplicationException {
+    public Collection<?> getPropertyValue(OWLIndividual individual, String propertyName) throws ApplicationException {
         final Set<OWLDataPropertyAssertionAxiom> dataAxioms = getOntology().getAxioms(AxiomType.DATA_PROPERTY_ASSERTION);
         final Collection<OWLDataPropertyAssertionAxiom> dataIndividualAxioms = CollectionUtils.filter(dataAxioms, new Specification<OWLDataPropertyAssertionAxiom>() {
             @Override
@@ -311,7 +308,12 @@ public class OWLServiceImpl implements OWLService {
             }
         });
         if (CollectionUtils.isNotEmpty(dataIndividualAxioms)) {
-            return dataIndividualAxioms.iterator().next().getObject();
+            return CollectionUtils.map(dataIndividualAxioms, new Transformer<OWLDataPropertyAssertionAxiom, Object>() {
+                @Override
+                public Object transform(OWLDataPropertyAssertionAxiom item) {
+                    return item.getObject();
+                }
+            });
         }
         final Set<OWLObjectPropertyAssertionAxiom> objectAxioms = getOntology().getAxioms(AxiomType.OBJECT_PROPERTY_ASSERTION);
         final Collection<OWLObjectPropertyAssertionAxiom> objectIndividualAxioms = CollectionUtils.filter(objectAxioms, new Specification<OWLObjectPropertyAssertionAxiom>() {
@@ -325,18 +327,28 @@ public class OWLServiceImpl implements OWLService {
             }
         });
         if (CollectionUtils.isNotEmpty(objectIndividualAxioms)) {
-            return objectIndividualAxioms.iterator().next().getObject();
+            return CollectionUtils.map(objectIndividualAxioms, new Transformer<OWLObjectPropertyAssertionAxiom, Object>() {
+                @Override
+                public Object transform(OWLObjectPropertyAssertionAxiom item) {
+                    return item.getObject();
+                }
+            });
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
-    public Object getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException {
-        final OWLPropertyAssertionAxiom propertyAssertionAxiom = getPropertyAssertionAxiom(individual, property);
-        if (propertyAssertionAxiom == null) {
-            return null;
+    public Collection<?> getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException {
+        final Collection<OWLPropertyAssertionAxiom<?, ?>> propertyAxioms = getPropertyAssertionAxiom(individual, property);
+        if (CollectionUtils.isEmpty(propertyAxioms)) {
+            return Collections.emptyList();
         }
-        return propertyAssertionAxiom.getObject();
+        return CollectionUtils.map(propertyAxioms, new Transformer<OWLPropertyAssertionAxiom<?,?>, Object>() {
+            @Override
+            public Object transform(OWLPropertyAssertionAxiom<?, ?> item) {
+                return item.getObject();
+            }
+        });
     }
 
     @Override
@@ -394,12 +406,13 @@ public class OWLServiceImpl implements OWLService {
         /**
          * Получим аксиому текущего значения
          */
-        final OWLPropertyAssertionAxiom assertionAxiom = getPropertyAssertionAxiom(individual, property);
-        if (assertionAxiom != null) {
+        final Collection<OWLPropertyAssertionAxiom<?, ?>> assertionAxioms = getPropertyAssertionAxiom(individual, property);
+        if (assertionAxioms.size() == 1) {
             /**
              * Это значение уже есть, надо заменить.
              * Сначала удалим старое значение
              */
+            final OWLPropertyAssertionAxiom<?, ?> assertionAxiom = assertionAxioms.iterator().next();
             final RemoveAxiom removeAxiom = new RemoveAxiom(getOntology(), assertionAxiom);
             manager.applyChange(removeAxiom);
         }

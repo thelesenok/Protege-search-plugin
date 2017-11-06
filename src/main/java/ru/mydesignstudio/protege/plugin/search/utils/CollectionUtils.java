@@ -33,12 +33,13 @@ public class CollectionUtils {
         if (source.size() == 0) {
             return false;
         }
-        return CollectionUtils.some(source, new Specification<ITEM>() {
+        final Specification<ITEM> specification = new Specification<ITEM>() {
             @Override
             public boolean isSatisfied(ITEM item) {
                 return item != null;
             }
-        });
+        };
+        return CollectionUtils.some(source, specification);
     }
 
     /**
@@ -98,6 +99,19 @@ public class CollectionUtils {
             if (specification.isSatisfied(item)) {
                 return item;
             }
+        }
+        return null;
+    }
+
+    /**
+     * Get first value in collection of items.
+     * @param source source collection
+     * @param <ITEM> element type
+     * @return first value of null if collection is empty
+     */
+    public static final <ITEM> ITEM findFirst(Collection<ITEM> source) {
+        if (source.size() > 0) {
+            return source.iterator().next();
         }
         return null;
     }

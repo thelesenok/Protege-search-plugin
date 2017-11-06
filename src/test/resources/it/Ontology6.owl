@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5">
+    <Prefix name="" IRI="http://www.semanticweb.org/thelesenok/ontologies/2017/10/untitled-ontology-5"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <DataProperty IRI="#projectName"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Developer"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#executorName"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasExecutor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Executor"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MS_Office"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Project"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Analyst"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Tester"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MS_Project"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Executor"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
+        <Class abbreviatedIRI="owl:Thing"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Analyst"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Project"/>
+        <NamedIndividual IRI="#MS_Office"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Project"/>
+        <NamedIndividual IRI="#MS_Project"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Executor"/>
+        <NamedIndividual IRI="#Tester"/>
+    </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Office"/>
+        <NamedIndividual IRI="#Analyst"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Office"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Project"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <NamedIndividual IRI="#MS_Project"/>
+        <NamedIndividual IRI="#Tester"/>
+    </ObjectPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Analyst"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">Kate</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Developer"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">Sam</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#projectName"/>
+        <NamedIndividual IRI="#MS_Office"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">MS Office</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#projectName"/>
+        <NamedIndividual IRI="#MS_Project"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">MS Project</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#executorName"/>
+        <NamedIndividual IRI="#Tester"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">Anna</Literal>
+    </DataPropertyAssertion>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasExecutor"/>
+    </FunctionalObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <Class IRI="#Project"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasExecutor"/>
+        <Class IRI="#Executor"/>
+    </ObjectPropertyRange>
+    <DataPropertyDomain>
+        <DataProperty IRI="#executorName"/>
+        <Class IRI="#Executor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#projectName"/>
+        <Class IRI="#Project"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#executorName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#projectName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi -->
+

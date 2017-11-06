@@ -69,10 +69,11 @@ public class ApplyUsagesAction implements Action<Integer> {
             @Override
             public Integer run() throws ApplicationException {
                 int currentValue = 0;
-                final Object propertyValue = owlService.getPropertyValue(record, targetProperty);
-                if (propertyValue != null) {
+                final Collection<?> propertyValues = owlService.getPropertyValue(record, targetProperty);
+                if (CollectionUtils.isNotEmpty(propertyValues)) {
                     // TODO: 04.06.17 костыли какие-то
-                    final OWLLiteralImplInteger integerLiteral = (OWLLiteralImplInteger) propertyValue;
+                    final OWLLiteralImplInteger integerLiteral =
+                            (OWLLiteralImplInteger) CollectionUtils.findFirst(propertyValues);
                     currentValue = Integer.parseInt(integerLiteral.getLiteral());
                 }
                 currentValue++;

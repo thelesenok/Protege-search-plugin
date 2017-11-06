@@ -195,7 +195,7 @@ public class SearchParamsPane extends JPanel {
         for (SearchStrategy enabledStrategy : strategies) {
             params.add(new LookupParam(
                     enabledStrategy,
-                    enabledStrategy.getSearchParamsPane() == null ? null : enabledStrategy.getSearchParamsPane().getSearchParams()
+                    enabledStrategy.getSearchStrategyParams()
             ));
         }
         return params;

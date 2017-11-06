@@ -152,7 +152,7 @@ public interface OWLService {
      * @return - значение свойства
      * @throws ApplicationException
      */
-    Object getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException;
+    Collection<?> getPropertyValue(OWLIndividual individual, OWLProperty property) throws ApplicationException;
 
     /**
      * Значение свойства
@@ -161,7 +161,7 @@ public interface OWLService {
      * @return - значение свойства
      * @throws ApplicationException
      */
-    Object getPropertyValue(OWLIndividual individual, String propertyName) throws ApplicationException;
+    Collection<?> getPropertyValue(OWLIndividual individual, String propertyName) throws ApplicationException;
 
     /**
      * Установить значение свойства

@@ -7,9 +7,10 @@ import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProces
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.component.FuzzyAttributiveParamsComponent;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor.FuzzyAttributiveProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.attributive.processor.FuzzyAttributiveProcessorParams;
 
 import javax.inject.Inject;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -34,6 +35,11 @@ public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
     @Override
     public String getTitle() {
         return "Fuzzy attributive lookup";
+    }
+
+    @Override
+    public FuzzyAttributiveProcessorParams getSearchStrategyParams() {
+        return paramsComponent.getSearchParams();
     }
 
     @Override

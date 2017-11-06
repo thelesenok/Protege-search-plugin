@@ -2,13 +2,15 @@ package ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
 import ru.mydesignstudio.protege.plugin.search.api.search.SearchStrategy;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.FuzzyTaxonomyProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.FuzzyTaxonomyProcessorParams;
 
 import javax.inject.Inject;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 25.06.17.
@@ -31,6 +33,11 @@ public class FuzzyTaxonomySearchStrategy implements SearchStrategy {
     @Override
     public String getTitle() {
         return "Fuzzy taxonomy lookup";
+    }
+
+    @Override
+    public SearchProcessorParams getSearchStrategyParams() {
+        return new FuzzyTaxonomyProcessorParams();
     }
 
     @Override

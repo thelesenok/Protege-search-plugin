@@ -7,9 +7,10 @@ import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrate
 import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 import ru.mydesignstudio.protege.plugin.search.api.service.fuzzy.FuzzyOWLService;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.FuzzyOntologyProcessor;
+import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.ontology.processor.FuzzyOntologyProcessorParams;
 
 import javax.inject.Inject;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 13.05.17.
@@ -29,6 +30,11 @@ public class FuzzyOntologySearchStrategy implements SearchStrategy {
     @Override
     public String getTitle() {
         return "Fuzzy ontology lookup";
+    }
+
+    @Override
+    public FuzzyOntologyProcessorParams getSearchStrategyParams() {
+        return new FuzzyOntologyProcessorParams();
     }
 
     @Override

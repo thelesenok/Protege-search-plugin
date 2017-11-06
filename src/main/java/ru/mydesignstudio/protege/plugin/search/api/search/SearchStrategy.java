@@ -1,10 +1,11 @@
 package ru.mydesignstudio.protege.plugin.search.api.search;
 
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
-import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
+import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.api.search.component.SearchStrategyComponent;
+import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProcessor;
 
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by abarmin on 03.01.17.
@@ -18,6 +19,12 @@ public interface SearchStrategy {
      * @return
      */
     String getTitle();
+
+    /**
+     * Get search strategy params.
+     * @return strategy params
+     */
+    SearchProcessorParams getSearchStrategyParams();
 
     /**
      * Панель конфигурации поиска
