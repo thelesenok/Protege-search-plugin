@@ -13,6 +13,7 @@ import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.Excepti
 import ru.mydesignstudio.protege.plugin.search.service.owl.fuzzy.related.FuzzySimilarClass;
 import ru.mydesignstudio.protege.plugin.search.utils.CollectionUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.InjectionUtils;
+import ru.mydesignstudio.protege.plugin.search.utils.OWLUtils;
 import ru.mydesignstudio.protege.plugin.search.utils.Specification;
 
 import java.util.Collection;
@@ -30,10 +31,12 @@ public class FuzzyTaxonomyRowWeightCalculator implements WeighedRowWeightCalcula
 
     private final FuzzyOWLService fuzzyOWLService;
     private final ExceptionWrapperService wrapperService;
+    private final OWLClass initialFromClass;
 
     public FuzzyTaxonomyRowWeightCalculator(OWLClass initialFromClass) {
         fuzzyOWLService = InjectionUtils.getInstance(FuzzyOWLService.class);
         wrapperService = InjectionUtils.getInstance(ExceptionWrapperService.class);
+        this.initialFromClass = initialFromClass;
         //
         weightMultipliers = wrapperService.invokeWrapped(new ExceptionWrappedCallback<Map<OWLClass, Double>>() {
             @Override
@@ -55,6 +58,20 @@ public class FuzzyTaxonomyRowWeightCalculator implements WeighedRowWeightCalcula
          */
         final OWLIndividual individual = fuzzyOWLService.getIndividual(row.getObjectIRI());
         final Collection<OWLClass> individualClasses = fuzzyOWLService.getIndividualClasses(individual);
+        /**
+         * If initial class and individual's class are equals, weight is 1
+         */
+        if (CollectionUtils.some(individualClasses, new Specification<OWLClass>() {
+            @Override
+            public boolean isSatisfied(OWLClass owlClass) {
+                return OWLUtils.equals(
+                        owlClass,
+                        initialFromClass
+                );
+            }
+        })) {
+            return Weight.maxWeight();
+        }
         /**
          * найдем из всей иерархии классов тот, у которого определен вес в аннотации
          */

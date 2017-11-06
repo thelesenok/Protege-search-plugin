@@ -13,7 +13,9 @@ import ru.mydesignstudio.protege.plugin.search.api.search.processor.SearchProces
 import ru.mydesignstudio.protege.plugin.search.api.service.OWLService;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrappedCallback;
 import ru.mydesignstudio.protege.plugin.search.service.exception.wrapper.ExceptionWrapperService;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.AttributiveProcessorParams;
 import ru.mydesignstudio.protege.plugin.search.strategy.attributive.processor.sparql.query.SparqlQueryConverter;
+import ru.mydesignstudio.protege.plugin.search.strategy.attributive.weight.calculator.AttributiveRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.processor.related.binding.FuzzyQueryCreator;
 import ru.mydesignstudio.protege.plugin.search.strategy.fuzzy.taxonomy.weight.calculator.FuzzyTaxonomyRowWeightCalculator;
 import ru.mydesignstudio.protege.plugin.search.strategy.support.processor.SparqlProcessorSupport;
@@ -37,6 +39,8 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
     private final RelatedQueriesCreator queriesCreator;
     private final ExceptionWrapperService wrapperService;
 
+    private AttributiveProcessorParams attributiveProcessorParams;
+
     @Inject
     public FuzzyTaxonomyProcessor(@FuzzyQueryCreator RelatedQueriesCreator queriesCreator,
                                   final OWLService owlService,
@@ -57,6 +61,16 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
         Validation.assertNotNull("Initial query not provided", initialQuery);
         Validation.assertNotNull("Strategy params not provided", strategyParams);
         Validation.assertNotNull("Other strategies parameters not provided", allParameters);
+
+        /**
+         * Get attributive processor params for future weight calculations
+         */
+        for (SearchProcessorParams parameter : allParameters) {
+            if (parameter instanceof AttributiveProcessorParams) {
+                attributiveProcessorParams = (AttributiveProcessorParams) parameter;
+            }
+        }
+        Validation.assertNotNull("Attributive processor params not provided", attributiveProcessorParams);
 
         /**
          * сохраним исходный запрос
@@ -90,7 +104,12 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
          */
         Collection<ResultSet> relatedData = new ArrayList<>();
         for (SelectQuery query : relatedQueries) {
-            relatedData.add(collect(query));
+            relatedData.add(
+                    toWeightedResultSet(
+                            collect(query),
+                            getAttributiveRowWeightCalculator(initialQuery, attributiveProcessorParams)
+                    )
+            );
         }
         /**
          * проверим, что полученные результаты хоть как-то подходят под параметры поиска
@@ -125,11 +144,16 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
      * @throws ApplicationException
      */
     private ResultSet mergeResultSets(ResultSet sourceData, Collection<ResultSet> relatedData) throws ApplicationException {
-        final WeighedResultSet targetResultSet = new WeighedResultSet(sourceData, getWeightCalculator(initialQuery));
+        final WeighedResultSet targetResultSet = new WeighedResultSet(sourceData, getTaxonomyRowWeightCalculator(initialQuery));
         for (ResultSet resultSet : relatedData) {
-            targetResultSet.addResultSet(resultSet, getWeightCalculator(initialQuery));
+            targetResultSet.addResultSet(resultSet, getTaxonomyRowWeightCalculator(initialQuery));
         }
         return targetResultSet;
+    }
+
+    private WeighedRowWeightCalculator getAttributiveRowWeightCalculator(SelectQuery initialQuery,
+                                                                         AttributiveProcessorParams attributiveProcessorParams) {
+        return new AttributiveRowWeightCalculator(initialQuery, attributiveProcessorParams);
     }
 
     /**
@@ -137,7 +161,7 @@ public class FuzzyTaxonomyProcessor extends SparqlProcessorSupport implements Se
      * @param initialQuery - запрос, который исходно ввел пользователь
      * @return
      */
-    private WeighedRowWeightCalculator getWeightCalculator(SelectQuery initialQuery) {
+    private WeighedRowWeightCalculator getTaxonomyRowWeightCalculator(SelectQuery initialQuery) {
         return new FuzzyTaxonomyRowWeightCalculator(initialQuery.getFrom().getOwlClass());
     }
 }
