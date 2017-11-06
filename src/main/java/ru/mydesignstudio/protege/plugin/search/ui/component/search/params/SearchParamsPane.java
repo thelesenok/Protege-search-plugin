@@ -54,7 +54,9 @@ public class SearchParamsPane extends JPanel {
 
     @Inject
     public SearchParamsPane(SearchStrategyService strategyService,
-			SearchStrategySerializationService serializationService, ExceptionWrapperService wrapperService) {
+                            SearchStrategySerializationService serializationService,
+                            ExceptionWrapperService wrapperService) {
+
 		this.strategyService = strategyService;
 		this.serializationService = serializationService;
 		this.wrapperService = wrapperService;
