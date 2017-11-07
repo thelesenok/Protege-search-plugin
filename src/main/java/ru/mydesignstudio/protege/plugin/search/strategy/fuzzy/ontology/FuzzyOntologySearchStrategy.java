@@ -29,7 +29,7 @@ public class FuzzyOntologySearchStrategy implements SearchStrategy {
 
     @Override
     public String getTitle() {
-        return "Fuzzy ontology lookup";
+        return "Fuzzy attributive lookup";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FuzzyOntologySearchStrategy implements SearchStrategy {
 
     @Override
     public int getOrder() {
-        return 4;
+        return 11;
     }
 
     @Override

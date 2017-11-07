@@ -57,7 +57,7 @@ public class FuzzyTaxonomySearchStrategy implements SearchStrategy {
 
     @Override
     public int getOrder() {
-        return 2;
+        return 12;
     }
 
     @Override

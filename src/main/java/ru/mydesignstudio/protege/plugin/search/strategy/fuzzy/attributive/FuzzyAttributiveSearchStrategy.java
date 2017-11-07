@@ -34,7 +34,7 @@ public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
 
     @Override
     public String getTitle() {
-        return "Fuzzy attributive lookup";
+        return "Fuzzy like lookup";
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FuzzyAttributiveSearchStrategy implements SearchStrategy {
 
     @Override
     public int getOrder() {
-        return 3;
+        return 10;
     }
 
     @Override
