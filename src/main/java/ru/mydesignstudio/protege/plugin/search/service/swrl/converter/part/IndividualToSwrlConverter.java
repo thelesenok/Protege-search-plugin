@@ -49,12 +49,22 @@ public class IndividualToSwrlConverter implements SwrlConverter<OWLIndividual> {
          * Конвертируем
          */
         final Collection<String> parts = new ArrayList<>();
-        parts.add(prefixResolver.extractPrefix(individualClass.getIRI()));
-        parts.add(":");
+        final String typePrefix = prefixResolver.extractPrefix(individualClass.getIRI());
+        if (StringUtils.isNotBlank(typePrefix)) {
+            parts.add(typePrefix);
+            parts.add(":");
+        } else {
+            parts.add("#");
+        }
         parts.add(individualClass.getIRI().getFragment());
         parts.add("(");
-        parts.add(prefixResolver.extractPrefix(individual.getIRI()));
-        parts.add(":");
+        final String individualPrefix = prefixResolver.extractPrefix(individual.getIRI());
+        if (StringUtils.isNotBlank(individualPrefix)) {
+            parts.add(individualPrefix);
+            parts.add(":");
+        } else {
+            parts.add("#");
+        }
         parts.add(individualName);
         parts.add(")");
         return StringUtils.join(parts, "");

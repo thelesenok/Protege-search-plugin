@@ -123,4 +123,13 @@ public class StringUtils {
         }
         return characters;
     }
+
+    /**
+     * Check is provided string not blank.
+     * @param value - provided string
+     * @return is blank
+     */
+    public static boolean isNotBlank(final String value) {
+        return value != null && value.trim().length() > 0;
+    }
 }

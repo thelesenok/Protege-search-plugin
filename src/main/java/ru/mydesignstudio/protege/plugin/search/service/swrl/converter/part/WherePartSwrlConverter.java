@@ -105,8 +105,16 @@ public class WherePartSwrlConverter implements CollectionItemSwrlConverter<Pair<
         final String propertyPrefix = prefixResolver.extractPrefix(pathField.getOwlClass().getIRI());
         final String propertyName = getPropertyName(pathField.getProperty());
         //
-        final String relation = propertyPrefix + ":" + propertyName + "(?" + sourceVariable + ", ?" + relationVariable + ")";
-        return new Pair<>(relationVariable, relation);
+        final StringBuilder relation = new StringBuilder();
+        if (StringUtils.isNotBlank(propertyPrefix)) {
+            relation.append(propertyPrefix);
+            relation.append(":");
+        } else {
+            relation.append("#");
+        }
+        relation.append(propertyName);
+        relation.append("(?" + sourceVariable + ", ?" + relationVariable + ")");
+        return new Pair<>(relationVariable, relation.toString());
     }
 
     private String convertCondition(LogicalOperation logicalOperation, Object value, int partNumber) throws ApplicationException {
@@ -168,8 +176,13 @@ public class WherePartSwrlConverter implements CollectionItemSwrlConverter<Pair<
      */
     private String convertProperty(String propertyOwnerVariable, OWLProperty property, int partNumber) throws ApplicationException {
         final Collection<String> parts = new ArrayList<>();
-        parts.add(prefixResolver.extractPrefix(property.getIRI()));
-        parts.add(":");
+        final String prefix = prefixResolver.extractPrefix(property.getIRI());
+        if (StringUtils.isNotBlank(prefix)) {
+            parts.add(prefix);
+            parts.add(":");
+        } else {
+            parts.add("#");
+        }
         parts.add(getPropertyName(property));
         parts.add("(?" + propertyOwnerVariable + ", ?prop" + partNumber + ")");
         //

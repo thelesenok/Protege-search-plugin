@@ -22,4 +22,24 @@ public class StringUtilsTest {
         //
         Assert.assertEquals("Substring extraction exception", "bbb", parsed);
     }
+
+    @Test
+    public void testIsNotBlank() throws Exception {
+        Assert.assertTrue(
+                "Invalid not blank detection",
+                StringUtils.isNotBlank(" a ")
+        );
+        Assert.assertTrue(
+                "Invalid not blank detection",
+                StringUtils.isNotBlank("a")
+        );
+        Assert.assertFalse(
+                "Invalid not blank detection",
+                StringUtils.isNotBlank("")
+        );
+        Assert.assertFalse(
+                "Invalid not blank detection",
+                StringUtils.isNotBlank("     ")
+        );
+    }
 }

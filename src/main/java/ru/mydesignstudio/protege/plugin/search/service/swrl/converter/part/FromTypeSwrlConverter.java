@@ -30,8 +30,13 @@ public class FromTypeSwrlConverter implements SwrlConverter<FromType> {
         final OWLClass owlClass = part.getOwlClass();
         //
         final Collection<String> parts = new ArrayList<>();
-        parts.add(prefixResolver.extractPrefix(owlClass.getIRI()));
-        parts.add(":");
+        final String prefix = prefixResolver.extractPrefix(owlClass.getIRI());
+        if (StringUtils.isNotBlank(prefix)) {
+            parts.add(prefix);
+            parts.add(":");
+        } else {
+            parts.add("#");
+        }
         parts.add(owlClass.getIRI().getFragment());
         parts.add("(");
         parts.add("?" + FieldConstants.OBJECT_IRI);

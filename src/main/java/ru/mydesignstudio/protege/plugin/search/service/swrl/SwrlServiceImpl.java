@@ -2,6 +2,8 @@ package ru.mydesignstudio.protege.plugin.search.service.swrl;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swrlapi.core.SWRLAPIRule;
 import org.swrlapi.core.SWRLRuleEngine;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
@@ -26,6 +28,7 @@ import java.util.Collection;
  */
 @Component
 public class SwrlServiceImpl implements SwrlService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwrlServiceImpl.class);
     private final SelectQueryToSwrlConverter queryToSwrlConverter;
     private final OWLService owlService;
     private final SwrlEngineManager engineManager;
@@ -77,6 +80,7 @@ public class SwrlServiceImpl implements SwrlService {
         try {
             return engine.createSWRLRule(ruleName, swrlRule);
         } catch (Exception e) {
+            LOGGER.error("Can't create SWRL rule with text {}", swrlRule);
             throw new ApplicationException(e);
         }
     }
