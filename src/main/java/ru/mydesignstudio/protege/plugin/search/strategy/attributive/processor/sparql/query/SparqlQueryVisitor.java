@@ -4,6 +4,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLPropertyRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mydesignstudio.protege.plugin.search.api.annotation.Component;
 import ru.mydesignstudio.protege.plugin.search.api.common.Triplet;
 import ru.mydesignstudio.protege.plugin.search.api.exception.ApplicationException;
@@ -40,6 +42,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
     private static final String OBJECT = "object";
     private static final AtomicInteger variableIndex = new AtomicInteger(0);
     private static final String NEW_LINE = "\n";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlQueryVisitor.class);
     private final Map<String, String> prefixes = new HashMap<String, String>();
 
     private final OWLService owlService;
@@ -241,6 +244,7 @@ public class SparqlQueryVisitor implements FromTypeVisitor, SelectQueryVisitor, 
             builder.append(NEW_LINE);
         }
         builder.append(" }");
+        LOGGER.info("Sparql Query: {}", builder.toString());
         return builder.toString();
     }
 
